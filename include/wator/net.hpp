@@ -1,5 +1,5 @@
 #pragma once
-#include <ifstream>
+#include <fstream>
 using namespace std;
 namespace Wator {
   class Net {
