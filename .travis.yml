@@ -4,8 +4,6 @@ compiler:
 
 # Setup different environments to test
 env:
-  - CPP14=0
-  - CPP14=1
 
 # Setup repos etc before installation
 before_install:
@@ -14,7 +12,7 @@ before_install:
 
 # Install dependencies
 install:
-  # install clang-3.4 if CPP14==1
+  # install clang
   - sudo apt-get install --allow-unauthenticated -qq clang cmake
 
 # command to run tests
