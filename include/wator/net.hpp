@@ -6,5 +6,5 @@ namespace Wator {
     public: 
       Net();
       Net(const ifstream &in);
-  }
+  };
 }
