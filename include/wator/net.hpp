@@ -1,10 +1,10 @@
 #pragma once
-#include <ifsteam>
+#include <ifstream>
 using namespace std;
 namespace Wator {
   class Net {
     public: 
       Net();
-      Net(const ifsteam &in);
+      Net(const ifstream &in);
   }
 }
