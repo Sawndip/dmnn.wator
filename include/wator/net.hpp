@@ -1,4 +1,4 @@
 #pragma once
-namespace WatorNet {
+namespace Wator {
   
 }
