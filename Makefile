@@ -1,6 +1,6 @@
 OBJ :=$(shell pwd)/object
 all:
-	unmae -a
+	uname -a
 	mkdir -p $(OBJ)
 	cd $(OBJ) && cmake ../
 	cd $(OBJ) && make
