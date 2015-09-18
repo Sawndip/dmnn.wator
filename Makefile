@@ -1,6 +1,9 @@
 OBJ :=$(shell pwd)/object
-all:
+build:
 	uname -a
 	mkdir -p $(OBJ)
 	cd $(OBJ) && cmake ../
 	cd $(OBJ) && make
+test:build
+	cd $(OBJ) && 
+	
