@@ -5,5 +5,5 @@ build:
 	cd $(OBJ) && cmake ../
 	cd $(OBJ) && make
 test:build
-	cd $(OBJ) && test/run/test
+	cd $(OBJ) && test/test
 	
