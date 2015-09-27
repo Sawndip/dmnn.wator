@@ -1,10 +1,15 @@
 #pragma once
 #include <fstream>
+#include <memory>
 using namespace std;
+
 namespace Wator {
-  class LayerBase {
-    public: 
-      LayerBase();
-      LayerBase(const ifstream &in);
-  };
+    class Blob;
+    class LayerBase {
+    public:
+        explicit LayerBase();
+        explicit LayerBase(const ifstream &in);
+    protected:
+        shared_ptr<Blob> blob_;
+    };
 }
