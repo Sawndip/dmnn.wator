@@ -13,7 +13,7 @@ before_install:
 # Install dependencies
 install:
   # install clang
-  - sudo apt-get install --allow-unauthenticated -qq clang cmake libboost-all-dev
+  - sudo apt-get install --allow-unauthenticated -qq clang cmake libboost-all-dev libopencv-dev
 
 # command to run tests
 script: 
