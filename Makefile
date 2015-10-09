@@ -6,6 +6,8 @@ build:
 	cd $(OBJ) && make
 test:build
 	-cd $(OBJ) && test/test_wator
+run:build
+	-cd $(OBJ) && tools/wator
 	
 clean:
 	rm -rf $(OBJ)

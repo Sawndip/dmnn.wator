@@ -29,7 +29,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <wator.hpp>
 #include <boost/program_options.hpp>
-int main(int ac,char *av[])
-{
-	return 0;
+namespace po = boost::program_options;
+
+int main(int ac,char *av[]){
+    po::options_description opt("option");
+    opt.add_options()
+    ("help,h", "show help")
+    ("configure,c", po::value<std::string>(), "configure file ");
+    po::variables_map vm;
+    try {
+        po::store(po::parse_command_line(ac, av, opt), vm);
+    } catch(const po::error_with_option_name& e) {
+        std::cout << e.what() << std::endl;
+        return 1;
+    }
+    po::notify(vm);
+    
+    if (vm.count("help")) {
+        std::cout << opt << std::endl;
+    }
+    return 0;
 }
