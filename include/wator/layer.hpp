@@ -34,9 +34,20 @@ using namespace std;
 
 namespace Wator {
     class Blob;
+    /**
+     * BaseLayer Base of all type Net layers.
+     **/ 
     class LayerBase {
     public:
+        /**
+         * Constructor 
+        **/
         explicit LayerBase();
+
+        /**
+         * Constructor 
+         * @param [in] layer parameter.
+        **/
         explicit LayerBase(const ifstream &in);
     protected:
         shared_ptr<Blob> blob_;
