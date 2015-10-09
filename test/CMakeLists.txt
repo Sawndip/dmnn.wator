@@ -1,4 +1,4 @@
-add_definitions(-DBOOST_TEST_DYN_LINK)
+#add_definitions(-DBOOST_TEST_DYN_LINK)
 
 file(GLOB __CXX *.cpp)
 

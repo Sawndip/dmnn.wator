@@ -5,5 +5,7 @@ build:
 	cd $(OBJ) && cmake ../
 	cd $(OBJ) && make
 test:build
-	cd $(OBJ) && test/test_wator
+	-cd $(OBJ) && test/test_wator
 	
+clean:
+	rm -rf $(OBJ)
