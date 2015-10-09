@@ -40,23 +40,23 @@ namespace Wator {
     class Net {
     public:
         /**
-         * constructor
+         * Constructor
         **/
         explicit Net();
 
         /**
-         * constructor
+         * Constructor
          * @param [in] setting information
         **/
         explicit Net(const ifstream &in);
 
         /**
-         * train net
+         * Train net
         **/
         void train();
 
         /**
-         * test net
+         * Test net
         **/
         void test();
     private:
