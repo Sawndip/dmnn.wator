@@ -34,10 +34,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace std;
 namespace Wator {
     class LayerBase;
+    /**
+     * Neural Net.
+     **/
     class Net {
     public:
+        /**
+         * constructor
+        **/
         explicit Net();
+
+        /**
+         * constructor
+         * @param [in] setting information
+        **/
         explicit Net(const ifstream &in);
+
+        /**
+         * train net
+        **/
+        void train();
+
+        /**
+         * test net
+        **/
+        void test();
     private:
         vector<shared_ptr<LayerBase> > layers_;
     };
