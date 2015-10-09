@@ -28,9 +28,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
-#include <fstream>
 #include <memory>
 using namespace std;
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+using namespace boost::property_tree;
 
 namespace Wator {
     class Blob;
@@ -46,9 +49,9 @@ namespace Wator {
 
         /**
          * Constructor 
-         * @param [in] layer parameter.
+         * @param [in] info layer parameter.
         **/
-        explicit LayerBase(const ifstream &in);
+        explicit LayerBase(const ptree& info);
     protected:
         shared_ptr<Blob> blob_;
     };
