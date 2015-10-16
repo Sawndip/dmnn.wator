@@ -55,7 +55,7 @@ namespace Wator {
         explicit LayerBase(const ptree& info);
     protected:
         shared_ptr<Blob> blob_;
-        int threshold_;
+        float threshold_;
         vector<float> activeWeight_;
         vector<float> deactiveWeight_;
         vector<float> weight_;
