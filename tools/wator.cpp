@@ -36,6 +36,12 @@ int main(int ac,char *av[]){
     opt.add_options()
     ("help,h", "show help")
     ("configure,c", po::value<std::string>(), "configure file ");
+    
+    po::positional_options_description pos_opt("positional option");
+    pos_opt.add_options()
+    ("train", "train or finetune a model")
+    ("test", "score a model");
+
     po::variables_map vm;
     try {
         po::store(po::parse_command_line(ac, av, opt), vm);
