@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 #include <memory>
+#include <vector>
 using namespace std;
 
 #include <boost/property_tree/ptree.hpp>
@@ -54,5 +55,9 @@ namespace Wator {
         explicit LayerBase(const ptree& info);
     protected:
         shared_ptr<Blob> blob_;
+        int threshold_;
+        vector<float> activeWeight_;
+        vector<float> deactiveWeight_;
+        vector<float> weight_;
     };
 }
