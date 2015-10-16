@@ -30,4 +30,5 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 #include <wator/net.hpp>
 #include <wator/layer.hpp>
+#include <wator/blob.hpp>
 #include <wator/layer_image.hpp>
