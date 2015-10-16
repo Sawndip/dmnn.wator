@@ -49,6 +49,12 @@ namespace Wator {
          * @param [in] setting information
         **/
         explicit Net(const ifstream &in);
+        
+        /**
+         * Constructor
+         * @param [in] layer
+        **/
+        Net& operator << (shared_ptr<LayerBase> layer);
 
         /**
          * Train net
