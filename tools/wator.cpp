@@ -44,7 +44,7 @@ int main(int ac,char *av[]){
 
     po::variables_map vm;
     try {
-        po::store(po::parse_command_line(ac, av, opt), vm);
+        po::store(po::parse_command_line(ac, av).options(opt).positional(pos_opt).run(), vm);
     } catch(const po::error_with_option_name& e) {
         std::cout << e.what() << std::endl;
         return 1;
