@@ -34,9 +34,32 @@ using namespace Wator;
 #include <boost/property_tree/json_parser.hpp>
 using namespace boost::property_tree;
 
+/**
+ * Constructor
+**/
 Net::Net()
 {
 }
+/**
+ * Constructor
+ * @param [in] setting information
+**/
 Net::Net(const ifstream &in)
 {
+}
+ /**
+ * Connect a Layer to Net.
+ * @param [in] layer
+**/
+Net& Net::operator << (shared_ptr<LayerBase> layer)
+{
+  this->layers_.push_back(layer);
+  return *this;
+}
+/**
+ * Train net
+**/
+void Net::train()
+{
+  
 }
