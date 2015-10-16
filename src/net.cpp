@@ -61,5 +61,19 @@ Net& Net::operator << (shared_ptr<LayerBase> layer)
 **/
 void Net::train()
 {
-  
+  for(auto layout :layers_)
+  {
+    layout->forward();
+  }
 }
+/**
+ * Test net
+**/
+void Net::test()
+{
+  for(auto layout :layers_)
+  {
+    layout->forward();
+  }
+}
+        
