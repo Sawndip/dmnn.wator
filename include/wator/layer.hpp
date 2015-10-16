@@ -43,6 +43,7 @@ namespace Wator {
      **/ 
     class LayerBase {
     public:
+    protected:
         /**
          * Constructor 
         **/
@@ -53,6 +54,13 @@ namespace Wator {
          * @param [in] info layer parameter.
         **/
         explicit LayerBase(const ptree& info);
+
+        /**
+         * forward 
+         * @return None.
+        **/
+        virtual void forward(void);
+
     protected:
         shared_ptr<Blob> blob_;
         float threshold_;
