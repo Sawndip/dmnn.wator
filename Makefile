@@ -9,8 +9,8 @@ pre-build:
 ut:build
 	build/test/test_wator
 test:build
-	build/tools/wator -p test
+	build/tools/wator -p test -c model/retina/model.conf
 train:build
-	build/tools/wator -p train	
+	build/tools/wator -p train -c model/retina/model.conf	
 clean:
 	rm -rf $(OBJ)
