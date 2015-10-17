@@ -37,6 +37,9 @@ using namespace std;
 namespace Wator {
     class ImageLayer :public LayerBase {
     public:
+        /**
+         * Constructor
+         **/
         explicit ImageLayer();
     private:
         cv::Mat data_;

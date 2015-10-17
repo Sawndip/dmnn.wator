@@ -27,54 +27,16 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <memory>
-using namespace std;
-#include <wator.hpp>
+#include "wator.hpp"
 using namespace Wator;
-#include <boost/program_options.hpp>
-namespace po = boost::program_options;
 
-static void train(void){
-    Net net;
-    shared_ptr<ImageLayer> img(new ImageLayer);
-    net << img;
-}
-static void test(void){
-    
-}
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+using namespace boost::property_tree;
 
-int main(int ac,char *av[]){
-    po::options_description opt("option");
-    opt.add_options()
-    ("help,h", "show help")
-    ("mode,m", po::value<std::string>(), "run mode test train")
-    ("configure,c", po::value<std::string>(), "configure file ");
-    
-    po::variables_map vm;
-    try {
-        auto parser = po::command_line_parser(ac, av);
-        po::store(parser.options(opt).run(), vm);
-        po::notify(vm);
-        
-        if (vm.count("help")) {
-            std::cout << opt << std::endl;
-        }
-        if (vm.count("configure")) {
-            std::cout << vm["configure"].as<std::string>() << std::endl;
-        }
-        if (vm.count("mode")) {
-            auto action = vm["mode"].as<std::string>();
-            std::cout << action << std::endl;
-            if("test"==action){
-                test();
-            }
-            if("train"==action){
-                train();
-            }
-        }
-    } catch(const po::error_with_option_name& e) {
-        std::cout << e.what() << std::endl;
-        return 1;
-    }
-    return 0;
+/**
+ * Constructor
+ **/
+ImageLayer::ImageLayer()
+{
 }
