@@ -62,10 +62,10 @@ namespace Wator {
 
     protected:
         shared_ptr<Blob> blob_;
-        float threshold_;
-        vector<float> activeWeight_;
-        vector<float> deactiveWeight_;
-        vector<float> weight_;
+        int threshold_;
+        vector<int> activeWeight_;
+        vector<int> deactiveWeight_;
+        vector<int> weight_;
     };
 
     /**

@@ -9,8 +9,8 @@ pre-build:
 ut:build
 	build/test/test_wator
 test:build
-	build/tools/wator -m test
+	build/tools/wator -p test
 train:build
-	build/tools/wator -m train	
+	build/tools/wator -p train	
 clean:
 	rm -rf $(OBJ)

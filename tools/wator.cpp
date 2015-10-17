@@ -47,8 +47,9 @@ int main(int ac,char *av[]){
     po::options_description opt("option");
     opt.add_options()
     ("help,h", "show help")
-    ("mode,m", po::value<std::string>(), "run mode test train")
-    ("configure,c", po::value<std::string>(), "configure file ");
+    ("phase,p", po::value<std::string>(), "phase test train")
+    ("snapshot,s", po::value<std::string>(), "snapshot nn mode")
+    ("configure,c", po::value<std::string>(), "net configure file ");
     
     po::variables_map vm;
     try {
@@ -62,8 +63,8 @@ int main(int ac,char *av[]){
         if (vm.count("configure")) {
             std::cout << vm["configure"].as<std::string>() << std::endl;
         }
-        if (vm.count("mode")) {
-            auto action = vm["mode"].as<std::string>();
+        if (vm.count("phase")) {
+            auto action = vm["phase"].as<std::string>();
             std::cout << action << std::endl;
             if("test"==action){
                 test();
