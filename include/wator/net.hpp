@@ -34,8 +34,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace std;
 namespace Wator {
     class LayerBase;
+    
+    
+    
     /**
-     * Neural Net.
+     * NeuralNetParam.
+     **/
+    struct NetParam {
+        bool endless_ = false;
+        int iter_ = 1000*1000;
+    };
+    /**
+     * Net.
      **/
     class Net {
     public:
@@ -67,5 +77,8 @@ namespace Wator {
         void test();
     private:
         vector<shared_ptr<LayerBase> > layers_;
+        
+        /// configureable
+        NetParam param_;
     };
 }
