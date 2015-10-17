@@ -57,3 +57,35 @@ void LayerBase::forward(void)
 {
 }
 
+
+
+/**
+ * Constructor
+ **/
+LayerInput::LayerInput()
+{
+}
+
+/**
+ * Constructor
+ * @param [in] info layer parameter.
+ **/
+LayerInput::LayerInput(const ptree& info)
+{
+}
+
+/**
+ * Constructor
+ **/
+LayerOutput::LayerOutput()
+{
+}
+
+/**
+ * Constructor
+ * @param [in] info layer parameter.
+ **/
+LayerOutput::LayerOutput(const ptree& info)
+{
+}
+

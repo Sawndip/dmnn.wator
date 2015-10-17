@@ -35,7 +35,7 @@ using namespace std;
 #include <opencv2/core/core.hpp>
 
 namespace Wator {
-    class ImageLayer :public LayerBase {
+    class ImageLayer :public LayerInput {
     public:
         /**
          * Constructor

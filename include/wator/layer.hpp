@@ -67,4 +67,45 @@ namespace Wator {
         vector<float> deactiveWeight_;
         vector<float> weight_;
     };
+
+    /**
+     * LayerInput Base of all type Net layers.
+     **/
+    class LayerInput :public LayerBase{
+    public:
+    protected:
+        /**
+         * Constructor
+         **/
+        explicit LayerInput();
+        
+        /**
+         * Constructor
+         * @param [in] info layer parameter.
+         **/
+        explicit LayerInput(const ptree& info);
+        
+    protected:
+    };
+
+    /**
+     * LayerInput Base of all type Net layers.
+     **/
+    class LayerOutput :public LayerBase{
+    public:
+    protected:
+        /**
+         * Constructor
+         **/
+        explicit LayerOutput();
+        
+        /**
+         * Constructor
+         * @param [in] info layer parameter.
+         **/
+        explicit LayerOutput(const ptree& info);
+        
+    protected:
+    };
+    
 }
