@@ -28,84 +28,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
+#include <fstream>
 #include <memory>
-#include <vector>
 using namespace std;
-
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-using namespace boost::property_tree;
+#include "wator/layer.hpp"
+#include <opencv2/core/core.hpp>
 
 namespace Wator {
-    class Blob;
-    /**
-     * BaseLayer Base of all type Net layers.
-     **/ 
-    class LayerBase {
+    class PolarizerLayer :public LayerBase {
     public:
         /**
-         * forward
-         * @return None.
+         * Constructor
          **/
-        virtual void forward(void);
-    protected:
-        /**
-         * Constructor 
-        **/
-        explicit LayerBase();
-
-        /**
-         * Constructor 
-         * @param [in] info layer parameter.
-        **/
-        explicit LayerBase(const ptree& info);
-
-    protected:
-        shared_ptr<Blob> blob_;
-        int threshold_;
-        vector<int> activeWeight_;
-        vector<int> deactiveWeight_;
-        vector<int> weight_;
+        explicit PolarizerLayer();
+    private:
     };
-
-    /**
-     * LayerInput Base of Input layers.
-     **/
-    class LayerInput :public LayerBase{
-    public:
-    protected:
-        /**
-         * Constructor
-         **/
-        explicit LayerInput();
-        
-        /**
-         * Constructor
-         * @param [in] info layer parameter.
-         **/
-        explicit LayerInput(const ptree& info);
-        
-    protected:
-    };
-
-    /**
-     * LayerOutput Base of Output layers.
-     **/
-    class LayerOutput :public LayerBase{
-    public:
-    protected:
-        /**
-         * Constructor
-         **/
-        explicit LayerOutput();
-        
-        /**
-         * Constructor
-         * @param [in] info layer parameter.
-         **/
-        explicit LayerOutput(const ptree& info);
-        
-    protected:
-    };
-    
 }
