@@ -38,6 +38,9 @@ static void train(void){
     Net net;
     shared_ptr<ImageLayer> img(new ImageLayer);
     net << img;
+    shared_ptr<PolarizerLayer> polazier(new PolarizerLayer);
+    net << polazier;
+    
 }
 static void test(void){
     
