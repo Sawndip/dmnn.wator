@@ -61,7 +61,7 @@ Net& Net::operator << (shared_ptr<LayerBase> layer)
 **/
 void Net::train()
 {
-    for(int i=0;i<param_.iter_;i++)
+    for(int i = 0;i < param_.iter_ ; i++)
     {
         for(auto layout :layers_)
         {

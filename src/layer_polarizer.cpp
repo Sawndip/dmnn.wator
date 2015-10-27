@@ -40,3 +40,10 @@ using namespace boost::property_tree;
 PolarizerLayer::PolarizerLayer()
 {
 }
+/**
+ * forward
+ * @return None.
+ **/
+void PolarizerLayer::forward(void)
+{
+}

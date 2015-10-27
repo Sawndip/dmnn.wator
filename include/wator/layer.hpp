@@ -85,6 +85,11 @@ namespace Wator {
          **/
         explicit LayerInput(const ptree& info);
         
+        /**
+         * forward
+         * @return None.
+         **/
+        virtual void forward(void);
     protected:
     };
 

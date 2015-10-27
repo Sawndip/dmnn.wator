@@ -74,6 +74,16 @@ LayerInput::LayerInput(const ptree& info)
 {
 }
 
+
+/**
+ * forward
+ * @return None.
+ **/
+void LayerInput::forward(void)
+{
+}
+
+
 /**
  * Constructor
  **/

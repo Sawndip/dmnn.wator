@@ -33,6 +33,11 @@ using namespace std;
 using namespace Wator;
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
+#include <boost/log/trivial.hpp>
+#include <boost/log/core.hpp>
+#include <boost/log/expressions.hpp>
+namespace log = boost::log;
+
 
 static void train(void){
     Net net;
@@ -47,6 +52,9 @@ static void test(void){
 }
 
 int main(int ac,char *av[]){
+    
+    log::core::get()->set_filter(log::trivial::severity >= log::trivial::trace);
+    
     po::options_description opt("option");
     opt.add_options()
     ("help,h", "show help")

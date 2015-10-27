@@ -41,6 +41,12 @@ namespace Wator {
          * Constructor
          **/
         explicit PolarizerLayer();
+        
+        /**
+         * forward
+         * @return None.
+         **/
+        virtual void forward(void);
     private:
     };
 }

@@ -35,13 +35,26 @@ using namespace std;
 #include <opencv2/core/core.hpp>
 
 namespace Wator {
+    /**
+     * NeuralNetParam.
+     **/
+    struct ImageLayerParam {
+        string root_ = "data/retina/";
+    };
     class ImageLayer :public LayerInput {
     public:
         /**
          * Constructor
          **/
         explicit ImageLayer();
+        
+        /**
+         * forward
+         * @return None.
+         **/
+        virtual void forward(void);
     private:
-        cv::Mat data_;
+        cv::Mat mat_;
+        ImageLayerParam param_;
     };
 }
