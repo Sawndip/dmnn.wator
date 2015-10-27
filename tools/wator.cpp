@@ -40,7 +40,7 @@ static void train(void){
     net << img;
     shared_ptr<PolarizerLayer> polazier(new PolarizerLayer);
     net << polazier;
-    
+    net.train();
 }
 static void test(void){
     
