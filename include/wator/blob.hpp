@@ -45,10 +45,9 @@ namespace Wator {
 
         /**
          * Constructor
-         * @param [in] setting information
-        **/
-        explicit Blob(const ifstream &in);
-        
+         * @param [in] size 
+         **/
+        explicit Blob(int size);
     private:
     };
 }

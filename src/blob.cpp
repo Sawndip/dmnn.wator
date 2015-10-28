@@ -30,63 +30,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "wator.hpp"
 using namespace Wator;
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-using namespace boost::property_tree;
-
-#include <boost/log/trivial.hpp>
-#include <boost/log/core.hpp>
-#include <boost/log/expressions.hpp>
-
-#define DEBUG_VAR(x) {BOOST_LOG_TRIVIAL(debug) << #x << "=<" << x << ">" <<endl;}
-#define TRACE_VAR(x) {BOOST_LOG_TRIVIAL(trace) << #x << "=<" << x << ">" <<endl;}
-
-
-#include <boost/filesystem.hpp>
-#include <boost/foreach.hpp>
-namespace fs = boost::filesystem;
-
-#include <opencv2/core/core.hpp>
-#include <opencv2/opencv.hpp>
-
 
 /**
  * Constructor
  **/
-ImageLayer::ImageLayer()
+Blob::Blob()
 {
 }
+
 /**
- * forward
- * @return None.
+ * Constructor
+ * @param [in] size
  **/
-void ImageLayer::forward(void)
+Blob::Blob(int size)
 {
-    TRACE_VAR(param_.root_);
-    const fs::path path(param_.root_);
-    BOOST_FOREACH(const fs::path& p, std::make_pair(fs::recursive_directory_iterator(path),fs::recursive_directory_iterator())){
-        if (!fs::is_directory(p)){
-            auto extension = p.extension().string();
-            if(".jpg" == extension || ".png" == extension ||
-               ".JPG" == extension || ".PNG" == extension){
-                TRACE_VAR(p);
-                mat_ = cv::imread(p.string());
-                pump();
-            }
-        }
-    }
-}
-void ImageLayer::pump(void)
-{
-    std::vector<cv::Mat> planes;
-    cv::split(mat_, planes);
-    blob_ = shared_ptr<Blob>(new Blob(mat_.channels() * mat_.cols * mat_.rows));
-    for(auto &mat:planes){
-        for(int x = 0;x < mat.cols;x++){
-            for(int y = 0;y < mat.rows;y++){
-                auto byte = mat.at<unsigned char>(y, x);
-                
-            }
-        }
-    }
 }
