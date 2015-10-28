@@ -54,6 +54,8 @@ namespace Wator {
          **/
         virtual void forward(void);
     private:
+        void pump(void);
+    private:
         cv::Mat mat_;
         ImageLayerParam param_;
     };

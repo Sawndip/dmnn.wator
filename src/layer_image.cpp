@@ -39,6 +39,7 @@ using namespace boost::property_tree;
 #include <boost/log/expressions.hpp>
 
 #define DEBUG_VAR(x) {BOOST_LOG_TRIVIAL(debug) << #x << "=<" << x << ">" <<endl;}
+#define TRACE_VAR(x) {BOOST_LOG_TRIVIAL(trace) << #x << "=<" << x << ">" <<endl;}
 
 
 #include <boost/filesystem.hpp>
@@ -61,16 +62,25 @@ ImageLayer::ImageLayer()
  **/
 void ImageLayer::forward(void)
 {
-    DEBUG_VAR(param_.root_);
+    TRACE_VAR(param_.root_);
     const fs::path path(param_.root_);
     BOOST_FOREACH(const fs::path& p, std::make_pair(fs::recursive_directory_iterator(path),fs::recursive_directory_iterator())){
         if (!fs::is_directory(p)){
-            DEBUG_VAR(p.extension().string());
-            if(".jpg" == p.extension().string() || ".png" == p.extension().string() ||
-               ".JPG" == p.extension().string() || ".PNG" == p.extension().string()){
-                DEBUG_VAR(p);
+            auto extension = p.extension().string();
+            if(".jpg" == extension || ".png" == extension ||
+               ".JPG" == extension || ".PNG" == extension){
+                TRACE_VAR(p);
                 mat_ = cv::imread(p.string());
+                pump();
             }
+        }
+    }
+}
+void ImageLayer::pump(void)
+{
+    for(int x = 0;x < mat_.width;x++){
+        for(int y = 0;y < mat_.height;y++){
+            
         }
     }
 }
