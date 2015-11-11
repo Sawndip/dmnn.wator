@@ -80,11 +80,21 @@ void ImageLayer::pump(void)
 {
     std::vector<cv::Mat> planes;
     cv::split(mat_, planes);
-    auto blob_ = shared_ptr<Blob>(new Blob(mat_.cols,mat_.rows,mat_.channels()));
+    for(int i = 0;i < top_.size();i++ )
+    {
+        auto blob = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(mat_.cols,mat_.rows,mat_.channels()));
+        blobs_.push_back(blob);
+    }
     for(auto &mat:planes){
         for(int x = 0;x < mat.cols;x++){
             for(int y = 0;y < mat.rows;y++){
-                auto byte = mat.at<unsigned char>(y, x);
+                auto byte = mat.at<uint8_t>(y, x);
+                for(int i = 0;i < top_.size();i++)
+                {
+                    auto polar = dynamic_pointer_cast<PolarizerLayer>(top_[i]);
+                    DEBUG_VAR(polar->w_);
+                    DEBUG_VAR(polar->h_);
+                }
                 
             }
         }

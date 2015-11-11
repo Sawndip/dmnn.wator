@@ -53,6 +53,12 @@ Net::Net(const ifstream &in)
 **/
 Net& Net::operator << (shared_ptr<LayerBase> layer)
 {
+  if(false == this->layers_.empty())
+  {
+      auto bottom = layers_.back();
+      bottom->top(layer);
+      layer->bottom(bottom);
+  }
   this->layers_.push_back(layer);
   return *this;
 }

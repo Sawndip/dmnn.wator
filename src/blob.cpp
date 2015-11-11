@@ -31,17 +31,3 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace Wator;
 
 
-/**
- * Constructor
- **/
-Blob::Blob()
-{
-}
-
-/**
- * Constructor
- * @param [in] size
- **/
-Blob::Blob(int width,int height,int channel)
-{
-}

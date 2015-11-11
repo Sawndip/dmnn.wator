@@ -36,6 +36,7 @@ namespace Wator {
     /**
      * Blob.
      **/
+    template <typename T>
     class Blob {
     public:
         /**
@@ -47,7 +48,11 @@ namespace Wator {
          * Constructor
          * @param [in] size 
          **/
-        explicit Blob(int width,int height,int channel);
+        explicit Blob(int width,int height,int channel)
+        :data_(new T[width*height*channel])
+        {
+        }
     private:
+        unique_ptr<T> data_;
     };
 }

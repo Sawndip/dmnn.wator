@@ -36,6 +36,7 @@ using namespace std;
 
 namespace Wator {
     class PolarizerLayer :public LayerBase {
+        friend class ImageLayer;
     public:
         /**
          * Constructor
@@ -49,6 +50,8 @@ namespace Wator {
         virtual void forward(void);
     private:
     private:
+        const int w_ = 3;
+        const int h_ = 3;
         int bandgap_;
     };
 }

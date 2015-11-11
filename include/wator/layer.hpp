@@ -37,17 +37,31 @@ using namespace std;
 using namespace boost::property_tree;
 
 namespace Wator {
-    class Blob;
     /**
      * BaseLayer Base of all type Net layers.
      **/ 
     class LayerBase {
+        friend class ImageLayer;
     public:
         /**
          * forward
          * @return None.
          **/
         virtual void forward(void);
+        
+        /**
+         * top
+         * @param [in] lyr layer.
+         * @return None.
+         **/
+        void top(shared_ptr<LayerBase> lyr){this->top_.push_back(lyr);}
+
+        /**
+         * bottom
+         * @param [in] lyr layer.
+         * @return None.
+         **/
+        void bottom(shared_ptr<LayerBase> lyr){this->bottom_.push_back(lyr);}
     protected:
         /**
          * Constructor 
@@ -63,7 +77,6 @@ namespace Wator {
     protected:
         vector<shared_ptr<LayerBase> > bottom_;
         vector<shared_ptr<LayerBase> > top_;
-        vector<shared_ptr<Blob>> blobs_;
         int threshold_;
         vector<int> activeWeight_;
         vector<int> deactiveWeight_;
@@ -93,6 +106,7 @@ namespace Wator {
          **/
         virtual void forward(void);
     protected:
+        vector<shared_ptr<Blob<uint8_t>>> blobs_;
     };
 
     /**
