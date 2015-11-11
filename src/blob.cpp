@@ -42,6 +42,6 @@ Blob::Blob()
  * Constructor
  * @param [in] size
  **/
-Blob::Blob(int size)
+Blob::Blob(int width,int height,int channel)
 {
 }

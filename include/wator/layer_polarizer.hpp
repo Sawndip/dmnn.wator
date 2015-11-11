@@ -48,5 +48,7 @@ namespace Wator {
          **/
         virtual void forward(void);
     private:
+    private:
+        int bandgap_;
     };
 }

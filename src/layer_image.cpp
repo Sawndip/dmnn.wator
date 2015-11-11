@@ -80,7 +80,7 @@ void ImageLayer::pump(void)
 {
     std::vector<cv::Mat> planes;
     cv::split(mat_, planes);
-    blob_ = shared_ptr<Blob>(new Blob(mat_.channels() * mat_.cols * mat_.rows));
+    auto blob_ = shared_ptr<Blob>(new Blob(mat_.cols,mat_.rows,mat_.channels()));
     for(auto &mat:planes){
         for(int x = 0;x < mat.cols;x++){
             for(int y = 0;y < mat.rows;y++){

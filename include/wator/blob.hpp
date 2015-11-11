@@ -47,7 +47,7 @@ namespace Wator {
          * Constructor
          * @param [in] size 
          **/
-        explicit Blob(int size);
+        explicit Blob(int width,int height,int channel);
     private:
     };
 }

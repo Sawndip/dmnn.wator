@@ -63,7 +63,7 @@ namespace Wator {
     protected:
         vector<shared_ptr<LayerBase> > bottom_;
         vector<shared_ptr<LayerBase> > top_;
-        shared_ptr<Blob> blob_;
+        vector<shared_ptr<Blob>> blobs_;
         int threshold_;
         vector<int> activeWeight_;
         vector<int> deactiveWeight_;
