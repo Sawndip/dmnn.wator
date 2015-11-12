@@ -95,7 +95,6 @@ void ImageLayer::pump(void)
                     DEBUG_VAR(polar->w_);
                     DEBUG_VAR(polar->h_);
                 }
-                
             }
         }
     }
