@@ -96,7 +96,7 @@ void LayerInput::load(void)
  * get ptr
  * @return None.
  **/
-shared_ptr<Blob<uint8_t>> LayerInput::getBlob(const LayerBase* who)
+shared_ptr<Blob<uint16_t>> LayerInput::getBlob(const LayerBase* who)
 {
     int i = 0;
     for(auto top:top_)

@@ -117,9 +117,9 @@ namespace Wator {
          * get ptr
          * @return None.
          **/
-        shared_ptr<Blob<uint8_t>> getBlob(const LayerBase* who);
+        shared_ptr<Blob<uint16_t>> getBlob(const LayerBase* who);
     protected:
-        vector<shared_ptr<Blob<uint8_t>>> blobs_;
+        vector<shared_ptr<Blob<uint16_t>>> blobs_;
     };
 
     /**

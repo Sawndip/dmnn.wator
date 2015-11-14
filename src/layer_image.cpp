@@ -75,32 +75,38 @@ void ImageLayer::pump(void)
 {
     for(int i = 0;i < top_.size();i++ )
     {
-        auto blob = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(mat_.cols,mat_.rows,mat_.channels()));
+        INFO_VAR(mat_.cols);
+        INFO_VAR(mat_.rows);
+        INFO_VAR(mat_.channels());
+        auto blob = shared_ptr<Blob<uint16_t>>(new Blob<uint16_t>(mat_.cols,mat_.rows,mat_.channels()));
         blobs_.push_back(blob);
     }
     std::vector<cv::Mat> planes;
     cv::split(mat_, planes);
     for(int channel = 0 ; channel < mat_.channels();channel++){
         auto &mat = planes[channel];
-        for(int x = 0;x < mat.cols;x++){
-            for(int y = 0;y < mat.rows;y++){
+        for(int y = 0;y < mat.rows;y++){
+            for(int x = 0;x < mat.cols;x++){
                 auto byte = mat.at<uint8_t>(y, x);
-                DEBUG_VAR(x);
-                DEBUG_VAR(y);
+                TRACE_VAR(x);
+                TRACE_VAR(y);
                 for(int i = 0;i < top_.size();i++)
                 {
                     auto polar = dynamic_pointer_cast<PolarizerLayer>(top_[i]);
-                    DEBUG_VAR(polar->w_);
-                    DEBUG_VAR(polar->h_);
-                    int grid = (x/polar->w_)* (y/polar->h_);
-                    DEBUG_VAR(grid);
-                    int index = channel*mat_.cols + mat_.rows ;
+                    TRACE_VAR(polar->w_);
+                    TRACE_VAR(polar->h_);
+                    int grid = ((y/polar->h_) * (mat_.cols/polar->w_))+ (x/polar->w_) ;
+                    TRACE_VAR(grid);
+                    TRACE_VAR(channel);
+                    
+                    int index = channel * mat_.cols * mat_.rows;
                     index += grid * polar->w_ * polar->h_;
                     index += (y%polar->h_)*polar->w_  + x%polar->w_ ;
-                    DEBUG_VAR(index);
-                    blobs_[i]->data_[index] = byte;
+                    TRACE_VAR(index);
+                    blobs_[i]->data_[index] = (uint16_t)byte +1;
                 }
             }
         }
     }
+    INFO_VAR(mat_.cols*mat_.rows*mat_.channels());
 }

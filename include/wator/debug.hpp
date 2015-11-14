@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TRACE_VAR(x)
 #endif
 
-#if 0
+#if 1
 #define DEBUG_VAR(x) {BOOST_LOG_TRIVIAL(debug) << #x << "=<" << x << ">" <<endl;}
 #else
 #define DEBUG_VAR(x)

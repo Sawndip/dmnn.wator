@@ -59,7 +59,8 @@ static void test(void){
 
 int main(int ac,char *av[]){
     
-    log::core::get()->set_filter(log::trivial::severity >= log::trivial::debug);
+    log::core::get()->set_filter(log::trivial::severity >= log::trivial::trace);
+//    log::core::get()->set_filter(log::trivial::severity >= log::trivial::debug);
     
     po::options_description opt("option");
     opt.add_options()

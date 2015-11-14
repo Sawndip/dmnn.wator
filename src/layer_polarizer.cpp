@@ -107,12 +107,15 @@ void Polarizer1stLayer::forward(void)
              int sum =0;
              for(int j = 0;j<weight_.size();j++) {
                  int index = i*weight_.size() + j;
+                 if(0==inBlob->data_[index]){
+                     INFO_VAR(index);
+                 }
                  sum += weight_[j] * (inBlob->data_[index]);
              }
-             if(sum > max){
+             if(sum > max) {
                  max = sum;
              }
-             if(sum < min){
+             if(sum < min) {
                  min = sum;
              }
              raw->data_[i] = sum;
