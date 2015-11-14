@@ -71,7 +71,14 @@ void Net::train()
     {
         for(auto layout :layers_)
         {
-            layout->forward();
+            layout->load();
+        }
+        for(int j  =0 ;j<param_.epoch_ ;j++)
+        {
+            for(auto layout :layers_)
+            {
+                layout->forward();
+            }
         }
     }
 }

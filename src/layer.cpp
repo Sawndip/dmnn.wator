@@ -50,6 +50,14 @@ LayerBase::LayerBase(const ptree& info)
 }
 
 /**
+ * load
+ * @return None.
+ **/
+void LayerBase::load(void)
+{
+}
+
+/**
  * forward
  * @return None.
  **/
@@ -76,11 +84,30 @@ LayerInput::LayerInput(const ptree& info)
 
 
 /**
- * forward
+ * load
  * @return None.
  **/
-void LayerInput::forward(void)
+void LayerInput::load(void)
 {
+}
+
+
+/**
+ * get ptr
+ * @return None.
+ **/
+shared_ptr<Blob<uint8_t>> LayerInput::getBlob(const LayerBase* who)
+{
+    int i = 0;
+    for(auto top:top_)
+    {
+        if(who == top.get())
+        {
+           return blobs_[i];
+        }
+        i++;
+    }
+    return nullptr;
 }
 
 

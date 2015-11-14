@@ -34,12 +34,6 @@ using namespace Wator;
 #include <boost/property_tree/json_parser.hpp>
 using namespace boost::property_tree;
 
-#include <boost/log/trivial.hpp>
-#include <boost/log/core.hpp>
-#include <boost/log/expressions.hpp>
-
-#define DEBUG_VAR(x) {BOOST_LOG_TRIVIAL(debug) << #x << "=<" << x << ">" <<endl;}
-#define TRACE_VAR(x) {BOOST_LOG_TRIVIAL(trace) << #x << "=<" << x << ">" <<endl;}
 
 
 #include <boost/filesystem.hpp>
@@ -57,10 +51,10 @@ ImageLayer::ImageLayer()
 {
 }
 /**
- * forward
+ * load
  * @return None.
  **/
-void ImageLayer::forward(void)
+void ImageLayer::load(void)
 {
     TRACE_VAR(param_.root_);
     const fs::path path(param_.root_);
@@ -75,25 +69,36 @@ void ImageLayer::forward(void)
             }
         }
     }
+    INFO_VAR("finnish load data");
 }
 void ImageLayer::pump(void)
 {
-    std::vector<cv::Mat> planes;
-    cv::split(mat_, planes);
     for(int i = 0;i < top_.size();i++ )
     {
         auto blob = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(mat_.cols,mat_.rows,mat_.channels()));
         blobs_.push_back(blob);
     }
-    for(auto &mat:planes){
+    std::vector<cv::Mat> planes;
+    cv::split(mat_, planes);
+    for(int channel = 0 ; channel < mat_.channels();channel++){
+        auto &mat = planes[channel];
         for(int x = 0;x < mat.cols;x++){
             for(int y = 0;y < mat.rows;y++){
                 auto byte = mat.at<uint8_t>(y, x);
+                DEBUG_VAR(x);
+                DEBUG_VAR(y);
                 for(int i = 0;i < top_.size();i++)
                 {
                     auto polar = dynamic_pointer_cast<PolarizerLayer>(top_[i]);
                     DEBUG_VAR(polar->w_);
                     DEBUG_VAR(polar->h_);
+                    int grid = (x/polar->w_)* (y/polar->h_);
+                    DEBUG_VAR(grid);
+                    int index = channel*mat_.cols + mat_.rows ;
+                    index += grid * polar->w_ * polar->h_;
+                    index += (y%polar->h_)*polar->w_  + x%polar->w_ ;
+                    DEBUG_VAR(index);
+                    blobs_[i]->data_[index] = byte;
                 }
             }
         }

@@ -48,10 +48,32 @@ namespace Wator {
          * @return None.
          **/
         virtual void forward(void);
-    private:
-    private:
+    protected:
         const int w_ = 3;
         const int h_ = 3;
-        int bandgap_;
+        unsigned int bandgap_ = UINT32_MAX/2;
+        vector<shared_ptr<Blob<bool>>> blobs_;
+    private:
+    private:
     };
+
+    class Polarizer1stLayer :public PolarizerLayer {
+        friend class ImageLayer;
+    public:
+        /**
+         * Constructor
+         **/
+        explicit Polarizer1stLayer();
+        
+        /**
+         * forward
+         * @return None.
+         **/
+        virtual void forward(void);
+    protected:
+    private:
+    private:
+        vector<shared_ptr<Blob<int>>> blobsRaw_;
+    };
+
 }

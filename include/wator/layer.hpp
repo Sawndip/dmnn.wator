@@ -44,6 +44,12 @@ namespace Wator {
         friend class ImageLayer;
     public:
         /**
+         * load
+         * @return None.
+         **/
+        virtual void load(void);
+        
+        /**
          * forward
          * @return None.
          **/
@@ -87,6 +93,7 @@ namespace Wator {
      * LayerInput Base of Input layers.
      **/
     class LayerInput :public LayerBase{
+        friend class Polarizer1stLayer;
     public:
     protected:
         /**
@@ -101,10 +108,16 @@ namespace Wator {
         explicit LayerInput(const ptree& info);
         
         /**
-         * forward
+         * load
          * @return None.
          **/
-        virtual void forward(void);
+        virtual void load(void);
+        
+        /**
+         * get ptr
+         * @return None.
+         **/
+        shared_ptr<Blob<uint8_t>> getBlob(const LayerBase* who);
     protected:
         vector<shared_ptr<Blob<uint8_t>>> blobs_;
     };

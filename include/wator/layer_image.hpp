@@ -49,10 +49,10 @@ namespace Wator {
         explicit ImageLayer();
         
         /**
-         * forward
+         * load
          * @return None.
          **/
-        virtual void forward(void);
+        virtual void load(void);
     private:
         void pump(void);
     private:

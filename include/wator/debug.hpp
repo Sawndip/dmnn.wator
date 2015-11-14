@@ -28,58 +28,26 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
-#include <fstream>
-#include <memory>
-#include <vector>
-using namespace std;
-namespace Wator {
-    class LayerBase;
-    
-    
-    
-    /**
-     * NeuralNetParam.
-     **/
-    struct NetParam {
-        bool endless_ = false;
-        int iter_ = 1;
-        int epoch_ = 2;
-    };
-    /**
-     * Net.
-     **/
-    class Net {
-    public:
-        /**
-         * Constructor
-        **/
-        explicit Net();
 
-        /**
-         * Constructor
-         * @param [in] setting information
-        **/
-        explicit Net(const ifstream &in);
-        
-        /**
-         * Connect a Layer to Net.
-         * @param [in] layer
-        **/
-        Net& operator << (shared_ptr<LayerBase> layer);
+#include <boost/log/trivial.hpp>
+#include <boost/log/core.hpp>
+#include <boost/log/expressions.hpp>
 
-        /**
-         * Train net
-        **/
-        void train();
 
-        /**
-         * Test net
-        **/
-        void test();
-    private:
-        vector<shared_ptr<LayerBase> > layers_;
-        
-        /// configureable
-        NetParam param_;
-    };
-}
+#if 0
+#define TRACE_VAR(x) {BOOST_LOG_TRIVIAL(trace) << #x << "=<" << x << ">" <<endl;}
+#else
+#define TRACE_VAR(x)
+#endif
+
+#if 0
+#define DEBUG_VAR(x) {BOOST_LOG_TRIVIAL(debug) << #x << "=<" << x << ">" <<endl;}
+#else
+#define DEBUG_VAR(x)
+#endif
+
+#if 1
+#define INFO_VAR(x) {BOOST_LOG_TRIVIAL(info) << #x << "=<" << x << ">" <<endl;}
+#else
+#define INFO_VAR(x)
+#endif

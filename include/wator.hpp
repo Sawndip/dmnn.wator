@@ -28,6 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
+#include <wator/debug.hpp>
 #include <wator/blob.hpp>
 #include <wator/layer.hpp>
 #include <wator/layer_image.hpp>
