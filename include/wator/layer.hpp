@@ -48,6 +48,12 @@ namespace Wator {
          * @return None.
          **/
         virtual void load(void);
+
+        /**
+         * round
+         * @return None.
+         **/
+        virtual void round(void);
         
         /**
          * forward

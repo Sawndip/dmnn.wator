@@ -44,14 +44,30 @@ namespace Wator {
         explicit PolarizerLayer();
         
         /**
+         * round
+         * @return None.
+         **/
+        virtual void round(void);
+
+        /**
          * forward
          * @return None.
          **/
         virtual void forward(void);
     protected:
+        /**
+         * update
+         * @return None.
+         **/
+        void update(void);
+    protected:
         const int w_ = 3;
         const int h_ = 3;
         unsigned int bandgap_ = UINT32_MAX/2;
+        int size_ = 0;
+        int max_ = 0;
+        int min_ = INT32_MAX;
+        vector<shared_ptr<Blob<int>>> blobsRaw_;
         vector<shared_ptr<Blob<bool>>> blobs_;
     private:
     private:
@@ -64,6 +80,12 @@ namespace Wator {
          * Constructor
          **/
         explicit Polarizer1stLayer();
+
+        /**
+         * round
+         * @return None.
+         **/
+        virtual void round(void);
         
         /**
          * forward
@@ -73,7 +95,6 @@ namespace Wator {
     protected:
     private:
     private:
-        vector<shared_ptr<Blob<int>>> blobsRaw_;
     };
 
 }

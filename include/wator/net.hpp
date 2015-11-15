@@ -43,7 +43,7 @@ namespace Wator {
     struct NetParam {
         bool endless_ = false;
         int iter_ = 1;
-        int epoch_ = 1;
+        int epoch_ = 1000*1000;
     };
     /**
      * Net.

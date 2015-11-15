@@ -58,6 +58,14 @@ void LayerBase::load(void)
 }
 
 /**
+ * round
+ * @return None.
+ **/
+void LayerBase::round(void)
+{
+}
+
+/**
  * forward
  * @return None.
  **/

@@ -67,6 +67,19 @@ PolarizerLayer::PolarizerLayer()
 }
 
 /**
+ * round
+ * @return None.
+ **/
+void PolarizerLayer::round(void)
+{
+    /*
+     for(auto btm:bottom_){
+     auto blob = btm->getBlob(this);
+     }
+     */
+}
+
+/**
  * forward
  * @return None.
  **/
@@ -78,6 +91,52 @@ void PolarizerLayer::forward(void)
     }
  */
 }
+/**
+ * update
+ * @return None.
+ **/
+void PolarizerLayer::update(void)
+{
+    bandgap_ = UINT32_MAX/2;
+    int weight = 0;
+    int spitedCounter =0;
+    for(auto &raw: blobsRaw_){
+        INFO_VAR(raw);
+        for(int i = 0 ;i < size_ ;i++) {
+            int delta = raw->data_[i] - threshold_;
+            unsigned int deltaU = ::abs(delta);
+            if(0==delta){
+                delta ++;
+            }
+            weight += UINT16_MAX/delta;
+            
+            if(deltaU < bandgap_){
+                bandgap_ = deltaU;
+            }
+            if(deltaU > (max_ - min_)/4){
+                spitedCounter++;
+            }
+        }
+    }
+    INFO_VAR(weight);
+    if(0 < weight){
+        for(auto &w:activeWeight_){
+            w += weight;
+        }
+    }else {
+        for(auto &w:deactiveWeight_){
+            w += 0-(weight);
+        }
+    }
+    for(int i = 0 ;i< activeWeight_.size();i++) {
+        weight_[i] = activeWeight_[i] - deactiveWeight_[i];
+        INFO_VAR(weight_[i]);
+    }
+    INFO_VAR(bandgap_);
+    INFO_VAR((double)spitedCounter/(double)size_);
+    INFO_VAR("finnish Polarizer1stLayer::update");
+}
+
 
 /**
  * Constructor
@@ -88,58 +147,63 @@ Polarizer1stLayer::Polarizer1stLayer()
 }
 
 /**
+ * round
+ * @return None.
+ **/
+void Polarizer1stLayer::round(void)
+{
+    this->forward();
+    this->update();
+    INFO_VAR("finnish Polarizer1stLayer::round");
+}
+
+
+/**
  * forward
  * @return None.
  **/
 void Polarizer1stLayer::forward(void)
 {
-     for(auto btm:bottom_){
-         auto input = dynamic_pointer_cast<LayerInput>(btm);
-         auto inBlob = input->getBlob(this);
-         INFO_VAR(inBlob->size_);
-         INFO_VAR(weight_.size());
-         const auto mySize = inBlob->size_/weight_.size();
-         auto raw = shared_ptr<Blob<int>>(new Blob<int>(mySize));
-         auto blob = shared_ptr<Blob<bool>>(new Blob<bool>(mySize));
-         int max = 0;
-         int min = INT32_MAX;
-         for(int i = 0 ;i < mySize ;i++) {
-             int sum =0;
-             for(int j = 0;j<weight_.size();j++) {
-                 int index = i*weight_.size() + j;
-                 if(0==inBlob->data_[index]){
-                     INFO_VAR(index);
-                 }
-                 sum += weight_[j] * (inBlob->data_[index]);
-             }
-             if(sum > max) {
-                 max = sum;
-             }
-             if(sum < min) {
-                 min = sum;
-             }
-             raw->data_[i] = sum;
-         }
-         blobsRaw_.push_back(raw);
-         INFO_VAR(max);
-         INFO_VAR(min);
-         auto threshold_ = (max+min)/2;
-         INFO_VAR(threshold_);
-         for(int i = 0 ;i < mySize ;i++) {
+    blobsRaw_.clear();
+    blobs_.clear();
+    for(auto btm:bottom_){
+        auto input = dynamic_pointer_cast<LayerInput>(btm);
+        auto inBlob = input->getBlob(this);
+        INFO_VAR(inBlob->size_);
+        INFO_VAR(weight_.size());
+        size_ = inBlob->size_/weight_.size();
+        auto raw = shared_ptr<Blob<int>>(new Blob<int>(size_));
+        auto blob = shared_ptr<Blob<bool>>(new Blob<bool>(size_));
+        max_ = 0;
+        min_ = INT32_MAX;
+        for(int i = 0 ;i < size_ ;i++) {
+            int sum =0;
+            for(int j = 0;j<weight_.size();j++) {
+                int index = i*weight_.size() + j;
+                sum += weight_[j] * (inBlob->data_[index]);
+            }
+            if(sum > max_) {
+                max_ = sum;
+            }
+            if(sum < min_) {
+                min_ = sum;
+            }
+            raw->data_[i] = sum;
+        }
+        blobsRaw_.push_back(raw);
+        INFO_VAR(max_);
+        INFO_VAR(min_);
+        threshold_ = (max_+min_)/2;
+        INFO_VAR(threshold_);
+        for(int i = 0 ;i < size_ ;i++) {
             int delta = raw->data_[i] - threshold_;
-            const unsigned int deltaU = ::abs(delta);
-             if(deltaU < bandgap_) {
-                 bandgap_ = deltaU;
-             }
-             if(0 < delta ){
-                 blob->data_[i] = true;
-             }else{
-                 blob->data_[i] = false;
-             }
-         }
-         INFO_VAR(bandgap_);
-         blobs_.push_back(blob);
-     }
+            if(0 < delta ){
+                blob->data_[i] = true;
+            }else{
+                blob->data_[i] = false;
+            }
+        }
+        blobs_.push_back(blob);
+    }
     INFO_VAR("finnish Polarizer1stLayer::forward");
 }
-

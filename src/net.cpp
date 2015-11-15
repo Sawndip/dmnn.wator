@@ -77,7 +77,7 @@ void Net::train()
         {
             for(auto layout :layers_)
             {
-                layout->forward();
+                layout->round();
             }
         }
     }
