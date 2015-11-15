@@ -37,68 +37,45 @@ using namespace boost::property_tree;
 /**
  * Constructor
  **/
-PolarizerLayer::PolarizerLayer()
+CoulombLayer::CoulombLayer()
 {
-    activeWeight_ = {
-        2.0,
-        2.0,
-        2.0,
-        2.0,
-        16.0,
-        2.0,
-        2.0,
-        2.0,
-        2.0,
-    };
-    deactiveWeight_ = {
-        1.0,
-        1.0,
-        1.0,
-        1.0,
-        8.0,
-        1.0,
-        1.0,
-        1.0,
-        1.0,
-    };
-    for(int i = 0 ;i< activeWeight_.size();i++) {
-        weight_.push_back(activeWeight_[i] - deactiveWeight_[i]);
-    }
+    updateW();
 }
 
-/**
- * round
- * @return None.
- **/
-void PolarizerLayer::round(void)
-{
-    /*
-     for(auto btm:bottom_){
-     auto blob = btm->getBlob(this);
-     }
-     */
-}
-
-/**
- * forward
- * @return None.
- **/
-void PolarizerLayer::forward(void)
-{
-/*
-    for(auto btm:bottom_){
-        auto blob = btm->getBlob(this);
-    }
- */
-}
 /**
  * update
  * @return None.
  **/
-void PolarizerLayer::update(void)
+void CoulombLayer::updateW(void)
+{
+    activeWeight_.clear();
+    deactiveWeight_.clear();
+    weight_.clear();
+    for(int y = 0 ;y < h_;y++){
+        for(int x =0;x < w_ ;x++){
+            float w = (x- w_/2) * (x- w_/2) + (y- h_/2) * (y- h_/2) + 1;
+            w = (1/w);
+            activeWeight_.push_back(w * activeRate);
+            
+            
+            deactiveWeight_.push_back(0 - w * deactiveRate);
+
+            weight_.push_back(w*activeRate - w * deactiveRate);
+        }
+    }
+    for(int i = 0 ;i< activeWeight_.size();i++) {
+        INFO_VAR(weight_[i]);
+    }
+}
+
+
+/**
+ * update
+ * @return None.
+ **/
+void CoulombLayer::update(void)
 {
     bandGap_ = UINT32_MAX/2;
-    int weight = 0;
     int spitedCounter =0;
     for(auto &raw: blobsRaw_){
         INFO_VAR(raw);
@@ -108,53 +85,37 @@ void PolarizerLayer::update(void)
             if(0==delta){
                 delta ++;
             }
-            weight += UINT16_MAX/delta;
+            auto rate = learnRate* delta/allGap_;
+            if(rate>0){
+                activeRate += rate;
+            } else {
+                deactiveRate -= rate;
+            }
             
             if(deltaU < bandGap_){
                 bandGap_ = deltaU;
             }
-            if(deltaU > (max_ - min_)/4){
+            if(deltaU > (allGap_)/4){
                 spitedCounter++;
             }
         }
     }
-    INFO_VAR(weight);
-    if(0 < weight){
-        for(auto &w:activeWeight_){
-            w += weight;
-        }
-    }else {
-        for(auto &w:deactiveWeight_){
-            w += 0-(weight);
-        }
-    }
-    for(int i = 0 ;i< activeWeight_.size();i++) {
-        weight_[i] = activeWeight_[i] - deactiveWeight_[i];
-        INFO_VAR(weight_[i]);
-    }
+    updateW();
     INFO_VAR(bandGap_);
     INFO_VAR((double)spitedCounter/(double)size_);
-    INFO_VAR("finnish Polarizer1stLayer::update");
+    INFO_VAR("finnish CoulombLayer::update");
 }
 
-
-/**
- * Constructor
- **/
-Polarizer1stLayer::Polarizer1stLayer()
-:PolarizerLayer()
-{
-}
 
 /**
  * round
  * @return None.
  **/
-void Polarizer1stLayer::round(void)
+void CoulombLayer::round(void)
 {
     this->forward();
     this->update();
-    INFO_VAR("finnish Polarizer1stLayer::round");
+    INFO_VAR("finnish CoulombLayer::round");
 }
 
 
@@ -162,7 +123,7 @@ void Polarizer1stLayer::round(void)
  * forward
  * @return None.
  **/
-void Polarizer1stLayer::forward(void)
+void CoulombLayer::forward(void)
 {
     blobsRaw_.clear();
     blobs_.clear();
@@ -193,7 +154,8 @@ void Polarizer1stLayer::forward(void)
         blobsRaw_.push_back(raw);
         INFO_VAR(max_);
         INFO_VAR(min_);
-        threshold_ = (max_+min_)/2;
+        threshold_ = (max_ + min_)/2;
+        allGap_ = max_ - min_;
         INFO_VAR(threshold_);
         for(int i = 0 ;i < size_ ;i++) {
             int delta = raw->data_[i] - threshold_;
@@ -205,5 +167,5 @@ void Polarizer1stLayer::forward(void)
         }
         blobs_.push_back(blob);
     }
-    INFO_VAR("finnish Polarizer1stLayer::forward");
+    INFO_VAR("finnish CoulombLayer::forward");
 }

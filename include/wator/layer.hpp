@@ -1,3 +1,4 @@
+
 /*
 Copyright (c) 2015, Wator Vapor
 All rights reserved.
@@ -90,9 +91,9 @@ namespace Wator {
         vector<shared_ptr<LayerBase> > bottom_;
         vector<shared_ptr<LayerBase> > top_;
         int threshold_;
-        vector<int> activeWeight_;
-        vector<int> deactiveWeight_;
-        vector<int> weight_;
+        vector<float> activeWeight_;
+        vector<float> deactiveWeight_;
+        vector<float> weight_;
     };
 
     /**
@@ -100,6 +101,7 @@ namespace Wator {
      **/
     class LayerInput :public LayerBase{
         friend class Polarizer1stLayer;
+        friend class CoulombLayer;
     public:
     protected:
         /**
@@ -123,9 +125,9 @@ namespace Wator {
          * get ptr
          * @return None.
          **/
-        shared_ptr<Blob<uint16_t>> getBlob(const LayerBase* who);
+        shared_ptr<Blob<uint8_t>> getBlob(const LayerBase* who);
     protected:
-        vector<shared_ptr<Blob<uint16_t>>> blobs_;
+        vector<shared_ptr<Blob<uint8_t>>> blobs_;
     };
 
     /**

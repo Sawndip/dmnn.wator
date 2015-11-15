@@ -43,16 +43,16 @@ static void train(void){
     Net net;
     shared_ptr<ImageLayer> img(new ImageLayer);
     net << img;
-    shared_ptr<Polarizer1stLayer> polazier1(new Polarizer1stLayer);
-    net << polazier1;
+    shared_ptr<CoulombLayer> coulom(new CoulombLayer);
+    net << coulom;
     net.train();
 }
 static void test(void){
     Net net;
     shared_ptr<ImageLayer> img(new ImageLayer);
     net << img;
-    shared_ptr<Polarizer1stLayer> polazier1(new Polarizer1stLayer);
-    net << polazier1;
+    shared_ptr<CoulombLayer> coulom(new CoulombLayer);
+    net << coulom;
     net.test();
     
 }

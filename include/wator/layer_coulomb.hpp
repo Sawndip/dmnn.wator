@@ -32,23 +32,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 using namespace std;
 #include "wator/layer.hpp"
-#include <opencv2/core/core.hpp>
 
 namespace Wator {
-    class PolarizerLayer :public LayerBase {
+    class CoulombLayer :public PolarizerLayer {
         friend class ImageLayer;
     public:
         /**
          * Constructor
          **/
-        explicit PolarizerLayer();
-        
+        explicit CoulombLayer();
+
         /**
          * round
          * @return None.
          **/
         virtual void round(void);
-
+        
         /**
          * forward
          * @return None.
@@ -60,42 +59,24 @@ namespace Wator {
          * @return None.
          **/
         virtual void update(void);
-    protected:
-        const int w_ = 3;
-        const int h_ = 3;
-        unsigned int bandGap_ = UINT32_MAX/2;
-        unsigned int allGap_ = UINT32_MAX;
-        int size_ = 0;
-        int max_ = 0;
-        int min_ = INT32_MAX;
-        vector<shared_ptr<Blob<float>>> blobsRaw_;
-        vector<shared_ptr<Blob<bool>>> blobs_;
     private:
-    private:
-    };
-
-    class Polarizer1stLayer :public PolarizerLayer {
-        friend class ImageLayer;
-    public:
         /**
-         * Constructor
-         **/
-        explicit Polarizer1stLayer();
-
-        /**
-         * round
+         * update
          * @return None.
          **/
-        virtual void round(void);
+        void updateW(void);
+    private:
+        // active pitch
+        float activeRate = 2.;
+
+        // deactive pitch
+        float deactiveRate = 1.;
+
+        // K Coulomb
+        const float learnRate = 0.0001;
         
-        /**
-         * forward
-         * @return None.
-         **/
-        virtual void forward(void);
-    protected:
-    private:
-    private:
+        // K Coulomb
+        const float kCoulomb_ = 1.;
     };
 
 }

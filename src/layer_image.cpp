@@ -78,7 +78,7 @@ void ImageLayer::pump(void)
         INFO_VAR(mat_.cols);
         INFO_VAR(mat_.rows);
         INFO_VAR(mat_.channels());
-        auto blob = shared_ptr<Blob<uint16_t>>(new Blob<uint16_t>(mat_.cols,mat_.rows,mat_.channels()));
+        auto blob = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(mat_.cols,mat_.rows,mat_.channels()));
         blobs_.push_back(blob);
     }
     std::vector<cv::Mat> planes;
@@ -103,7 +103,7 @@ void ImageLayer::pump(void)
                     index += grid * polar->w_ * polar->h_;
                     index += (y%polar->h_)*polar->w_  + x%polar->w_ ;
                     TRACE_VAR(index);
-                    blobs_[i]->data_[index] = (uint16_t)byte +1;
+                    blobs_[i]->data_[index] = byte;
                 }
             }
         }
