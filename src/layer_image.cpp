@@ -90,8 +90,7 @@ void ImageLayer::pump(void)
                 auto byte = mat.at<uint8_t>(y, x);
                 TRACE_VAR(x);
                 TRACE_VAR(y);
-                for(int i = 0;i < top_.size();i++)
-                {
+                for(int i = 0;i < top_.size();i++){
                     auto polar = dynamic_pointer_cast<PolarizerLayer>(top_[i]);
                     TRACE_VAR(polar->w_);
                     TRACE_VAR(polar->h_);
@@ -103,6 +102,9 @@ void ImageLayer::pump(void)
                     index += grid * polar->w_ * polar->h_;
                     index += (y%polar->h_)*polar->w_  + x%polar->w_ ;
                     TRACE_VAR(index);
+                    if (0==byte){
+                        byte = 1;
+                    }
                     blobs_[i]->data_[index] = byte;
                 }
             }

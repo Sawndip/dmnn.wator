@@ -39,33 +39,32 @@ using namespace boost::property_tree;
  **/
 CoulombLayer::CoulombLayer()
 {
+    for(int y = 0 ;y < h_;y++){
+        for(int x =0;x < w_ ;x++){
+            // 电荷中心，在几何中心。
+            float w = (x- w_/2) * (x- w_/2) + (y- h_/2) * (y- h_/2) + 1;
+            w = 1/w;
+            kCoulomb_.push_back(w);
+        }
+    }
     updateW();
 }
+
+
 
 /**
  * update
  * @return None.
  **/
-void CoulombLayer::updateW(void)
-{
-    activeWeight_.clear();
-    deactiveWeight_.clear();
+void CoulombLayer::updateW(void){
     weight_.clear();
-    for(int y = 0 ;y < h_;y++){
-        for(int x =0;x < w_ ;x++){
-            float w = (x- w_/2) * (x- w_/2) + (y- h_/2) * (y- h_/2) + 1;
-            w = (1/w);
-            activeWeight_.push_back(w * activeRate);
-            
-            
-            deactiveWeight_.push_back(0 - w * deactiveRate);
-
-            weight_.push_back(w*activeRate - w * deactiveRate);
-        }
+    for(auto k:kCoulomb_) {
+        weight_.push_back(k*activeRate_ - k*deactiveRate_);
     }
-    for(int i = 0 ;i< activeWeight_.size();i++) {
+    for(int i = 0;i< weight_.size();i++) {
         INFO_VAR(weight_[i]);
     }
+
 }
 
 
@@ -76,21 +75,18 @@ void CoulombLayer::updateW(void)
 void CoulombLayer::update(void)
 {
     bandGap_ = UINT32_MAX/2;
-    int spitedCounter =0;
     for(auto &raw: blobsRaw_){
+        int spitedCounter =0;
+        float rateLoop = 0.;
         INFO_VAR(raw);
         for(int i = 0 ;i < size_ ;i++) {
             int delta = raw->data_[i] - threshold_;
             unsigned int deltaU = ::abs(delta);
             if(0==delta){
-                delta ++;
+                continue;
             }
-            auto rate = learnRate* delta/allGap_;
-            if(rate>0){
-                activeRate += rate;
-            } else {
-                deactiveRate -= rate;
-            }
+            auto rate = learnRate_* allGap_/(2*delta);
+            rateLoop += rate;
             
             if(deltaU < bandGap_){
                 bandGap_ = deltaU;
@@ -99,10 +95,17 @@ void CoulombLayer::update(void)
                 spitedCounter++;
             }
         }
+        INFO_VAR(rateLoop);
+        INFO_VAR(rateLoop/(float)size_);
+        if(rateLoop>0){
+            activeRate_ += rateLoop/(float)size_;
+        } else {
+            deactiveRate_ -= rateLoop/(float)size_;
+        }
+        INFO_VAR(bandGap_);
+        INFO_VAR((double)spitedCounter/(double)size_);
+        updateW();
     }
-    updateW();
-    INFO_VAR(bandGap_);
-    INFO_VAR((double)spitedCounter/(double)size_);
     INFO_VAR("finnish CoulombLayer::update");
 }
 

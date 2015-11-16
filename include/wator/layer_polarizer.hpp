@@ -63,11 +63,11 @@ namespace Wator {
     protected:
         const int w_ = 3;
         const int h_ = 3;
-        unsigned int bandGap_ = UINT32_MAX/2;
-        unsigned int allGap_ = UINT32_MAX;
+        float bandGap_ = UINT32_MAX/2;
+        float allGap_ = UINT32_MAX;
         int size_ = 0;
-        int max_ = 0;
-        int min_ = INT32_MAX;
+        float max_ = 0;
+        float min_ = INT32_MAX;
         vector<shared_ptr<Blob<float>>> blobsRaw_;
         vector<shared_ptr<Blob<bool>>> blobs_;
     private:

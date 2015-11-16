@@ -66,17 +66,18 @@ namespace Wator {
          **/
         void updateW(void);
     private:
-        // active pitch
-        float activeRate = 2.;
+        // active rate
+        float activeRate_ = 2.;
 
-        // deactive pitch
-        float deactiveRate = 1.;
+        // deactive rate
+        float deactiveRate_ = 1.;
 
-        // K Coulomb
-        const float learnRate = 0.0001;
+        // learn rate
+        const float learnRate_ = 0.001;
         
         // K Coulomb
-        const float kCoulomb_ = 1.;
+        vector<float> kCoulomb_;
+
     };
 
 }
