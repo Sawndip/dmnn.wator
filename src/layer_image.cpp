@@ -49,7 +49,21 @@ namespace fs = boost::filesystem;
  **/
 ImageLayer::ImageLayer()
 {
+    INFO_VAR(this);
 }
+
+/**
+ * Connect a Layer to Net.
+ * @param [in] layer
+ **/
+CoulombLayer& ImageLayer::operator << (CoulombLayer &layer)
+{
+    this->top_.push_back(&layer);
+    layer.bottom(this);
+    INFO_VAR(top_.size());
+    return layer;
+}
+
 /**
  * load
  * @return None.
@@ -79,6 +93,7 @@ void ImageLayer::pump(void)
         INFO_VAR(mat_.rows);
         INFO_VAR(mat_.channels());
         auto blob = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(mat_.cols,mat_.rows,mat_.channels()));
+        INFO_VAR(this);
         blobs_.push_back(blob);
     }
     std::vector<cv::Mat> planes;
@@ -91,16 +106,16 @@ void ImageLayer::pump(void)
                 TRACE_VAR(x);
                 TRACE_VAR(y);
                 for(int i = 0;i < top_.size();i++){
-                    auto polar = dynamic_pointer_cast<PolarizerLayer>(top_[i]);
-                    TRACE_VAR(polar->w_);
-                    TRACE_VAR(polar->h_);
-                    int grid = ((y/polar->h_) * (mat_.cols/polar->w_))+ (x/polar->w_) ;
+                    CoulombLayer *clm = dynamic_cast<CoulombLayer*>(top_[i]);
+                    TRACE_VAR(clm->w_);
+                    TRACE_VAR(clm->h_);
+                    int grid = ((y/clm->h_) * (mat_.cols/clm->w_))+ (x/clm->w_) ;
                     TRACE_VAR(grid);
                     TRACE_VAR(channel);
                     
                     int index = channel * mat_.cols * mat_.rows;
-                    index += grid * polar->w_ * polar->h_;
-                    index += (y%polar->h_)*polar->w_  + x%polar->w_ ;
+                    index += grid * clm->w_ * clm->h_;
+                    index += (y%clm->h_)*clm->w_  + x%clm->w_ ;
                     TRACE_VAR(index);
                     if (0==byte){
                         byte = 1;

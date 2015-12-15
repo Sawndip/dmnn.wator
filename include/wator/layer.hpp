@@ -62,19 +62,13 @@ namespace Wator {
          **/
         virtual void forward(void);
         
-        /**
-         * top
-         * @param [in] lyr layer.
-         * @return None.
-         **/
-        void top(shared_ptr<LayerBase> lyr){this->top_.push_back(lyr);}
 
         /**
          * bottom
          * @param [in] lyr layer.
          * @return None.
          **/
-        void bottom(shared_ptr<LayerBase> lyr){this->bottom_.push_back(lyr);}
+        void bottom(LayerBase *lyr){this->bottom_.push_back(lyr);}
     protected:
         /**
          * Constructor 
@@ -88,8 +82,8 @@ namespace Wator {
         explicit LayerBase(const ptree& info);
 
     protected:
-        vector<shared_ptr<LayerBase> > bottom_;
-        vector<shared_ptr<LayerBase> > top_;
+        vector<LayerBase*> bottom_;
+        vector<LayerBase*> top_;
         int threshold_;
         vector<float> activeWeight_;
         vector<float> deactiveWeight_;

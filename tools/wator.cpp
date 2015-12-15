@@ -40,19 +40,21 @@ namespace log = boost::log;
 
 
 static void train(void){
+    ImageLayer img;
+    CoulombLayer coulom;
+    img << coulom;
+
     Net net;
-    shared_ptr<ImageLayer> img(new ImageLayer);
-    net << img;
-    shared_ptr<CoulombLayer> coulom(new CoulombLayer);
-    net << coulom;
+    net << &img;
     net.train();
 }
 static void test(void){
+    ImageLayer img;
+    CoulombLayer coulom;
+    img << coulom;
+
     Net net;
-    shared_ptr<ImageLayer> img(new ImageLayer);
-    net << img;
-    shared_ptr<CoulombLayer> coulom(new CoulombLayer);
-    net << coulom;
+    net << &img;
     net.test();
     
 }

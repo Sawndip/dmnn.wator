@@ -49,6 +49,8 @@ LayerBase::LayerBase(const ptree& info)
 {
 }
 
+
+
 /**
  * load
  * @return None.
@@ -63,6 +65,10 @@ void LayerBase::load(void)
  **/
 void LayerBase::round(void)
 {
+    DEBUG_VAR(top_.size());
+    for(auto & top:top_){
+        top->round();
+    }
 }
 
 /**
@@ -107,11 +113,20 @@ void LayerInput::load(void)
 shared_ptr<Blob<uint8_t>> LayerInput::getBlob(const LayerBase* who)
 {
     int i = 0;
+    DEBUG_VAR(top_.size());
     for(auto top:top_)
     {
-        if(who == top.get())
+        if(who == top)
         {
-           return blobs_[i];
+            DEBUG_VAR(blobs_.size());
+            if(blobs_.size() > i)
+            {
+                return blobs_[i];
+            }
+            else
+            {
+                FATAL_VAR("fatal errro");
+            }
         }
         i++;
     }

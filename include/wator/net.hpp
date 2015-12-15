@@ -43,7 +43,7 @@ namespace Wator {
     struct NetParam {
         bool endless_ = false;
         int iter_ = 1;
-        int epoch_ = 1000*1000;
+        int epoch_ = 2;
     };
     /**
      * Net.
@@ -65,7 +65,7 @@ namespace Wator {
          * Connect a Layer to Net.
          * @param [in] layer
         **/
-        Net& operator << (shared_ptr<LayerBase> layer);
+        Net& operator << (LayerBase *layer);
 
         /**
          * Train net
@@ -77,7 +77,7 @@ namespace Wator {
         **/
         void test();
     private:
-        vector<shared_ptr<LayerBase> > layers_;
+        vector<LayerBase*> layers_;
         
         /// configureable
         NetParam param_;

@@ -98,9 +98,9 @@ void CoulombLayer::update(void)
         INFO_VAR(rateLoop);
         INFO_VAR(rateLoop/(float)size_);
         if(rateLoop>0){
-            activeRate_ += rateLoop/(float)size_;
+            //activeRate_ += rateLoop/(float)size_;
         } else {
-            deactiveRate_ -= rateLoop/(float)size_;
+            //deactiveRate_ -= rateLoop/(float)size_;
         }
         INFO_VAR(bandGap_);
         INFO_VAR((double)spitedCounter/(double)size_);
@@ -131,7 +131,7 @@ void CoulombLayer::forward(void)
     blobsRaw_.clear();
     blobs_.clear();
     for(auto btm:bottom_){
-        auto input = dynamic_pointer_cast<LayerInput>(btm);
+        LayerInput *input = dynamic_cast<LayerInput*>(btm);
         auto inBlob = input->getBlob(this);
         INFO_VAR(inBlob->size_);
         INFO_VAR(weight_.size());

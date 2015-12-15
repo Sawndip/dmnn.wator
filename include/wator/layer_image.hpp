@@ -41,6 +41,7 @@ namespace Wator {
     struct ImageLayerParam {
         string root_ = "data/retina/";
     };
+    class CoulombLayer;
     class ImageLayer :public LayerInput {
     public:
         /**
@@ -48,6 +49,12 @@ namespace Wator {
          **/
         explicit ImageLayer();
         
+        /**
+         * Connect a Layer to Net.
+         * @param [in] layer
+         **/
+        CoulombLayer& operator << (CoulombLayer &layer);
+
         /**
          * load
          * @return None.

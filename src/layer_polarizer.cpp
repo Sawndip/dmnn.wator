@@ -34,6 +34,8 @@ using namespace Wator;
 #include <boost/property_tree/json_parser.hpp>
 using namespace boost::property_tree;
 
+
+
 /**
  * Constructor
  **/
@@ -167,7 +169,7 @@ void Polarizer1stLayer::forward(void)
     blobsRaw_.clear();
     blobs_.clear();
     for(auto btm:bottom_){
-        auto input = dynamic_pointer_cast<LayerInput>(btm);
+        LayerInput *input = dynamic_cast<LayerInput*>(btm);
         auto inBlob = input->getBlob(this);
         INFO_VAR(inBlob->size_);
         INFO_VAR(weight_.size());

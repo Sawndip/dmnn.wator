@@ -35,19 +35,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #if 0
-#define TRACE_VAR(x) {BOOST_LOG_TRIVIAL(trace) << #x << "=<" << x << ">" <<endl;}
+#define TRACE_VAR(x) {BOOST_LOG_TRIVIAL(trace) << __FILE__ << ":" << __LINE__ << ":" << #x << "=<" << x << ">" <<endl;}
 #else
 #define TRACE_VAR(x)
 #endif
 
 #if 1
-#define DEBUG_VAR(x) {BOOST_LOG_TRIVIAL(debug) << #x << "=<" << x << ">" <<endl;}
+#define DEBUG_VAR(x) {BOOST_LOG_TRIVIAL(debug) << __FILE__ << ":" << __LINE__ << ":" << #x << "=<" << x << ">" <<endl;}
 #else
 #define DEBUG_VAR(x)
 #endif
 
 #if 1
-#define INFO_VAR(x) {BOOST_LOG_TRIVIAL(info) << #x << "=<" << x << ">" <<endl;}
+#define INFO_VAR(x) {BOOST_LOG_TRIVIAL(info) << __FILE__ << ":" << __LINE__ << ":" << #x << "=<" << x << ">" <<endl;}
 #else
 #define INFO_VAR(x)
+#endif
+
+
+#if 1
+#define FATAL_VAR(x) {BOOST_LOG_TRIVIAL(info) << __FILE__ << ":" << __LINE__ << ":" << #x << "=<" << x << ">" <<endl;}
+#else
+#define FATAL_VAR(x)
 #endif
