@@ -65,7 +65,7 @@ void LayerBase::load(void)
  **/
 void LayerBase::round(void)
 {
-    DEBUG_VAR(top_.size());
+    TRACE_VAR(top_.size());
     for(auto & top:top_){
         top->round();
     }
@@ -113,12 +113,12 @@ void LayerInput::load(void)
 shared_ptr<Blob<uint8_t>> LayerInput::getBlob(const LayerBase* who)
 {
     int i = 0;
-    DEBUG_VAR(top_.size());
+    TRACE_VAR(top_.size());
     for(auto top:top_)
     {
         if(who == top)
         {
-            DEBUG_VAR(blobs_.size());
+            TRACE_VAR(blobs_.size());
             if(blobs_.size() > i)
             {
                 return blobs_[i];

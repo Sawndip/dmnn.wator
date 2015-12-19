@@ -41,6 +41,7 @@ using namespace boost::property_tree;
  **/
 PolarizerLayer::PolarizerLayer()
 {
+#if 0
     activeWeight_ = {
         2.0,
         2.0,
@@ -66,6 +67,7 @@ PolarizerLayer::PolarizerLayer()
     for(int i = 0 ;i< activeWeight_.size();i++) {
         weight_.push_back(activeWeight_[i] - deactiveWeight_[i]);
     }
+#endif
 }
 
 /**

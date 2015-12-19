@@ -34,7 +34,7 @@ using namespace std;
 #include "wator/layer.hpp"
 
 namespace Wator {
-    class CoulombLayer :public PolarizerLayer {
+    class CoulombLayer :public LayerBase {
         friend class ImageLayer;
     public:
         /**
@@ -66,18 +66,20 @@ namespace Wator {
          **/
         void updateW(void);
     private:
-        // active rate
-        float activeRate_ = 2.;
+        const int w_ = 3;
+        const int h_ = 3;
+        int size_ = 0;
+        float max_ = 0;
+        float min_ = INT32_MAX;
+        vector<shared_ptr<Blob<float>>> blobsRaw_;
+        vector<shared_ptr<Blob<bool>>> blobs_;
 
-        // deactive rate
-        float deactiveRate_ = 1.;
-
-        // learn rate
-        const float learnRate_ = 0.001;
-        
         // K Coulomb
         vector<float> kCoulomb_;
-
+        
+        //
+        const int activeReciprocal_ = 3;
+        const int  thresholdStep_ = 1;
     };
 
 }
