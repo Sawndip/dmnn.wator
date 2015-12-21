@@ -117,9 +117,6 @@ void ImageLayer::pump(void)
                     index += grid * clm->w_ * clm->h_;
                     index += (y%clm->h_)*clm->w_  + x%clm->w_ ;
                     TRACE_VAR(index);
-                    if (0==byte){
-                        byte = 1;
-                    }
                     blobs_[i]->data_[index] = byte;
                 }
             }

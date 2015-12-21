@@ -32,6 +32,5 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <wator/blob.hpp>
 #include <wator/layer.hpp>
 #include <wator/layer_image.hpp>
-#include <wator/layer_polarizer.hpp>
 #include <wator/layer_coulomb.hpp>
 #include <wator/net.hpp>
