@@ -85,6 +85,26 @@ void ImageLayer::load(void)
     }
     INFO_VAR("finnish load data");
 }
+
+/*
+ x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12
+ y1,y2,y3,y4,y5,y6,y7,y8,y9,y10,y11,y12
+ z1,z2,z3,z4,z5,z6,z7,z8,z9,z10,z11,z12
+ u1,u2,u3,u4,u5,u6,u7,u8,u9,u10,u11,u12
+ v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12
+ w1,w2,w3,w4,w5,w6,w7,w8,w9,w10,w11,w12
+ 
+ ------------------
+ x1,x2,x3,y1,y2,y3,z1,z2,z3,  
+ x4,x5,x6,y4,y5,y6,z4,z5,z6, 
+ x7,x8,x9,y7,y8,y9,z7,z8,z9,
+ x10,x11,x12,y10,y11,y12,z10,z11,z12,
+ u1,u2,u3,v1,v2,v3,w1,w2,w3,
+ u4,u5,u6,v4,v5,v6,w4,w5,w6,
+ u7,u8,u9,v7,v8,v9,w7,w8,w9,
+ u10,u11,u12,v10,v11,v12,w10,w11,w12
+ */
+
 void ImageLayer::pump(void)
 {
     for(int i = 0;i < top_.size();i++ )

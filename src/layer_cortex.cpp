@@ -75,7 +75,5 @@ void CortexLayer::round(void)
  **/
 void CortexLayer::forward(void)
 {
-    blobsRaw_.clear();
-    blobs_.clear();
     INFO_VAR("finnish CortexLayer::forward");
 }

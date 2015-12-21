@@ -60,23 +60,11 @@ namespace Wator {
          **/
         virtual void update(void);
     private:
+    protected:
+        const int w_ = 3;
+        const int h_ = 3;
+        const int sparse_ = 3;
     private:
-        const int w_ = 5;
-        const int h_ = 5;
-        int size_ = 0;
-        float max_ = 0;
-        float min_ = INT32_MAX;
-        vector<shared_ptr<Blob<float>>> blobsRaw_;
-        vector<shared_ptr<Blob<bool>>> blobs_;
-
-        
-        //
-        const int activeReciprocal_ = 3;
-        const int  thresholdStep_ = 1;
-        
-        int wGrid_;
-        int hGrid_;
-        int chGrid_;
     };
 
 }
