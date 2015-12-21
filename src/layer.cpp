@@ -137,6 +137,22 @@ shared_ptr<Blob<uint8_t>> LayerInput::getBlob(const LayerBase* who)
 /**
  * Constructor
  **/
+LayerHidden::LayerHidden()
+{
+}
+
+/**
+ * Constructor
+ * @param [in] info layer parameter.
+ **/
+LayerHidden::LayerHidden(const ptree& info)
+{
+}
+
+
+/**
+ * Constructor
+ **/
 LayerOutput::LayerOutput()
 {
 }

@@ -53,6 +53,12 @@ namespace Wator {
          * @return None.
          **/
         virtual void forward(void);
+
+        /**
+         * aspect
+         * @return None.
+         **/
+        virtual void aspect(int w,int h,int ch);
     protected:
         /**
          * update
@@ -80,6 +86,10 @@ namespace Wator {
         //
         const int activeReciprocal_ = 3;
         const int  thresholdStep_ = 1;
+        
+        int wGrid_;
+        int hGrid_;
+        int chGrid_;
     };
 
 }

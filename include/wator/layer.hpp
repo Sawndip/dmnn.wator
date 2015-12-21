@@ -125,6 +125,26 @@ namespace Wator {
     };
 
     /**
+     * LayerOutput Base of Hidden layers.
+     **/
+    class LayerHidden :public LayerBase{
+    public:
+    protected:
+        /**
+         * Constructor
+         **/
+        explicit LayerHidden();
+        
+        /**
+         * Constructor
+         * @param [in] info layer parameter.
+         **/
+        explicit LayerHidden(const ptree& info);
+        
+    protected:
+    };
+
+    /**
      * LayerOutput Base of Output layers.
      **/
     class LayerOutput :public LayerBase{

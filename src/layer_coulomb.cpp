@@ -74,6 +74,18 @@ void CoulombLayer::update(void)
 
 
 /**
+ * aspect
+ * @return None.
+ **/
+void CoulombLayer::aspect(int w,int h,int ch)
+{
+    this->wGrid_ = w;
+    this->hGrid_ = h;
+    this->chGrid_ = ch;
+}
+
+
+/**
  * round
  * @return None.
  **/

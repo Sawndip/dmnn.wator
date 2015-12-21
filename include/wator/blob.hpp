@@ -59,12 +59,18 @@ namespace Wator {
          * @param [in] size 
          **/
         explicit Blob(int width,int height,int channel)
-        :size_(width*height*channel)
-        ,data_(new T[width*height*channel])
+        :w_(width)
+        ,h_(height)
+        ,ch_(channel)
+        ,size_(w_*h_*ch_)
+        ,data_(new T[size_])
         {
         }
     public:
-        unique_ptr<T[]> data_;
+        int w_;
+        int h_;
+        int ch_;
         int size_ ;
+        unique_ptr<T[]> data_;
     };
 }
