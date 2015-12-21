@@ -28,11 +28,55 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
-#include <wator/debug.hpp>
-#include <wator/blob.hpp>
-#include <wator/layer.hpp>
-#include <wator/layer_image.hpp>
-#include <wator/layer_coulomb.hpp>
-#include <wator/layer_cortex.hpp>
-#include <wator/layer_v1_cortex.hpp>
-#include <wator/net.hpp>
+#include <fstream>
+#include <memory>
+using namespace std;
+#include "wator/layer.hpp"
+
+namespace Wator {
+    class CortexLayer :public LayerHidden {
+    public:
+        /**
+         * Constructor
+         **/
+        explicit CortexLayer();
+
+        /**
+         * round
+         * @return None.
+         **/
+        virtual void round(void);
+        
+        /**
+         * forward
+         * @return None.
+         **/
+        virtual void forward(void);
+
+    protected:
+        /**
+         * update
+         * @return None.
+         **/
+        virtual void update(void);
+    private:
+    private:
+        const int w_ = 5;
+        const int h_ = 5;
+        int size_ = 0;
+        float max_ = 0;
+        float min_ = INT32_MAX;
+        vector<shared_ptr<Blob<float>>> blobsRaw_;
+        vector<shared_ptr<Blob<bool>>> blobs_;
+
+        
+        //
+        const int activeReciprocal_ = 3;
+        const int  thresholdStep_ = 1;
+        
+        int wGrid_;
+        int hGrid_;
+        int chGrid_;
+    };
+
+}

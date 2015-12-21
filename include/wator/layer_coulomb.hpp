@@ -34,6 +34,7 @@ using namespace std;
 #include "wator/layer.hpp"
 
 namespace Wator {
+    class V1CortexLayer;
     class CoulombLayer :public LayerBase {
         friend class ImageLayer;
     public:
@@ -41,6 +42,12 @@ namespace Wator {
          * Constructor
          **/
         explicit CoulombLayer();
+
+        /**
+         * Connect a Layer to Net.
+         * @param [in] layer
+         **/
+        V1CortexLayer& operator << (V1CortexLayer &layer);
 
         /**
          * round

@@ -40,8 +40,10 @@ namespace log = boost::log;
 
 
 static void train(void){
-    ImageLayer img;
+    V1CortexLayer v1;
     CoulombLayer coulom;
+    coulom << v1;
+    ImageLayer img;
     img << coulom;
 
     Net net;
@@ -49,8 +51,10 @@ static void train(void){
     net.train();
 }
 static void test(void){
-    ImageLayer img;
+    V1CortexLayer v1;
     CoulombLayer coulom;
+    coulom << v1;
+    ImageLayer img;
     img << coulom;
 
     Net net;

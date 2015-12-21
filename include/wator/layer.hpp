@@ -94,7 +94,6 @@ namespace Wator {
      * LayerInput Base of Input layers.
      **/
     class LayerInput :public LayerBase{
-        friend class Polarizer1stLayer;
         friend class CoulombLayer;
     public:
     protected:

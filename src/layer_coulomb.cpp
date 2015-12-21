@@ -53,6 +53,17 @@ CoulombLayer::CoulombLayer()
     INFO_VAR(weight_.size());
 }
 
+/**
+ * Connect a Layer to Net.
+ * @param [in] layer
+ **/
+V1CortexLayer& CoulombLayer::operator << (V1CortexLayer &layer)
+{
+    this->top_.push_back(&layer);
+    layer.bottom(this);
+    INFO_VAR(top_.size());
+    return layer;
+}
 
 
 /**
