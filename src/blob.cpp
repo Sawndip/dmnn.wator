@@ -73,7 +73,11 @@ template <typename T> void Blob<T>::dump(void){
             }
         }
     }
-    cv::imwrite("dump.image.jpg",image);
+    static int counter = 0;
+    string path = "dump.image.";
+    path += std::to_string(++counter);
+    path += ".png";
+    cv::imwrite(path ,image);
 }
 
 template void Blob<bool>::dump();
