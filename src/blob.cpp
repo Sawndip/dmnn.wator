@@ -31,3 +31,50 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace Wator;
 
 
+#include <opencv/highgui.h>
+/**
+ * dump to png
+ * @return None.
+ **/
+template <typename T> void Blob<T>::dump(void){
+    INFO_VAR(this->w_);
+    INFO_VAR(this->h_);
+    INFO_VAR(this->ch_);
+    cv::Mat image(this->h_,this->w_,CV_8UC3);
+    for (int x = 0; x < this->w_; x++) {
+        for (int y = 0; y < this->h_; y++) {
+            if(3 ==this->ch_) {
+                for (int ch = 0; ch < this->ch_; ch++) {
+                    int index = ch*this->w_* this->h_ + y*this->w_ + x;
+                    auto value = this->data_[index];
+                    TRACE_VAR(index);
+                    TRACE_VAR(value);
+                    if (value) {
+                        image.at<cv::Vec3b>(y,x)[ch] = 0xff;
+                    } else {
+                        image.at<cv::Vec3b>(y,x)[ch] = 0x0;
+                    }
+                }
+            }
+            if (1 ==this->ch_) {
+                int index = y*this->w_ + x;
+                auto value = this->data_[index];
+                TRACE_VAR(index);
+                TRACE_VAR(value);
+                if (value) {
+                    image.at<cv::Vec3b>(y,x)[0] = 0xff;
+                    image.at<cv::Vec3b>(y,x)[1] = 0xff;
+                    image.at<cv::Vec3b>(y,x)[2] = 0xff;
+                } else {
+                    image.at<cv::Vec3b>(y,x)[0] = 0x0;
+                    image.at<cv::Vec3b>(y,x)[1] = 0x0;
+                    image.at<cv::Vec3b>(y,x)[2] = 0x0;
+                }
+            }
+        }
+    }
+    cv::imwrite("dump.image.jpg",image);
+}
+
+template void Blob<bool>::dump();
+

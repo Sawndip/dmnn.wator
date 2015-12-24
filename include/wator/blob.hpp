@@ -66,6 +66,13 @@ namespace Wator {
         ,data_(new T[size_])
         {
         }
+        
+        /**
+         * dump to png
+         * @return None.
+         **/
+        void dump(void);
+        
     public:
         int w_;
         int h_;

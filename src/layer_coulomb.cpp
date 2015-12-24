@@ -106,6 +106,7 @@ void CoulombLayer::round(void)
     this->update();
     INFO_VAR("finnish CoulombLayer::round");
     LayerBase::round();
+    this->dump();
 }
 
 
@@ -168,7 +169,7 @@ void CoulombLayer::forward(void)
         INFO_VAR(inBlob->size_);
         INFO_VAR(weight_.size());
         size_ = inBlob->size_/weight_.size();
-        auto raw = shared_ptr<Blob<float>>(new Blob<float>(size_));
+        auto raw = shared_ptr<Blob<float>>(new Blob<float>(this->wGrid_,this->hGrid_,this->chGrid_));
         max_ = 0;
         min_ = INT32_MAX;
         for(int i = 0 ;i < size_ ;i++) {
@@ -187,8 +188,10 @@ void CoulombLayer::forward(void)
         }
         blobsRaw_.push_back(raw);
         
+        
+        /// cal every blob for every top
         for (auto top:top_) {
-            auto blob = shared_ptr<Blob<bool>>(new Blob<bool>(size_));
+            auto blob = shared_ptr<Blob<bool>>(new Blob<bool>(this->wGrid_,this->hGrid_,this->chGrid_));
             V1CortexLayer *v1 = dynamic_cast<V1CortexLayer*>(top);
             auto gridW = this->wGrid_/v1->w_;
             auto gridH = this->hGrid_/v1->h_;
@@ -200,13 +203,16 @@ void CoulombLayer::forward(void)
                         threshold_ = (max_ + min_)/2;
                         TRACE_VAR(threshold_);
                         int activeSize = v1->w_ * v1->h_;
-                        while (activeSize > (size_ / v1->sparse_)) {
+                        TRACE_VAR(activeSize);
+                        TRACE_VAR(activeSize / v1->sparse_);
+                        while (activeSize > (v1->w_ * v1->h_ / v1->sparse_)) {
                             activeSize = 0;
                             for(int x2 = 0 ;x2 < v1->w_ ;x2++) {
                                 for(int y2 = 0 ;y2 < v1->h_ ;y2++) {
                                     /* index */
                                     auto index = ch * this->wGrid_* this->hGrid_ + (y * v1->h_+y2) * this->wGrid_ + x*v1->w_ + x2;
                                     int delta = raw->data_[index] - threshold_;
+                                    TRACE_VAR(delta);
                                     if(0 < delta ){
                                         blob->data_[index] = true;
                                         activeSize++;
@@ -217,6 +223,8 @@ void CoulombLayer::forward(void)
                             }
                             threshold_ += thresholdStep_;
                         }
+                        TRACE_VAR(activeSize);
+                        TRACE_VAR(v1->w_ * v1->h_ / v1->sparse_);
                     }
                 }
             }
@@ -225,4 +233,15 @@ void CoulombLayer::forward(void)
     }
     INFO_VAR(blobs_.size());
     INFO_VAR("finnish CoulombLayer::forward");
+}
+
+
+/**
+ * dump to png
+ * @return None.
+ **/
+void CoulombLayer::dump(void){
+    for (auto blob:blobs_) {
+        blob->dump();
+    }
 }

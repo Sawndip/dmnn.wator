@@ -78,6 +78,12 @@ namespace Wator {
          * @return None.
          **/
         void updateW(void);
+
+        /**
+         * dump to png
+         * @return None.
+         **/
+        void dump(void);
     private:
         const int w_ = 3;
         const int h_ = 3;
@@ -90,8 +96,6 @@ namespace Wator {
         // K Coulomb
         vector<float> kCoulomb_;
         
-        //
-        const int activeReciprocal_ = 3;
         const int  thresholdStep_ = 1;
         
         int wGrid_;
