@@ -140,7 +140,14 @@ namespace Wator {
          **/
         explicit LayerHidden(const ptree& info);
         
+        /**
+         * get ptr
+         * @return None.
+         **/
+        shared_ptr<Blob<bool>> getBlob(const LayerBase* who);
     protected:
+        vector<shared_ptr<Blob<bool>>> filter_;
+        vector<shared_ptr<Blob<bool>>> blobs_;
     };
 
     /**

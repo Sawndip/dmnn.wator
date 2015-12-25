@@ -43,7 +43,7 @@ CoulombLayer::CoulombLayer()
         for(int x =0;x < w_ ;x++){
             // 电荷中心，在几何中心。
             float w = (x- w_/2) * (x- w_/2) + (y- h_/2) * (y- h_/2) +1;
-            w = 1/w - 0.25;
+            w = 1/w;
             TRACE_VAR(x);
             TRACE_VAR(y);
             weight_.push_back(w);
@@ -244,4 +244,31 @@ void CoulombLayer::dump(void){
     for (auto blob:blobs_) {
         blob->dump();
     }
+}
+
+/**
+ * get ptr
+ * @return None.
+ **/
+shared_ptr<Blob<bool>> CoulombLayer::getBlob(const LayerBase* who)
+{
+    int i = 0;
+    TRACE_VAR(top_.size());
+    for(auto top:top_)
+    {
+        if(who == top)
+        {
+            TRACE_VAR(blobs_.size());
+            if(blobs_.size() > i)
+            {
+                return blobs_[i];
+            }
+            else
+            {
+                FATAL_VAR("fatal errro");
+            }
+        }
+        i++;
+    }
+    return nullptr;
 }

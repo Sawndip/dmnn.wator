@@ -34,19 +34,12 @@ using namespace std;
 #include "wator/layer.hpp"
 
 namespace Wator {
-    class ObjectLayer;
-    class CortexLayer :public LayerHidden {
+    class ObjectLayer :public LayerOutput {
     public:
         /**
          * Constructor
          **/
-        explicit CortexLayer();
-
-        /**
-         * Connect a Layer to Net.
-         * @param [in] layer
-         **/
-        ObjectLayer& operator << (ObjectLayer &layer);
+        explicit ObjectLayer();
 
         /**
          * round
@@ -68,9 +61,6 @@ namespace Wator {
         virtual void update(void);
     private:
     protected:
-        const int w_ = 3;
-        const int h_ = 3;
-        const int sparse_ = 3;
     private:
     };
 

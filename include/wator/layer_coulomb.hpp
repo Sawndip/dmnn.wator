@@ -66,6 +66,13 @@ namespace Wator {
          * @return None.
          **/
         virtual void aspect(int w,int h,int ch);
+    
+        /**
+         * get ptr
+         * @return None.
+         **/
+        shared_ptr<Blob<bool>> getBlob(const LayerBase* who);
+
     protected:
         /**
          * update

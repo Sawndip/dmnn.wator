@@ -37,7 +37,7 @@ using namespace boost::property_tree;
 /**
  * Constructor
  **/
-CortexLayer::CortexLayer()
+ObjectLayer::ObjectLayer()
 {
 }
 
@@ -49,9 +49,9 @@ CortexLayer::CortexLayer()
  * update
  * @return None.
  **/
-void CortexLayer::update(void)
+void ObjectLayer::update(void)
 {
-    INFO_VAR("finnish CortexLayer::update");
+    INFO_VAR("finnish ObjectLayer::update");
 }
 
 
@@ -61,11 +61,11 @@ void CortexLayer::update(void)
  * round
  * @return None.
  **/
-void CortexLayer::round(void)
+void ObjectLayer::round(void)
 {
     this->forward();
     this->update();
-    INFO_VAR("finnish CortexLayer::round");
+    INFO_VAR("finnish ObjectLayer::round");
 }
 
 
@@ -73,20 +73,10 @@ void CortexLayer::round(void)
  * forward
  * @return None.
  **/
-void CortexLayer::forward(void)
+void ObjectLayer::forward(void)
 {
-    INFO_VAR("finnish CortexLayer::forward");
+    INFO_VAR("finnish ObjectLayer::forward");
 }
 
-/**
- * Connect a Layer to Net.
- * @param [in] layer
- **/
-ObjectLayer& CortexLayer::operator << (ObjectLayer &layer)
-{
-    this->top_.push_back(&layer);
-    layer.bottom(this);
-    INFO_VAR(top_.size());
-    return layer;
-}
+
 

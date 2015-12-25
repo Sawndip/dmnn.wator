@@ -61,6 +61,11 @@ namespace Wator {
          **/
         virtual void update(void);
     private:
+        /**
+         * dump to png
+         * @return None.
+         **/
+        void dump(void);
     private:
     };
 

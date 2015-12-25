@@ -66,6 +66,8 @@ void V1CortexLayer::round(void)
     this->forward();
     this->update();
     INFO_VAR("finnish V1CortexLayer::round");
+    LayerBase::round();
+    this->dump();
 }
 
 
@@ -75,5 +77,38 @@ void V1CortexLayer::round(void)
  **/
 void V1CortexLayer::forward(void)
 {
+    filter_.clear();
+    blobs_.clear();
+    for(auto btm:bottom_){
+        CoulombLayer *coulom  = dynamic_cast<CoulombLayer*>(btm);
+        auto coulomBlob = coulom->getBlob(this);
+        INFO_VAR(coulomBlob->w_);
+        INFO_VAR(coulomBlob->h_);
+        INFO_VAR(coulomBlob->ch_);
+        const int size = (coulomBlob->w_/this->w_ )* (coulomBlob->h_ /this->h_)* coulomBlob->ch_;
+        for (auto top:top_) {
+            for (int ch = 0; ch < coulomBlob->ch_; ch++) {
+                ;
+                for (int x = 0; x < coulomBlob->w_; x++) {
+                    ;
+                    for (int y = 0; y < coulomBlob->h_; y++) {
+                        ;
+                    }
+                }
+            }
+        }
+    }
+    INFO_VAR(blobs_.size());
     INFO_VAR("finnish V1CortexLayer::forward");
+}
+
+
+/**
+ * dump to png
+ * @return None.
+ **/
+void V1CortexLayer::dump(void){
+    for (auto blob:blobs_) {
+        blob->dump();
+    }
 }
