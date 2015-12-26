@@ -117,14 +117,18 @@ void V1CortexLayer::forward(void)
         TRACE_VAR(pinch->size_);
         for (int i = 0;i < pinch->size_;i += this->w_*this->h_) {
             uint64_t memIndex = 0;
-            int couter = 0;
             for (int j = 0; j < this->w_*this->h_; j++) {
                 if (pinch->data_[i + j]) {
                     memIndex++;
-                    couter++;
                 }
                 memIndex = memIndex <<1;
             }
+            std::bitset<64> memBit(memIndex);
+            // sparse +- 1/3
+            if (memBit.count() < this->sparse_*2/3 || memBit.count() > this->sparse_*4/3) {
+                continue;
+            }
+            TRACE_VAR(memBit);
             TRACE_VAR(memIndex);
             auto it = memory.find(memIndex);
             if (it != memory.end()) {
@@ -137,18 +141,32 @@ void V1CortexLayer::forward(void)
     }
     INFO_VAR(memory_.size());
     for(auto memory :memory_) {
+        map<uint64_t,vector<uint64_t>> sortByCount;
         for (auto it:memory) {
-            if(9 ==this->w_*this->h_) {
-                std::bitset<9> y(it.first);
-                INFO_VAR(y);
+            auto memCount = it.second;
+            auto itSort = sortByCount.find(memCount);
+            if (sortByCount.end() != itSort) {
+                itSort->second.push_back(it.first);
+            } else {
+                sortByCount[memCount] = {it.first};
             }
-            if(25 ==this->w_*this->h_) {
-                std::bitset<25> y(it.first);
-                INFO_VAR(y);
+        }
+        for (auto it:sortByCount) {
+            auto memCount = it.first;
+            INFO_VAR(memCount);
+            for (auto mem:it.second) {
+                if(9 ==this->w_*this->h_) {
+                    std::bitset<9> memBit(mem);
+                    INFO_VAR(memBit);
+                }
+                if(25 ==this->w_*this->h_) {
+                    std::bitset<25> memBit(mem);
+                    INFO_VAR(memBit);
+                }
             }
-            INFO_VAR(it.second);
         }
         INFO_VAR(memory.size());
+        INFO_VAR(sortByCount.size());
 #if 0
         {
             uint64_t line = 0b010010010;
