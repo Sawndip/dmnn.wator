@@ -95,13 +95,13 @@ void V1CortexLayer::forward(void)
             for (int ch = 0; ch < coulomBlob->ch_; ch++) {
                 for (int x = 0; x < coulomBlob->w_; x++) {
                     for (int y = 0; y < coulomBlob->h_; y++) {
-                        int grid = ((y/this->h_) * (coulomBlob->w_/this->w_))+ (x/this->w_) ;
+                        int grid = (y/this->h_) * (coulomBlob->w_/this->w_) + (x/this->w_) ;
                         int index = ch * coulomBlob->w_ * coulomBlob->h_;
                         index += grid * this->w_ * this->h_;
                         index += (y%this->h_)*this->w_  + x%this->w_ ;
                         TRACE_VAR(index);
                         int index2 = ch * coulomBlob->w_ * coulomBlob->h_;
-                        index2 += y*coulomBlob->w_ + x
+                        index2 += y*coulomBlob->w_ + x;
                         TRACE_VAR(index2);
                         pinch->data_[index] = coulomBlob->data_[index2];
                     }
@@ -117,9 +117,11 @@ void V1CortexLayer::forward(void)
         TRACE_VAR(pinch->size_);
         for (int i = 0;i < pinch->size_;i += this->w_*this->h_) {
             uint64_t memIndex = 0;
+            int couter = 0;
             for (int j = 0; j < this->w_*this->h_; j++) {
                 if (pinch->data_[i + j]) {
                     memIndex++;
+                    couter++;
                 }
                 memIndex = memIndex <<1;
             }
@@ -135,15 +137,19 @@ void V1CortexLayer::forward(void)
     }
     INFO_VAR(memory_.size());
     for(auto memory :memory_) {
-/*
         for (auto it:memory) {
             if(9 ==this->w_*this->h_) {
                 std::bitset<9> y(it.first);
                 INFO_VAR(y);
             }
+            if(25 ==this->w_*this->h_) {
+                std::bitset<25> y(it.first);
+                INFO_VAR(y);
+            }
             INFO_VAR(it.second);
         }
- */
+        INFO_VAR(memory.size());
+#if 0
         {
             uint64_t line = 0b010010010;
             std::bitset<9> LineB(line);
@@ -188,6 +194,7 @@ void V1CortexLayer::forward(void)
                 INFO_VAR(0);
             }
         }
+#endif
     }
     INFO_VAR(blobs_.size());
     INFO_VAR("finnish V1CortexLayer::forward");
