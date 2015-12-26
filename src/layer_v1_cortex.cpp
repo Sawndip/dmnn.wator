@@ -30,6 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "wator.hpp"
 using namespace Wator;
 
+#include <bitset>
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 using namespace boost::property_tree;
@@ -39,6 +41,8 @@ using namespace boost::property_tree;
  **/
 V1CortexLayer::V1CortexLayer()
 {
+    
+    memory_.push_back({});
 }
 
 
@@ -77,7 +81,7 @@ void V1CortexLayer::round(void)
  **/
 void V1CortexLayer::forward(void)
 {
-    filter_.clear();
+    pinchs_.clear();
     blobs_.clear();
     for(auto btm:bottom_){
         CoulombLayer *coulom  = dynamic_cast<CoulombLayer*>(btm);
@@ -87,14 +91,101 @@ void V1CortexLayer::forward(void)
         INFO_VAR(coulomBlob->ch_);
         const int size = (coulomBlob->w_/this->w_ )* (coulomBlob->h_ /this->h_)* coulomBlob->ch_;
         for (auto top:top_) {
+            auto pinch = shared_ptr<Blob<bool>>(new Blob<bool>(coulomBlob->w_,coulomBlob->h_,coulomBlob->ch_));
             for (int ch = 0; ch < coulomBlob->ch_; ch++) {
-                ;
                 for (int x = 0; x < coulomBlob->w_; x++) {
-                    ;
                     for (int y = 0; y < coulomBlob->h_; y++) {
-                        ;
+                        int grid = ((y/this->h_) * (coulomBlob->w_/this->w_))+ (x/this->w_) ;
+                        int index = ch * coulomBlob->w_ * coulomBlob->h_;
+                        index += grid * this->w_ * this->h_;
+                        index += (y%this->h_)*this->w_  + x%this->w_ ;
+                        TRACE_VAR(index);
+                        int index2 = ch * coulomBlob->w_ * coulomBlob->h_;
+                        index2 += y*coulomBlob->w_ + x
+                        TRACE_VAR(index2);
+                        pinch->data_[index] = coulomBlob->data_[index2];
                     }
                 }
+            }
+            pinchs_.push_back(pinch);
+        }
+    }
+    INFO_VAR(pinchs_.size());
+    for(int index = 0; index < pinchs_.size();index++) {
+        auto &memory = memory_[index];
+        auto pinch = pinchs_[index];
+        TRACE_VAR(pinch->size_);
+        for (int i = 0;i < pinch->size_;i += this->w_*this->h_) {
+            uint64_t memIndex = 0;
+            for (int j = 0; j < this->w_*this->h_; j++) {
+                if (pinch->data_[i + j]) {
+                    memIndex++;
+                }
+                memIndex = memIndex <<1;
+            }
+            TRACE_VAR(memIndex);
+            auto it = memory.find(memIndex);
+            if (it != memory.end()) {
+                it->second++;
+            } else {
+                memory[memIndex] = 1;
+            }
+        }
+        memory_[index] = memory;
+    }
+    INFO_VAR(memory_.size());
+    for(auto memory :memory_) {
+/*
+        for (auto it:memory) {
+            if(9 ==this->w_*this->h_) {
+                std::bitset<9> y(it.first);
+                INFO_VAR(y);
+            }
+            INFO_VAR(it.second);
+        }
+ */
+        {
+            uint64_t line = 0b010010010;
+            std::bitset<9> LineB(line);
+            INFO_VAR(LineB);
+            auto it = memory.find(line);
+            if (memory.end() != it) {
+                INFO_VAR(it->second);
+            } else {
+                INFO_VAR(0);
+            }
+        }
+        {
+            uint64_t line = 0b000111000;
+            std::bitset<9> LineB(line);
+            INFO_VAR(LineB);
+            auto it = memory.find(line);
+            if (memory.end() != it) {
+                INFO_VAR(it->second);
+            } else {
+                INFO_VAR(0);
+            }
+        }
+        {
+            uint64_t line = 0b100010001;
+            std::bitset<9> LineB(line);
+            INFO_VAR(LineB);
+            auto it = memory.find(line);
+            if (memory.end() != it) {
+                INFO_VAR(it->second);
+            } else {
+                INFO_VAR(0);
+            }
+        }
+        {
+            uint64_t line = 0b001010100;
+            std::bitset<9> LineB(line);
+            INFO_VAR(LineB);
+            auto it = memory.find(line);
+            if (memory.end() != it) {
+                INFO_VAR(it->second);
+            } else {
+                INFO_VAR(0);
             }
         }
     }

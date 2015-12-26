@@ -77,7 +77,7 @@ void ImageLayer::load(void)
             auto extension = p.extension().string();
             if(".jpg" == extension || ".png" == extension ||
                ".JPG" == extension || ".PNG" == extension){
-                TRACE_VAR(p);
+                INFO_VAR(p);
                 mat_ = cv::imread(p.string());
                 pump();
             }
@@ -127,7 +127,7 @@ void ImageLayer::pump(void)
                 TRACE_VAR(y);
                 for(int i = 0;i < top_.size();i++){
                     CoulombLayer *clm = dynamic_cast<CoulombLayer*>(top_[i]);
-                    clm->aspect(mat.cols/clm->w_,mat.rows/clm->h_,mat_.channels());
+                    //clm->aspect(mat.cols/clm->w_,mat.rows/clm->h_,mat_.channels());
                     TRACE_VAR(clm->w_);
                     TRACE_VAR(clm->h_);
                     int grid = ((y/clm->h_) * (mat_.cols/clm->w_))+ (x/clm->w_) ;

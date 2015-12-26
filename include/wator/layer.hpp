@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 #include <memory>
 #include <vector>
+#include <map>
+#include <cinttypes>
 using namespace std;
 
 #include <boost/property_tree/ptree.hpp>
@@ -146,8 +148,9 @@ namespace Wator {
          **/
         shared_ptr<Blob<bool>> getBlob(const LayerBase* who);
     protected:
-        vector<shared_ptr<Blob<bool>>> filter_;
+        vector<shared_ptr<Blob<bool>>> pinchs_;
         vector<shared_ptr<Blob<bool>>> blobs_;
+        vector<map<uint64_t,uint64_t>> memory_;
     };
 
     /**

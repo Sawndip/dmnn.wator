@@ -166,9 +166,16 @@ void CoulombLayer::forward(void)
     for(auto btm:bottom_){
         LayerInput *input = dynamic_cast<LayerInput*>(btm);
         auto inBlob = input->getBlob(this);
-        INFO_VAR(inBlob->size_);
+        INFO_VAR(inBlob->w_);
+        INFO_VAR(inBlob->h_);
+        INFO_VAR(inBlob->ch_);
         INFO_VAR(weight_.size());
         size_ = inBlob->size_/weight_.size();
+        this->wGrid_ = inBlob->w_/this->w_;
+        this->hGrid_ = inBlob->h_/this->h_;
+        this->chGrid_ = inBlob->ch_;
+        INFO_VAR(this->wGrid_);
+        INFO_VAR(this->hGrid_);
         auto raw = shared_ptr<Blob<float>>(new Blob<float>(this->wGrid_,this->hGrid_,this->chGrid_));
         max_ = 0;
         min_ = INT32_MAX;
