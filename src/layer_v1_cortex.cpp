@@ -144,7 +144,8 @@ void V1CortexLayer::forward(void)
             }
             std::bitset<64> memBit(memIndex);
             // sparse +- 1/3
-            if (memBit.count() < this->sparse_*2/3 || memBit.count() > this->sparse_*6/3) {
+            //if (memBit.count() < this->sparse_*2/3 || memBit.count() > this->sparse_*6/3) {
+            if (memBit.count() != this->sparse_) {
                 continue;
             }
             TRACE_VAR(memBit);

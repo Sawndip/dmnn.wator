@@ -47,14 +47,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #if 1
-#define INFO_VAR(x) {BOOST_LOG_TRIVIAL(fatal) << __FILE__ << ":" << __LINE__ << ":" << #x << "=<" << x << ">" <<endl;}
+#define INFO_VAR(x) {BOOST_LOG_TRIVIAL(info) << __FILE__ << ":" << __LINE__ << ":" << #x << "=<" << x << ">" <<endl;}
 #else
 #define INFO_VAR(x)
 #endif
 
 
 #if 1
-#define FATAL_VAR(x) {BOOST_LOG_TRIVIAL(info) << __FILE__ << ":" << __LINE__ << ":" << #x << "=<" << x << ">" <<endl;}
+#define FATAL_VAR(x) {BOOST_LOG_TRIVIAL(fatal) << __FILE__ << ":" << __LINE__ << ":" << #x << "=<" << x << ">" <<endl;}
 #else
 #define FATAL_VAR(x)
 #endif
