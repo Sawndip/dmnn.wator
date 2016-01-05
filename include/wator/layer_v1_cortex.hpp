@@ -41,6 +41,8 @@ namespace Wator {
          * Constructor
          **/
         explicit V1CortexLayer();
+        
+        virtual ~V1CortexLayer();
 
         /**
          * round

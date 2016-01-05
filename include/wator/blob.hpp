@@ -67,6 +67,11 @@ namespace Wator {
         {
         }
         
+        ~Blob()
+        {
+            delete [] data_;
+        }
+        
         /**
          * dump to png
          * @return None.
@@ -78,6 +83,6 @@ namespace Wator {
         int h_;
         int ch_;
         int size_ ;
-        unique_ptr<T[]> data_;
+        T *data_;
     };
 }

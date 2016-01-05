@@ -40,6 +40,10 @@ using namespace boost::property_tree;
 CortexLayer::CortexLayer()
 {
 }
+CortexLayer::~CortexLayer()
+{
+    INFO_VAR(this);
+}
 
 
 

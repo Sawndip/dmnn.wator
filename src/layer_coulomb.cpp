@@ -248,6 +248,7 @@ void CoulombLayer::forward(void)
  * @return None.
  **/
 void CoulombLayer::dump(void){
+    INFO_VAR(blobs_.size());
     for (auto blob:blobs_) {
         blob->dump();
     }

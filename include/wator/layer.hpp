@@ -110,6 +110,7 @@ namespace Wator {
          **/
         explicit LayerInput(const ptree& info);
         
+        virtual ~LayerInput();
         /**
          * load
          * @return None.
@@ -120,9 +121,9 @@ namespace Wator {
          * get ptr
          * @return None.
          **/
-        shared_ptr<Blob<uint8_t>> getBlob(const LayerBase* who);
+        Blob<uint8_t> *getBlob(const LayerBase* who);
     protected:
-        vector<shared_ptr<Blob<uint8_t>>> blobs_;
+        vector<Blob<uint8_t>*> blobs_;
     };
 
     /**
@@ -142,14 +143,15 @@ namespace Wator {
          **/
         explicit LayerHidden(const ptree& info);
         
+        virtual ~LayerHidden();
         /**
          * get ptr
          * @return None.
          **/
-        shared_ptr<Blob<bool>> getBlob(const LayerBase* who);
+        Blob<bool>* getBlob(const LayerBase* who);
     protected:
-        vector<shared_ptr<Blob<bool>>> pinchs_;
-        vector<shared_ptr<Blob<bool>>> blobs_;
+        vector<Blob<bool>*> pinchs_;
+        vector<Blob<bool>*> blobs_;
         vector<map<uint64_t,uint64_t>> memory_;
     };
 

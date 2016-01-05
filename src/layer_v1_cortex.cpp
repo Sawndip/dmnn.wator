@@ -44,7 +44,10 @@ V1CortexLayer::V1CortexLayer()
     
     memory_.push_back({});
 }
-
+V1CortexLayer::~V1CortexLayer()
+{
+    INFO_VAR(this);
+}
 
 
 
@@ -89,20 +92,36 @@ void V1CortexLayer::forward(void)
         INFO_VAR(coulomBlob->w_);
         INFO_VAR(coulomBlob->h_);
         INFO_VAR(coulomBlob->ch_);
-        const int size = (coulomBlob->w_/this->w_ )* (coulomBlob->h_ /this->h_)* coulomBlob->ch_;
+//        const int size = (coulomBlob->w_/this->w_ )* (coulomBlob->h_ /this->h_)* coulomBlob->ch_;
         for (auto top:top_) {
-            auto pinch = shared_ptr<Blob<bool>>(new Blob<bool>(coulomBlob->w_,coulomBlob->h_,coulomBlob->ch_));
+            auto pinch = new Blob<bool>(coulomBlob->w_,coulomBlob->h_,coulomBlob->ch_);
             for (int ch = 0; ch < coulomBlob->ch_; ch++) {
-                for (int x = 0; x < coulomBlob->w_; x++) {
-                    for (int y = 0; y < coulomBlob->h_; y++) {
+                for (int y = 0; y < coulomBlob->h_; y++) {
+                    for (int x = 0; x < coulomBlob->w_; x++) {
                         int grid = (y/this->h_) * (coulomBlob->w_/this->w_) + (x/this->w_) ;
                         int index = ch * coulomBlob->w_ * coulomBlob->h_;
                         index += grid * this->w_ * this->h_;
                         index += (y%this->h_)*this->w_  + x%this->w_ ;
                         TRACE_VAR(index);
+                        TRACE_VAR(x);
+                        TRACE_VAR(y);
                         int index2 = ch * coulomBlob->w_ * coulomBlob->h_;
                         index2 += y*coulomBlob->w_ + x;
                         TRACE_VAR(index2);
+                        if (index >= coulomBlob->size_|| index2 >= coulomBlob->size_) {
+                            /// 无法整除的最后几行，不能的到下一层的完整输出，省略。
+                            TRACE_VAR(this->w_);
+                            TRACE_VAR(this->h_);
+                            TRACE_VAR(grid);
+                            TRACE_VAR(x);
+                            TRACE_VAR(y);
+                            TRACE_VAR(index);
+                            TRACE_VAR(index2);
+                            TRACE_VAR(coulomBlob->w_);
+                            TRACE_VAR(coulomBlob->h_);
+                            TRACE_VAR(coulomBlob->size_);
+                            continue;
+                        }
                         pinch->data_[index] = coulomBlob->data_[index2];
                     }
                 }
@@ -224,6 +243,7 @@ void V1CortexLayer::forward(void)
  * @return None.
  **/
 void V1CortexLayer::dump(void){
+    INFO_VAR(blobs_.size());
     for (auto blob:blobs_) {
         blob->dump();
     }

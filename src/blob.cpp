@@ -59,8 +59,8 @@ template <typename T> void Blob<T>::dump(void){
             if (1 ==this->ch_) {
                 int index = y*this->w_ + x;
                 auto value = this->data_[index];
-                TRACE_VAR(index);
-                TRACE_VAR(value);
+                INFO_VAR(index);
+                INFO_VAR(value);
                 if (value) {
                     image.at<cv::Vec3b>(y,x)[0] = 0xff;
                     image.at<cv::Vec3b>(y,x)[1] = 0xff;
