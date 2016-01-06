@@ -109,7 +109,7 @@ void V1CortexLayer::forward(void)
                         index2 += y*coulomBlob->w_ + x;
                         TRACE_VAR(index2);
                         if (index >= coulomBlob->size_|| index2 >= coulomBlob->size_) {
-                            /// 无法整除的最后几行，不能的到下一层的完整输出，省略。
+                            // 无法整除的最后几行，不能的到下一层的完整输出，省略。
                             TRACE_VAR(this->w_);
                             TRACE_VAR(this->h_);
                             TRACE_VAR(grid);
@@ -137,7 +137,12 @@ void V1CortexLayer::forward(void)
         for (int i = 0;i < pinch->size_;i += this->w_*this->h_) {
             uint64_t memIndex = 0;
             for (int j = 0; j < this->w_*this->h_; j++) {
-                if (pinch->data_[i + j]) {
+                auto index = i + j;
+                // 无法整除的最后几点，不能的到下一层的完整输出，省略。
+                if (index >= pinch->size_) {
+                    continue;
+                }
+                if (pinch->data_[index]) {
                     memIndex++;
                 }
                 memIndex = memIndex <<1;
