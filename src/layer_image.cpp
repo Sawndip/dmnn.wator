@@ -68,7 +68,7 @@ CoulombLayer& ImageLayer::operator << (CoulombLayer &layer)
  * load
  * @return None.
  **/
-void ImageLayer::load(void)
+void ImageLayer::load(bool train)
 {
     TRACE_VAR(param_.root_);
     const fs::path path(param_.root_);
@@ -80,6 +80,14 @@ void ImageLayer::load(void)
                 INFO_VAR(p);
                 mat_ = cv::imread(p.string());
                 pump();
+                for(auto &top:top_)
+                {
+                    if (train) {
+                        top->round();
+                    } else {
+                        top->forward();
+                    }
+                }
             }
         }
     }
@@ -107,6 +115,7 @@ void ImageLayer::load(void)
 
 void ImageLayer::pump(void)
 {
+    blobs_.clear();
     for(int i = 0;i < top_.size();i++ )
     {
         INFO_VAR(mat_.cols);

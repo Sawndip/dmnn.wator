@@ -51,13 +51,6 @@ LayerBase::LayerBase(const ptree& info)
 
 
 
-/**
- * load
- * @return None.
- **/
-void LayerBase::load(void)
-{
-}
 
 /**
  * round
@@ -109,7 +102,7 @@ LayerInput::LayerInput(const ptree& info)
  * load
  * @return None.
  **/
-void LayerInput::load(void)
+void LayerInput::load(bool train)
 {
 }
 

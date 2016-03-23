@@ -59,7 +59,7 @@ namespace Wator {
          * load
          * @return None.
          **/
-        virtual void load(void);
+        virtual void load(bool train);
     private:
         void pump(void);
     private:

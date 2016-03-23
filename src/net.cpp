@@ -63,16 +63,10 @@ void Net::train()
 {
     for(int i = 0;i < param_.iter_ ; i++)
     {
-        for(auto &layout :layers_)
-        {
-            layout->load();
-        }
         for(int j  =0 ;j<param_.epoch_ ;j++)
         {
-            for(auto &layout :layers_)
-            {
-                layout->round();
-            }
+            auto input = dynamic_cast<LayerInput*>(layers_.front());
+            input->load(true);
         }
     }
 }
@@ -83,9 +77,7 @@ void Net::train()
 **/
 void Net::test()
 {
-  for(auto &layout :layers_)
-  {
-    layout->forward();
-  }
+    auto input = dynamic_cast<LayerInput*>(layers_.front());
+    input->load(false);
 }
         

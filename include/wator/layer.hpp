@@ -47,12 +47,6 @@ namespace Wator {
         friend class ImageLayer;
     public:
         /**
-         * load
-         * @return None.
-         **/
-        virtual void load(void);
-
-        /**
          * round
          * @return None.
          **/
@@ -94,6 +88,12 @@ namespace Wator {
     class LayerInput :public LayerBase{
         friend class CoulombLayer;
     public:
+
+        /**
+         * load
+         * @return None.
+         **/
+        virtual void load(bool train);
     protected:
         /**
          * Constructor
@@ -107,11 +107,6 @@ namespace Wator {
         explicit LayerInput(const ptree& info);
         
         virtual ~LayerInput();
-        /**
-         * load
-         * @return None.
-         **/
-        virtual void load(void);
         
         /**
          * get ptr
