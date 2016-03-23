@@ -97,12 +97,18 @@ namespace Wator {
         int size_ = 0;
         float max_ = 0;
         float min_ = INT32_MAX;
+        
+        vector<float> activeWeight_;
+        vector<float> deactiveWeight_;
+        vector<float> weight_;
+        
         vector<shared_ptr<Blob<float>>> blobsRaw_;
         vector<shared_ptr<Blob<bool>>> blobs_;
 
         // K Coulomb
         vector<float> kCoulomb_;
         
+        int  threshold_ = 1;
         const int  thresholdStep_ = 1;
         
         int wGrid_;

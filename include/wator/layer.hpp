@@ -86,10 +86,6 @@ namespace Wator {
     protected:
         vector<LayerBase*> bottom_;
         vector<LayerBase*> top_;
-        int threshold_;
-        vector<float> activeWeight_;
-        vector<float> deactiveWeight_;
-        vector<float> weight_;
     };
 
     /**
@@ -123,6 +119,7 @@ namespace Wator {
          **/
         Blob<uint8_t> *getBlob(const LayerBase* who);
     protected:
+        int threshold_;
         vector<Blob<uint8_t>*> blobs_;
     };
 
@@ -153,6 +150,7 @@ namespace Wator {
         vector<Blob<bool>*> pinchs_;
         vector<Blob<bool>*> blobs_;
         vector<map<uint64_t,uint64_t>> memory_;
+        vector<map<uint64_t,vector<uint64_t>>> memRanking_;
     };
 
     /**

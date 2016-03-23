@@ -41,8 +41,8 @@ using namespace boost::property_tree;
  **/
 V1CortexLayer::V1CortexLayer()
 {
-    
     memory_.push_back({});
+    memRanking_.push_back({});
 }
 V1CortexLayer::~V1CortexLayer()
 {
@@ -150,7 +150,7 @@ void V1CortexLayer::forward(void)
             std::bitset<64> memBit(memIndex);
             // sparse +- 1/3
             //if (memBit.count() < this->sparse_*2/3 || memBit.count() > this->sparse_*6/3) {
-            if (memBit.count() != this->sparse_) {
+            if (memBit.count() < this->sparse_) {
                 continue;
             }
             TRACE_VAR(memBit);
@@ -165,20 +165,20 @@ void V1CortexLayer::forward(void)
         memory_[index] = memory;
     }
     INFO_VAR(memory_.size());
-    for(auto memory :memory_) {
-        map<uint64_t,vector<uint64_t>> sortByCount;
+    for(int index = 0; index < pinchs_.size();index++) {
+//        map<uint64_t,vector<uint64_t>> sortByCount;
+        auto &memory = memory_[index];
         for (auto it:memory) {
             auto memCount = it.second;
-            auto itSort = sortByCount.find(memCount);
-            if (sortByCount.end() != itSort) {
+            auto itSort = memRanking_[index].find(memCount);
+            if (memRanking_[index].end() != itSort) {
                 itSort->second.push_back(it.first);
             } else {
-                sortByCount[memCount] = {it.first};
+                memRanking_[index][memCount] = {it.first};
             }
         }
-        for (auto it:sortByCount) {
+        for (auto it:memRanking_[index]) {
             auto memCount = it.first;
-            INFO_VAR(memCount);
             for (auto mem:it.second) {
                 if(9 ==this->w_*this->h_) {
                     std::bitset<9> memBit(mem);
@@ -189,10 +189,11 @@ void V1CortexLayer::forward(void)
                     INFO_VAR(memBit);
                 }
             }
+            INFO_VAR(memCount);
         }
         INFO_VAR(memory.size());
-        INFO_VAR(sortByCount.size());
-#if 0
+        INFO_VAR(memRanking_[index].size());
+#if 1
         {
             uint64_t line = 0b010010010;
             std::bitset<9> LineB(line);
@@ -239,6 +240,16 @@ void V1CortexLayer::forward(void)
         }
 #endif
     }
+#if 0
+    for(int index = 0; index < pinchs_.size();index++) {
+        auto &pinch = pinchs_[index];
+        for (int i =0; i < pinch->size_; i + = this->w_*this->h_) {
+            for (int j = 0; j < this->w_*this->h_; j++) {
+                ;
+            }
+        }
+    }
+#endif
     INFO_VAR(blobs_.size());
     INFO_VAR("finnish V1CortexLayer::forward");
 }
