@@ -179,6 +179,7 @@ void V1CortexLayer::forward(void)
         }
         for (auto it:memRanking_[index]) {
             auto memCount = it.first;
+            INFO_VAR(memCount);
             for (auto mem:it.second) {
                 if(9 ==this->w_*this->h_) {
                     std::bitset<9> memBit(mem);
@@ -189,11 +190,10 @@ void V1CortexLayer::forward(void)
                     INFO_VAR(memBit);
                 }
             }
-            INFO_VAR(memCount);
         }
         INFO_VAR(memory.size());
         INFO_VAR(memRanking_[index].size());
-#if 1
+#if 0
         {
             uint64_t line = 0b010010010;
             std::bitset<9> LineB(line);

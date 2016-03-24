@@ -34,6 +34,9 @@ using namespace Wator;
 #include <boost/property_tree/json_parser.hpp>
 using namespace boost::property_tree;
 
+static float const fConstCoulombDiff = 0.0001;
+
+
 /**
  * Constructor
  **/
@@ -41,7 +44,7 @@ CoulombLayer::CoulombLayer()
 {
     for(int y = 0 ;y < h_;y++){
         for(int x =0;x < w_ ;x++){
-            // 电荷中心，在几何中心。
+            // 电荷中心，在几何中心。高斯分布
             float w = (x- w_/2) * (x- w_/2) + (y- h_/2) * (y- h_/2) +1;
             w = 1/w;
             TRACE_VAR(x);
@@ -50,6 +53,41 @@ CoulombLayer::CoulombLayer()
             INFO_VAR(w);
         }
     }
+    
+    
+    /// weight bias cal. 调整截距，使相同亮度的输出为0
+    float sum = 1.0;
+    bool minus = true;
+
+    float const fConstCoulombStepOne = fConstCoulombDiff * weight_.size();
+    float const fConstCoulombStepTwo = fConstCoulombDiff / weight_.size();
+    
+    do {
+        auto rate = fConstCoulombStepOne;
+        if(std::abs(sum) - fConstCoulombDiff < weight_.size()*fConstCoulombDiff) {
+            rate = fConstCoulombStepTwo;
+        }
+        sum = 0.0;
+        for (int i = 0;i < weight_.size();i++) {
+            if (minus) {
+                weight_[i] -= rate;
+            } else {
+                weight_[i] += rate;
+            }
+            
+            sum += weight_[i];
+        }
+        INFO_VAR(sum);
+        if( sum - fConstCoulombDiff < 0) {
+            minus = false;
+        }
+    } while (std::abs(sum) > fConstCoulombDiff);
+    
+    
+    for (int i = 0;i < weight_.size();i++) {
+        INFO_VAR(weight_[i]);
+    }
+    INFO_VAR(sum);
     INFO_VAR(weight_.size());
 }
 
