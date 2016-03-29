@@ -78,7 +78,8 @@ void ImplicitMemory::update(int pinch,uint64_t index,int ground)
  **/
 void ImplicitMemory::sort()
 {
-    for(int index = memRanking_.size(); index < memory_.size();index++) {
+    memRanking_.clear();
+    for(int index = 0; index < memory_.size();index++) {
         memRanking_.push_back({});
     }
     for(int index = 0; index < memory_.size();index++) {
@@ -98,12 +99,12 @@ void ImplicitMemory::sort()
         }
         for (auto it:memRanking_[index]) {
             auto memCount = it.first;
-            TRACE_VAR(memCount);
-            TRACE_VAR(it.second.size());
+            INFO_VAR(it.second.size());
+            INFO_VAR(memCount);
             for (auto mem:it.second)
             {
                 std::bitset<25> memBit(mem);
-                TRACE_VAR(memBit);
+                INFO_VAR(memBit);
             }
         }
         TRACE_VAR(memory.size());
@@ -112,11 +113,13 @@ void ImplicitMemory::sort()
     INFO_VAR(memory_.size());
     for(const auto &memory :memory_){
         INFO_VAR(memory.size());
+#if 0
         for(const auto &pair:memory){
             std::bitset<25> memBit(pair.first);
             INFO_VAR(memBit);
             INFO_VAR(pair.second);
         }
+#endif
     }
 }
 
