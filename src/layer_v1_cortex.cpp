@@ -41,7 +41,7 @@ using namespace boost::property_tree;
  **/
 V1CortexLayer::V1CortexLayer()
 {
-    memRanking_ = {{}} ;
+    memory_ = new ImplicitMemory;
 }
 V1CortexLayer::~V1CortexLayer()
 {
@@ -130,7 +130,6 @@ void V1CortexLayer::forward(void)
     }
     INFO_VAR(pinchs_.size());
     for(int index = 0; index < pinchs_.size();index++) {
-        auto &memory = memory_[index];
         auto pinch = pinchs_[index];
         TRACE_VAR(pinch->size_);
         for (int i = 0;i < pinch->size_;i += this->w_*this->h_) {
@@ -146,116 +145,10 @@ void V1CortexLayer::forward(void)
                     memIndex++;
                 }
             }
-            
-            std::bitset<64> memBit(memIndex);
-            const uint64_t max25Bit = 0b1111111111111111111111111;
-            if(memIndex > max25Bit) {
-                INFO_VAR(memBit);
-            }
-            // sparse +- 1/3
-            //if (memBit.count() < this->sparse_*2/3 || memBit.count() > this->sparse_*6/3) {
-            if (memBit.count() < this->sparse_) {
-                continue;
-            }
-            TRACE_VAR(memBit);
-            TRACE_VAR(memIndex);
-            auto it = memory.find(memIndex);
-            if (it != memory.end()) {
-                it->second++;
-                if(it->second > 470) {
-                    TRACE_VAR(memIndex);
-                    std::bitset<25> memBit25(memIndex);
-                    INFO_VAR(memBit);
-                    INFO_VAR(memBit25);
-                }
-            } else {
-                memory.insert({memIndex,1});
-            }
+            memory_->update(index,memIndex,this->sparse_*2/3);
         }
-        memory_[index] = memory;
     }
-    INFO_VAR(memory_.size());
-    for(int index = 0; index < pinchs_.size();index++) {
-//        map<uint64_t,vector<uint64_t>> sortByCount;
-        auto &memory = memory_[index];
-        for (auto it:memory) {
-            auto memCount = it.second;
-            std::bitset<25> memBit(it.first);
-            TRACE_VAR(memBit);
-            TRACE_VAR(it.second);
-            auto itSort = memRanking_[index].find(memCount);
-            if (memRanking_[index].end() != itSort) {
-                itSort->second.push_back(it.first);
-            } else {
-                memRanking_[index][memCount] = {it.first};
-            }
-        }
-        for (auto it:memRanking_[index]) {
-            auto memCount = it.first;
-            INFO_VAR(memCount);
-            INFO_VAR(it.second.size());
-            auto mem = it.second.front();
-            //for (auto mem:it.second)
-            {
-                if(9 ==this->w_*this->h_) {
-                    std::bitset<9> memBit(mem);
-                    INFO_VAR(memBit);
-                }
-                if(25 ==this->w_*this->h_) {
-                    std::bitset<25> memBit(mem);
-                    INFO_VAR(memBit);
-                }
-            }
-        }
-        INFO_VAR(memory.size());
-        INFO_VAR(memRanking_[index].size());
-#if 0
-        {
-            uint64_t line = 0b010010010;
-            std::bitset<9> LineB(line);
-            INFO_VAR(LineB);
-            auto it = memory.find(line);
-            if (memory.end() != it) {
-                INFO_VAR(it->second);
-            } else {
-                INFO_VAR(0);
-            }
-        }
-        {
-            uint64_t line = 0b000111000;
-            std::bitset<9> LineB(line);
-            INFO_VAR(LineB);
-            auto it = memory.find(line);
-            if (memory.end() != it) {
-                INFO_VAR(it->second);
-            } else {
-                INFO_VAR(0);
-            }
-        }
-        {
-            uint64_t line = 0b100010001;
-            std::bitset<9> LineB(line);
-            INFO_VAR(LineB);
-            auto it = memory.find(line);
-            if (memory.end() != it) {
-                INFO_VAR(it->second);
-            } else {
-                INFO_VAR(0);
-            }
-        }
-        {
-            uint64_t line = 0b001010100;
-            std::bitset<9> LineB(line);
-            INFO_VAR(LineB);
-            auto it = memory.find(line);
-            if (memory.end() != it) {
-                INFO_VAR(it->second);
-            } else {
-                INFO_VAR(0);
-            }
-        }
-#endif
-    }
+    memory_->sort();
 #if 0
     for(int index = 0; index < pinchs_.size();index++) {
         auto &pinch = pinchs_[index];

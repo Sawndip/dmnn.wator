@@ -165,7 +165,7 @@ LayerHidden::LayerHidden(const ptree& info)
 }
 
 
-vector<map<uint64_t,uint64_t>> LayerHidden::memory_({{}});
+//vector<map<uint64_t,uint64_t>> LayerHidden::memory_({{}});
 
 /**
  * Constructor

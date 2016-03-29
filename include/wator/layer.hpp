@@ -118,6 +118,8 @@ namespace Wator {
         vector<Blob<uint8_t>*> blobs_;
     };
 
+    
+    class ImplicitMemory;
     /**
      * LayerOutput Base of Hidden layers.
      **/
@@ -144,8 +146,7 @@ namespace Wator {
     protected:
         vector<Blob<bool>*> pinchs_;
         vector<Blob<bool>*> blobs_;
-        static vector<map<uint64_t,uint64_t>> memory_;
-        vector<map<uint64_t,vector<uint64_t>>> memRanking_;
+        ImplicitMemory* memory_;
     };
 
     /**

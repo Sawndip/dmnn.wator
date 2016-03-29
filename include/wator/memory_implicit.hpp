@@ -30,23 +30,40 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 #include <fstream>
 #include <memory>
+#include <vector>
+#include <map>
 using namespace std;
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
-using namespace boost::property_tree;
+namespace pt = boost::property_tree;
 
 namespace Wator {
     class ImplicitMemory {
-    
+        friend class V1CortexLayer;
+    public:
+        /**
+         * update
+         **/
+        void update(int pinch,uint64_t index,int ground);
+
+        /**
+         * sort
+         **/
+        void sort();
     protected:
         /**
          * Constructor
          **/
         explicit ImplicitMemory();
+        
         /**
          * Constructor
          * @param [in] info layer parameter.
          **/
-        explicit ImplicitMemory(const ptree& info);
+        explicit ImplicitMemory(const pt::ptree& info);
+    private:
+        vector<map<uint64_t,uint64_t>> memory_;
+        vector<map<uint64_t,vector<uint64_t>>> memRanking_;
+        pt::ptree serial_;
     };
 }

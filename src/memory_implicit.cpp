@@ -34,3 +34,94 @@ using namespace Wator;
 #include <boost/property_tree/json_parser.hpp>
 using namespace boost::property_tree;
 
+/**
+ * Constructor
+ **/
+ImplicitMemory::ImplicitMemory()
+{
+}
+/**
+ * Constructor
+ * @param [in] info layer parameter.
+ **/
+ImplicitMemory::ImplicitMemory(const pt::ptree& info)
+:serial_(info)
+{
+}
+
+/**
+ * update
+ **/
+void ImplicitMemory::update(int pinch,uint64_t index,int ground)
+{
+    std::bitset<64> memBit(index);
+    if (memBit.count() < ground) {
+        return;
+    }
+    
+    // add hold space
+    for(int i = memory_.size();i < pinch + 1 ;i++) {
+        memory_.push_back({});
+    }
+    INFO_VAR(memory_.size());
+    auto &memory = memory_.at(pinch);
+    auto it = memory.find(index);
+    if (it != memory.end()) {
+        it->second++;
+   } else {
+        memory.insert({index,1});
+    }
+}
+
+/**
+ * sort
+ **/
+void ImplicitMemory::sort()
+{
+    for(int index = memRanking_.size(); index < memory_.size();index++) {
+        memRanking_.push_back({});
+    }
+    for(int index = 0; index < memory_.size();index++) {
+        //        map<uint64_t,vector<uint64_t>> sortByCount;
+        auto &memory = memory_[index];
+        for (auto it:memory) {
+            auto memCount = it.second;
+            std::bitset<25> memBit(it.first);
+            TRACE_VAR(memBit);
+            TRACE_VAR(it.second);
+            auto itSort = memRanking_[index].find(memCount);
+            if (memRanking_[index].end() != itSort) {
+                itSort->second.push_back(it.first);
+            } else {
+                memRanking_[index][memCount] = {it.first};
+            }
+        }
+        for (auto it:memRanking_[index]) {
+            auto memCount = it.first;
+            TRACE_VAR(memCount);
+            TRACE_VAR(it.second.size());
+            for (auto mem:it.second)
+            {
+                std::bitset<25> memBit(mem);
+                TRACE_VAR(memBit);
+            }
+        }
+        TRACE_VAR(memory.size());
+        TRACE_VAR(memRanking_[index].size());
+    }
+    INFO_VAR(memory_.size());
+    for(const auto &memory :memory_){
+        INFO_VAR(memory.size());
+        for(const auto &pair:memory){
+            std::bitset<25> memBit(pair.first);
+            INFO_VAR(memBit);
+            INFO_VAR(pair.second);
+        }
+    }
+}
+
+/*
+ 1000010000100000000000000
+ 1000010000100000000000000
+ */
+
