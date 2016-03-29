@@ -94,7 +94,9 @@ CoulombLayer::CoulombLayer()
     }
     INFO_VAR(sum);
     INFO_VAR(weight_.size());
-    
+
+/*
+ not use it.
     for(int y = 0 ;y < h_;y++){
         for(int x =0;x < w_ ;x++){
             // 电荷中心，在几何中心。高斯分布,中心暗，外部亮。
@@ -144,6 +146,7 @@ CoulombLayer::CoulombLayer()
     }
     INFO_VAR(sum);
     INFO_VAR(weight_R_.size());
+ */
 }
 
 /**

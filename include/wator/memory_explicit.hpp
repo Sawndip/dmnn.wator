@@ -28,15 +28,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
-#include <wator/debug.hpp>
-#include <wator/blob.hpp>
-#include <wator/layer.hpp>
-#include <wator/layer_image.hpp>
-#include <wator/layer_coulomb.hpp>
-#include <wator/layer_cortex.hpp>
-#include <wator/layer_v1_cortex.hpp>
-#include <wator/layer_object.hpp>
-#include <wator/memory_implicit.hpp>
-#include <wator/memory_explicit.hpp>
-#include <wator/net.hpp>
+#include <fstream>
+#include <memory>
+using namespace std;
+#include "wator/layer.hpp"
 
+namespace Wator {
+}
