@@ -32,6 +32,9 @@ using namespace Wator;
 
 
 #include <opencv/highgui.h>
+#include <vector>
+#include <memory>
+using namespace std;
 /**
  * dump to png
  * @return None.
@@ -40,19 +43,22 @@ template <typename T> void Blob<T>::dump(const string &name){
     INFO_VAR(this->w_);
     INFO_VAR(this->h_);
     INFO_VAR(this->ch_);
-    cv::Mat image(this->h_,this->w_,CV_8UC3);
+    
+    vector<shared_ptr<cv::Mat>> mats;
+    for (int ch = 0; ch < this->ch_; ch++) {
+        shared_ptr<cv::Mat> mat(new cv::Mat(this->h_,this->w_,CV_8UC3,cv::Scalar::all(0)));
+        mats.push_back(mat);
+    }
     for (int x = 0; x < this->w_; x++) {
         for (int y = 0; y < this->h_; y++) {
             if(3 ==this->ch_) {
                 for (int ch = 0; ch < this->ch_; ch++) {
-                    int index = ch*this->w_* this->h_ + y*this->w_ + x;
+                    int index = ch * this->w_ * this->h_ + y * this->w_ + x;
                     auto value = this->data_[index];
                     TRACE_VAR(index);
                     TRACE_VAR(value);
                     if (value) {
-                        image.at<cv::Vec3b>(y,x)[ch] = 0xff;
-                    } else {
-                        image.at<cv::Vec3b>(y,x)[ch] = 0x0;
+                        mats[ch]->at<cv::Vec3b>(y,x)[ch] = 0xff;
                     }
                 }
             }
@@ -62,24 +68,32 @@ template <typename T> void Blob<T>::dump(const string &name){
                 INFO_VAR(index);
                 INFO_VAR(value);
                 if (value) {
-                    image.at<cv::Vec3b>(y,x)[0] = 0xff;
-                    image.at<cv::Vec3b>(y,x)[1] = 0xff;
-                    image.at<cv::Vec3b>(y,x)[2] = 0xff;
-                } else {
-                    image.at<cv::Vec3b>(y,x)[0] = 0x0;
-                    image.at<cv::Vec3b>(y,x)[1] = 0x0;
-                    image.at<cv::Vec3b>(y,x)[2] = 0x0;
+                    mats[0]->at<cv::Vec3b>(y,x)[0] = 0xff;
+                    mats[0]->at<cv::Vec3b>(y,x)[1] = 0xff;
+                    mats[0]->at<cv::Vec3b>(y,x)[2] = 0xff;
                 }
             }
         }
     }
     static int counter = 0;
-    string path = "dump.image.";
-    path += name;
-    path += ".";
-    path += std::to_string(++counter);
-    path += ".png";
-    cv::imwrite(path ,image);
+    for (int ch = 0; ch < this->ch_; ch++) {
+        string path = "dump.image.";
+        path += name;
+        path += ".";
+        path += std::to_string(counter);
+        if(0 == ch){
+            path += ".B.";
+        }
+        if(1 == ch){
+            path += ".G.";
+        }
+        if(2 == ch){
+            path += ".R.";
+        }
+        path += ".png";
+        cv::imwrite(path ,*mats[ch]);
+    }
+    ++counter;
 }
 
 template void Blob<bool>::dump(const string &name);
