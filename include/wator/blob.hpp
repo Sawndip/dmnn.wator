@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 #include <memory>
 #include <vector>
+#include <string>
 using namespace std;
 namespace Wator {
     /**
@@ -74,9 +75,10 @@ namespace Wator {
         
         /**
          * dump to png
+         * @param [in] name
          * @return None.
          **/
-        void dump(void);
+        void dump(const string &name);
         
     public:
         int w_;

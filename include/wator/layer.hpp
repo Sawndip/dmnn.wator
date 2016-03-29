@@ -144,7 +144,7 @@ namespace Wator {
     protected:
         vector<Blob<bool>*> pinchs_;
         vector<Blob<bool>*> blobs_;
-        vector<map<uint64_t,uint64_t>> memory_;
+        static vector<map<uint64_t,uint64_t>> memory_;
         vector<map<uint64_t,vector<uint64_t>>> memRanking_;
     };
 

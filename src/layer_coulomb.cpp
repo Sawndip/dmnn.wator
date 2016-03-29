@@ -44,27 +44,26 @@ CoulombLayer::CoulombLayer()
 {
     for(int y = 0 ;y < h_;y++){
         for(int x =0;x < w_ ;x++){
-            // 电荷中心，在几何中心。高斯分布
+            // 电荷中心，在几何中心。高斯分布,中心亮，外部暗。
             float w = (x- w_/2) * (x- w_/2) + (y- h_/2) * (y- h_/2) +1;
             w = 1/w;
             TRACE_VAR(x);
             TRACE_VAR(y);
             weight_.push_back(w);
-            INFO_VAR(w);
+            TRACE_VAR(w);
         }
     }
-    
     
     /// weight bias cal. 调整截距，使相同亮度的输出为0
     float sum = 1.0;
     bool minus = true;
-
-    float const fConstCoulombStepOne = fConstCoulombDiff * weight_.size();
-    float const fConstCoulombStepTwo = fConstCoulombDiff / weight_.size();
+    bool shock = false;
+    float fConstCoulombStepOne = fConstCoulombDiff * weight_.size();
+    float fConstCoulombStepTwo = fConstCoulombDiff / weight_.size();
     
     do {
         auto rate = fConstCoulombStepOne;
-        if(std::abs(sum) - fConstCoulombDiff < weight_.size()*fConstCoulombDiff) {
+        if(shock) {
             rate = fConstCoulombStepTwo;
         }
         sum = 0.0;
@@ -77,10 +76,16 @@ CoulombLayer::CoulombLayer()
             
             sum += weight_[i];
         }
-        INFO_VAR(sum);
+        TRACE_VAR(sum);
         if( sum - fConstCoulombDiff < 0) {
             minus = false;
+        } else {
+            if (false == minus) {
+                shock = true;
+            }
+            minus = true;
         }
+        TRACE_VAR(minus);
     } while (std::abs(sum) > fConstCoulombDiff);
     
     
@@ -89,6 +94,56 @@ CoulombLayer::CoulombLayer()
     }
     INFO_VAR(sum);
     INFO_VAR(weight_.size());
+    
+    for(int y = 0 ;y < h_;y++){
+        for(int x =0;x < w_ ;x++){
+            // 电荷中心，在几何中心。高斯分布,中心暗，外部亮。
+            float w = (x- w_/2) * (x- w_/2) + (y- h_/2) * (y- h_/2) +1;
+            w = 1- 1/w;
+            TRACE_VAR(x);
+            TRACE_VAR(y);
+            weight_R_.push_back(w);
+            TRACE_VAR(w);
+        }
+    }
+
+    /// weight bias cal. 调整截距，使相同亮度的输出为0
+    fConstCoulombStepOne = fConstCoulombDiff * weight_R_.size();
+    fConstCoulombStepTwo = fConstCoulombDiff / weight_R_.size();
+    sum = 1.0;
+    
+    do {
+        auto rate = fConstCoulombStepOne;
+        if(shock) {
+            rate = fConstCoulombStepTwo;
+        }
+        sum = 0.0;
+        for (int i = 0;i < weight_R_.size();i++) {
+            if (minus) {
+                weight_R_[i] -= rate;
+            } else {
+                weight_R_[i] += rate;
+            }
+            
+            sum += weight_R_[i];
+        }
+        TRACE_VAR(sum);
+        if( sum - fConstCoulombDiff < 0) {
+            minus = false;
+        } else {
+            if (false == minus) {
+                shock = true;
+            }
+            minus = true;
+        }
+        TRACE_VAR(minus);
+    } while (std::abs(sum) > fConstCoulombDiff);
+
+    for (int i = 0;i < weight_R_.size();i++) {
+        INFO_VAR(weight_R_[i]);
+    }
+    INFO_VAR(sum);
+    INFO_VAR(weight_R_.size());
 }
 
 /**
@@ -245,7 +300,7 @@ void CoulombLayer::forward(void)
                     for (int y = 0;y < gridH;y++){
                         TRACE_VAR(max_);
                         TRACE_VAR(min_);
-                        threshold_ = (max_ + min_)/2;
+                        threshold_ = (max_ + min_)*4/5;
                         TRACE_VAR(threshold_);
                         int activeSize = v1->w_ * v1->h_;
                         TRACE_VAR(activeSize);
@@ -288,7 +343,7 @@ void CoulombLayer::forward(void)
 void CoulombLayer::dump(void){
     INFO_VAR(blobs_.size());
     for (auto blob:blobs_) {
-        blob->dump();
+        blob->dump(typeid(this).name());
     }
 }
 

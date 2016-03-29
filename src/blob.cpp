@@ -36,7 +36,7 @@ using namespace Wator;
  * dump to png
  * @return None.
  **/
-template <typename T> void Blob<T>::dump(void){
+template <typename T> void Blob<T>::dump(const string &name){
     INFO_VAR(this->w_);
     INFO_VAR(this->h_);
     INFO_VAR(this->ch_);
@@ -75,10 +75,12 @@ template <typename T> void Blob<T>::dump(void){
     }
     static int counter = 0;
     string path = "dump.image.";
+    path += name;
+    path += ".";
     path += std::to_string(++counter);
     path += ".png";
     cv::imwrite(path ,image);
 }
 
-template void Blob<bool>::dump();
+template void Blob<bool>::dump(const string &name);
 

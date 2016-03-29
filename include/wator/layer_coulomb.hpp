@@ -98,11 +98,11 @@ namespace Wator {
         float max_ = 0;
         float min_ = INT32_MAX;
         
-        vector<float> activeWeight_;
-        vector<float> deactiveWeight_;
         vector<float> weight_;
+        vector<float> weight_R_;
         
         vector<shared_ptr<Blob<float>>> blobsRaw_;
+        vector<shared_ptr<Blob<float>>> blobsRawR_;
         vector<shared_ptr<Blob<bool>>> blobs_;
 
         // K Coulomb

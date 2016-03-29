@@ -41,8 +41,7 @@ using namespace boost::property_tree;
  **/
 V1CortexLayer::V1CortexLayer()
 {
-    memory_.push_back({});
-    memRanking_.push_back({});
+    memRanking_ = {{}} ;
 }
 V1CortexLayer::~V1CortexLayer()
 {
@@ -142,12 +141,17 @@ void V1CortexLayer::forward(void)
                 if (index >= pinch->size_) {
                     continue;
                 }
+                memIndex = memIndex <<1;
                 if (pinch->data_[index]) {
                     memIndex++;
                 }
-                memIndex = memIndex <<1;
             }
+            
             std::bitset<64> memBit(memIndex);
+            const uint64_t max25Bit = 0b1111111111111111111111111;
+            if(memIndex > max25Bit) {
+                INFO_VAR(memBit);
+            }
             // sparse +- 1/3
             //if (memBit.count() < this->sparse_*2/3 || memBit.count() > this->sparse_*6/3) {
             if (memBit.count() < this->sparse_) {
@@ -158,8 +162,14 @@ void V1CortexLayer::forward(void)
             auto it = memory.find(memIndex);
             if (it != memory.end()) {
                 it->second++;
+                if(it->second > 470) {
+                    TRACE_VAR(memIndex);
+                    std::bitset<25> memBit25(memIndex);
+                    INFO_VAR(memBit);
+                    INFO_VAR(memBit25);
+                }
             } else {
-                memory[memIndex] = 1;
+                memory.insert({memIndex,1});
             }
         }
         memory_[index] = memory;
@@ -170,6 +180,9 @@ void V1CortexLayer::forward(void)
         auto &memory = memory_[index];
         for (auto it:memory) {
             auto memCount = it.second;
+            std::bitset<25> memBit(it.first);
+            TRACE_VAR(memBit);
+            TRACE_VAR(it.second);
             auto itSort = memRanking_[index].find(memCount);
             if (memRanking_[index].end() != itSort) {
                 itSort->second.push_back(it.first);
@@ -180,7 +193,10 @@ void V1CortexLayer::forward(void)
         for (auto it:memRanking_[index]) {
             auto memCount = it.first;
             INFO_VAR(memCount);
-            for (auto mem:it.second) {
+            INFO_VAR(it.second.size());
+            auto mem = it.second.front();
+            //for (auto mem:it.second)
+            {
                 if(9 ==this->w_*this->h_) {
                     std::bitset<9> memBit(mem);
                     INFO_VAR(memBit);
@@ -254,6 +270,20 @@ void V1CortexLayer::forward(void)
     INFO_VAR("finnish V1CortexLayer::forward");
 }
 
+/*
+ 528
+ 0001000010000100001000010
+ 
+ 
+ 480
+ 00010
+ 00010
+ 00010
+ 00010
+ 00010
+ 
+ */
+
 
 /**
  * dump to png
@@ -262,6 +292,6 @@ void V1CortexLayer::forward(void)
 void V1CortexLayer::dump(void){
     INFO_VAR(blobs_.size());
     for (auto blob:blobs_) {
-        blob->dump();
+        blob->dump(typeid(this).name());
     }
 }
