@@ -109,6 +109,7 @@ namespace Wator {
         vector<float> kCoulomb_;
         
         int  threshold_ = 1;
+        int thresholdCenter_ = 1;
         const int  thresholdStep_ = 1;
         
         int wGrid_;

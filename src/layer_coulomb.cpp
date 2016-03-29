@@ -300,7 +300,10 @@ void CoulombLayer::forward(void)
                     for (int y = 0;y < gridH;y++){
                         TRACE_VAR(max_);
                         TRACE_VAR(min_);
-                        threshold_ = (max_ + min_)*4/5;
+                        thresholdCenter_ = (max_ + min_)/2;
+                        //threshold_ = std::abs(max_ - min_)/8;
+                        threshold_ = std::abs(max_ - min_)/256;
+                        TRACE_VAR(thresholdCenter_);
                         TRACE_VAR(threshold_);
                         int activeSize = v1->w_ * v1->h_;
                         TRACE_VAR(activeSize);
@@ -311,7 +314,7 @@ void CoulombLayer::forward(void)
                                 for(int y2 = 0 ;y2 < v1->h_ ;y2++) {
                                     /* index */
                                     auto index = ch * this->wGrid_* this->hGrid_ + (y * v1->h_+y2) * this->wGrid_ + x*v1->w_ + x2;
-                                    int delta = raw->data_[index] - threshold_;
+                                    int delta = std::abs(raw->data_[index] - thresholdCenter_) - threshold_;
                                     TRACE_VAR(delta);
                                     if(0 < delta ){
                                         blob->data_[index] = true;
