@@ -31,7 +31,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 #include <memory>
 using namespace std;
-#include "wator/layer.hpp"
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+using namespace boost::property_tree;
 
 namespace Wator {
+    class ImplicitMemory {
+    
+    protected:
+        /**
+         * Constructor
+         **/
+        explicit ImplicitMemory();
+        /**
+         * Constructor
+         * @param [in] info layer parameter.
+         **/
+        explicit ImplicitMemory(const ptree& info);
+    };
 }
