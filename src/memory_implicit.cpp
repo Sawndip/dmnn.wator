@@ -34,11 +34,19 @@ using namespace Wator;
 #include <boost/property_tree/json_parser.hpp>
 using namespace boost::property_tree;
 
+
+const uint64_t iuConstMaxNum25 =0b1111100000000000000000000;
+map<uint64_t,bool> ImplicitMemory::shotThough_;
+
 /**
  * Constructor
  **/
 ImplicitMemory::ImplicitMemory()
 {
+    for(uint64_t i = 0;i < iuConstMaxNum25 ;i++)
+    {
+        shotThough_[i] = true;
+    }
 }
 /**
  * Constructor
@@ -49,13 +57,15 @@ ImplicitMemory::ImplicitMemory(const pt::ptree& info)
 {
 }
 
+
+
 /**
  * update
  **/
-void ImplicitMemory::update(int pinch,uint64_t index,int ground)
+void ImplicitMemory::update(int pinch,uint64_t index,int sparse)
 {
     std::bitset<64> memBit(index);
-    if (memBit.count() < ground) {
+    if (memBit.count() < sparse) {
         return;
     }
     
@@ -127,4 +137,154 @@ void ImplicitMemory::sort()
  1000010000100000000000000
  1000010000100000000000000
  */
+
+
+/*
+ 
+ cant not list all.
+ 
+ #define __S(a,b,c,d,e) {0b##a##b##c##d##e,#a#b#c#d#e}
+ const map<uint64_t,string> ImplicitMemory::shotThough_ = {
+ __S(11111,
+ 00000,
+ 00000,
+ 00000,
+ 00000),
+ 
+ __S(00000,
+ 11111,
+ 00000,
+ 00000,
+ 00000),
+ 
+ __S(00000,
+ 00000,
+ 11111,
+ 00000,
+ 00000),
+ 
+ __S(00000,
+ 00000,
+ 00000,
+ 11111,
+ 00000),
+ 
+ __S(00000,
+ 00000,
+ 00000,
+ 00000,
+ 11111),
+ 
+ 
+ __S(10000,
+ 10000,
+ 10000,
+ 10000,
+ 10000),
+ 
+ __S(01000,
+ 01000,
+ 01000,
+ 01000,
+ 01000),
+ 
+ __S(00100,
+ 00100,
+ 00100,
+ 00100,
+ 00100),
+ 
+ __S(00010,
+ 00010,
+ 00010,
+ 00010,
+ 00010),
+ 
+ __S(00001,
+ 00001,
+ 00001,
+ 00001,
+ 00001),
+ 
+ 
+ __S(10000,
+ 01000,
+ 00100,
+ 00010,
+ 00001),
+ 
+ __S(00001,
+ 00010,
+ 00100,
+ 01000,
+ 10000),
+ 
+ 
+ __S(10000,
+ 01000,
+ 01000,
+ 01000,
+ 01000),
+ 
+ 
+ __S(10000,
+ 01000,
+ 10000,
+ 10000,
+ 10000),
+ 
+ 
+ 
+ __S(00001,
+ 00010,
+ 00100,
+ 01000,
+ 10000),
+ };
+
+
+ 
+ 00000
+ 00000
+ 01100
+ 01100
+ 00000
+ 
+ 
+ 01100
+ 01100
+ 00000
+ 00000
+ 00000
+
+ 
+ 00100
+ 00100
+ 00100
+ 00100
+ 00000
+ 
+ 00000
+ 01111
+ 10000
+ 00000
+ 00000
+ 
+ 
+ 00010,
+ 10000,
+ 00010,
+ 10000
+
+ 
+ 10000,
+ 00111,
+ 00010,
+ 10000
+
+ 
+ ),
+
+ */
+
 

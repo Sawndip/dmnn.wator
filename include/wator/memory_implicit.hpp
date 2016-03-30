@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <vector>
 #include <map>
+#include <string>
 using namespace std;
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -44,7 +45,7 @@ namespace Wator {
         /**
          * update
          **/
-        void update(int pinch,uint64_t index,int ground);
+        void update(int pinch,uint64_t index,int sparse);
 
         /**
          * sort
@@ -62,6 +63,7 @@ namespace Wator {
          **/
         explicit ImplicitMemory(const pt::ptree& info);
     private:
+        static map<uint64_t,bool> shotThough_;
         vector<map<uint64_t,uint64_t>> memory_;
         vector<map<uint64_t,vector<uint64_t>>> memRanking_;
         pt::ptree serial_;
