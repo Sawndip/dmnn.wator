@@ -11,3 +11,7 @@ target_link_libraries( wator
   opencv_highgui
   opencv_core
 )
+
+
+add_executable(shotThough shotThough.cpp)
+

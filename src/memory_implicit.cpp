@@ -43,10 +43,6 @@ map<uint64_t,bool> ImplicitMemory::shotThough_;
  **/
 ImplicitMemory::ImplicitMemory()
 {
-    for(uint64_t i = 0;i < iuConstMaxNum25 ;i++)
-    {
-        shotThough_[i] = true;
-    }
 }
 /**
  * Constructor
