@@ -233,7 +233,7 @@ int main(int ac,char *av[]){
     {
         std::bitset<25> memBit(i);
         if(isShotThough(memBit)) {
-            cout<< memBit <<endl;
+            cout<< "{0b" << memBit << ",true},"<<endl;
             counter++;
         }
     }

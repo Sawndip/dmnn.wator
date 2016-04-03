@@ -63,7 +63,7 @@ namespace Wator {
          **/
         explicit ImplicitMemory(const pt::ptree& info);
     private:
-        static map<uint64_t,bool> shotThough_;
+        static const map<uint64_t,bool> shotThough_;
         vector<map<uint64_t,uint64_t>> memory_;
         vector<map<uint64_t,vector<uint64_t>>> memRanking_;
         pt::ptree serial_;
