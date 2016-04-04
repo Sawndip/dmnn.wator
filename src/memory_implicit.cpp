@@ -87,6 +87,22 @@ void ImplicitMemory::update(int pinch,uint64_t index,int sparse)
 }
 
 /**
+ * get parter.
+ **/
+uint64_t ImplicitMemory::getNext(int id)
+{
+    if(id > memRanking_.size()) {
+        return 0;
+    }
+    auto it = memRanking_[id].rbegin();
+    if (it != memRanking_[id].rend()) {
+        return it->second[0];
+    }
+    return 0;
+}
+
+
+/**
  * sort
  **/
 void ImplicitMemory::sort()

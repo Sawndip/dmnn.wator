@@ -84,6 +84,7 @@ void V1CortexLayer::round(void)
 void V1CortexLayer::forward(void)
 {
     pinchs_.clear();
+    raws_.clear();
     blobs_.clear();
     for(auto btm:bottom_){
         CoulombLayer *coulom  = dynamic_cast<CoulombLayer*>(btm);
@@ -149,16 +150,44 @@ void V1CortexLayer::forward(void)
         }
     }
     memory_->sort();
-#if 0
     for(int index = 0; index < pinchs_.size();index++) {
         auto &pinch = pinchs_[index];
-        for (int i =0; i < pinch->size_; i + = this->w_*this->h_) {
+        auto raw = new Blob<int>(pinch->w_/this->w_,pinch->h_/this->h_,pinch->ch_);
+        int rawIndex = 0;
+        for (int i =0; i < pinch->size_; i += this->w_*this->h_) {
+            auto line = memory_->getNext(index);
+            std::bitset<25> memBit(line);
+            auto sum = 0;
             for (int j = 0; j < this->w_*this->h_; j++) {
-                ;
+                int index = i+j;
+                if(pinch->data_[index] && memBit[j]) {
+                    sum++;
+                }
+            }
+            TRACE_VAR(memBit);
+            TRACE_VAR(sum);
+            TRACE_VAR(raw->size_);
+            TRACE_VAR(rawIndex);
+            if(rawIndex++ >= raw->size_) {
+                break;
+            }
+            raw->data_[rawIndex] = sum;
+        }
+        raws_.push_back(raw);
+    }
+    for(int index = 0; index < raws_.size();index++) {
+        auto &raw = raws_[index];
+        auto blob = new Blob<bool>(raw->w_,raw->h_,raw->ch_);
+        int rawIndex = 0;
+        for (int i =0; i < raw->size_; i++) {
+            if(raw->data_[i]>4) {
+                blob->data_[i] = true;
+            } else {
+                blob->data_[i] = false;
             }
         }
+        blobs_.push_back(blob);
     }
-#endif
     INFO_VAR(blobs_.size());
     INFO_VAR("finnish V1CortexLayer::forward");
 }

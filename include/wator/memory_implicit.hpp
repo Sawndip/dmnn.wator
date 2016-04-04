@@ -51,6 +51,11 @@ namespace Wator {
          * sort
          **/
         void sort();
+        
+        /**
+         * get parter.
+         **/
+        uint64_t getNext(int id);
     protected:
         /**
          * Constructor

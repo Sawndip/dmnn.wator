@@ -145,6 +145,7 @@ namespace Wator {
         Blob<bool>* getBlob(const LayerBase* who);
     protected:
         vector<Blob<bool>*> pinchs_;
+        vector<Blob<int>*> raws_;
         vector<Blob<bool>*> blobs_;
         ImplicitMemory* memory_;
     };
