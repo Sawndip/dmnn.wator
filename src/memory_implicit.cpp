@@ -58,6 +58,15 @@ ImplicitMemory::ImplicitMemory(const pt::ptree& info)
  **/
 void ImplicitMemory::update(int pinch,uint64_t index,int sparse)
 {
+    const auto itST = shotThough_.find(index);
+    if(itST == shotThough_.end())
+    {
+        return;
+    }
+    if(false == itST->second)
+    {
+        return;
+    }
     std::bitset<64> memBit(index);
     if (memBit.count() < sparse) {
         return;
@@ -130,6 +139,38 @@ void ImplicitMemory::sort()
 /*
  1000010000100000000000000
  1000010000100000000000000
+ 
+ 00001
+ 11110
+ 00000
+ 00000
+ 00000
+ 
+ 00000
+ 10000
+ 01111
+ 00000
+ 00000
+ 
+ 00000
+ 00111
+ 11000
+ 00000
+ 00000
+ 
+ 
+ 11000
+ 00000
+ 00000
+ 00000
+ 00111
+ 
+ 00000
+ 00000
+ 00000
+ 00111
+ 11000
+ 
  */
 
 const map<uint64_t,bool> ImplicitMemory::shotThough_ = {
