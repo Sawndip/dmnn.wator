@@ -43,11 +43,14 @@ namespace fs = boost::filesystem;
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
 
+#include <algorithm>
+using namespace std;
 
 /**
  * Constructor
  **/
 ImageLayer::ImageLayer()
+:extension_({"jpg",".JPG",".png",".PNG",".tif",".TIF"})
 {
     INFO_VAR(this);
 }
@@ -75,8 +78,8 @@ void ImageLayer::load(bool train)
     BOOST_FOREACH(const fs::path& p, std::make_pair(fs::recursive_directory_iterator(path),fs::recursive_directory_iterator())){
         if (!fs::is_directory(p)){
             auto extension = p.extension().string();
-            if(".jpg" == extension || ".png" == extension ||
-               ".JPG" == extension || ".PNG" == extension){
+            auto itExt = std::find(extension_.begin(),extension_.end(),extension);
+            if(itExt != extension_.end()){
                 INFO_VAR(p);
                 mat_ = cv::imread(p.string());
                 pump();

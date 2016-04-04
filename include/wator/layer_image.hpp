@@ -29,6 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 #include <fstream>
+#include <list>
+#include <string>
 #include <memory>
 using namespace std;
 #include "wator/layer.hpp"
@@ -65,5 +67,6 @@ namespace Wator {
     private:
         cv::Mat mat_;
         ImageLayerParam param_;
+        const list<string> extension_;
     };
 }
