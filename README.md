@@ -1,5 +1,5 @@
 # wator
-Deep Learning Base On CephFS.
+Deep Memory Neural Network (DMNN) Base On CephFS.
 
 Train Visual Cortex V1.
 
