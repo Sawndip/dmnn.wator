@@ -304,20 +304,30 @@ void CoulombLayer::forward(void)
                         TRACE_VAR(max_);
                         TRACE_VAR(min_);
                         thresholdCenter_ = (max_ + min_)/2;
-                        //threshold_ = std::abs(max_ - min_)/8;
+                        //thresholdCenter_ = fConstCoulombDiff;
                         threshold_ = std::abs(max_ - min_)/256;
+                        //threshold_ = fConstCoulombDiff/256;
                         TRACE_VAR(thresholdCenter_);
                         TRACE_VAR(threshold_);
                         int activeSize = v1->w_ * v1->h_;
                         TRACE_VAR(activeSize);
                         TRACE_VAR(activeSize / v1->sparse_);
                         const int maxActive = v1->w_ * v1->h_ / v1->sparse_;
+                        int iCounter = 0;
                         while (activeSize >= maxActive) {
+                            max_ = 0;
+                            min_ = INT32_MAX;
                             activeSize = 0;
                             for(int x2 = 0 ;x2 < v1->w_ ;x2++) {
                                 for(int y2 = 0 ;y2 < v1->h_ ;y2++) {
                                     /* index */
                                     auto index = ch * this->wGrid_* this->hGrid_ + (y * v1->h_+y2) * this->wGrid_ + x*v1->w_ + x2;
+                                    if(raw->data_[index] > max_) {
+                                        max_ = raw->data_[index];
+                                    }
+                                    if(raw->data_[index] < min_) {
+                                        min_ = raw->data_[index];
+                                    }
                                     int delta = std::abs(raw->data_[index] - thresholdCenter_) - threshold_;
                                     TRACE_VAR(delta);
                                     if(0 < delta ){
@@ -328,7 +338,13 @@ void CoulombLayer::forward(void)
                                     }
                                 }
                             }
-                            threshold_ += thresholdStep_;
+                            if(iCounter++ > 0) {
+                                threshold_ += thresholdStep_;
+                            } else {
+                                threshold_ = std::abs(max_ - min_)/256;;
+                                thresholdCenter_ = (max_ + min_)/2;
+                                activeSize = maxActive;
+                            }
                         }
                         TRACE_VAR(activeSize);
                         TRACE_VAR(maxActive);
