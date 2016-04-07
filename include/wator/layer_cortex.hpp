@@ -71,7 +71,7 @@ namespace Wator {
     protected:
         const int w_ = 5;
         const int h_ = 5;
-        const int sparse_ = 5;
+        const int sparse_ = 1;
     private:
     };
 

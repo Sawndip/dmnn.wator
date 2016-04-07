@@ -40,6 +40,7 @@ using namespace boost::property_tree;
  * Constructor
  **/
 ImplicitMemory::ImplicitMemory()
+:searchIndex_(0)
 {
 }
 /**
@@ -91,14 +92,17 @@ void ImplicitMemory::update(int pinch,uint64_t index,int sparse)
  **/
 uint64_t ImplicitMemory::getNext(int id)
 {
-    if(id > memRanking_.size()) {
+    TRACE_VAR(id);
+    TRACE_VAR(memSort_.size());
+    if(id >= memSort_.size()) {
         return 0;
     }
-    auto it = memRanking_[id].rbegin();
-    if (it != memRanking_[id].rend()) {
-        return it->second[0];
+    TRACE_VAR(searchIndex_);
+    TRACE_VAR(memSort_[id].size());
+    if(searchIndex_ >= memSort_[id].size()) {
+        return 0;
     }
-    return 0;
+    return memSort_[id][searchIndex_++];
 }
 
 
@@ -108,6 +112,7 @@ uint64_t ImplicitMemory::getNext(int id)
 void ImplicitMemory::sort()
 {
     memRanking_.clear();
+    memSort_.clear();
     for(int index = 0; index < memory_.size();index++) {
         memRanking_.push_back({});
     }
@@ -139,6 +144,17 @@ void ImplicitMemory::sort()
         TRACE_VAR(memory.size());
         TRACE_VAR(memRanking_[index].size());
     }
+    for(auto &it:memRanking_){
+        vector<uint64_t> memory;
+        for(auto &it2:it) {
+            memory.insert(memory.begin(),it2.second.begin(),it2.second.end());
+        }
+        memSort_.push_back(memory);
+    }
+    for(const auto &sortMem :memSort_){
+        INFO_VAR(sortMem.size());
+    }
+
     INFO_VAR(memory_.size());
     for(const auto &memory :memory_){
         INFO_VAR(memory.size());

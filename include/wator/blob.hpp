@@ -53,6 +53,7 @@ namespace Wator {
         :size_(size)
         ,data_(new T[size])
         {
+            memset(data_,0x0,size_);
         }
 
         /**
@@ -66,6 +67,7 @@ namespace Wator {
         ,size_(w_*h_*ch_)
         ,data_(new T[size_])
         {
+            memset(data_,0x0,size_);
         }
         
         ~Blob()

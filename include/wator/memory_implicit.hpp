@@ -53,6 +53,12 @@ namespace Wator {
         void sort();
         
         /**
+         * clear once loop.
+         **/
+        void clearSearchOnce(){
+            searchIndex_ = 0;
+        }
+        /**
          * get parter.
          **/
         uint64_t getNext(int id);
@@ -71,6 +77,8 @@ namespace Wator {
         static const map<uint64_t,bool> shotThough_;
         vector<map<uint64_t,uint64_t>> memory_;
         vector<map<uint64_t,vector<uint64_t>>> memRanking_;
+        vector<vector<uint64_t>> memSort_;
+        int searchIndex_;
         pt::ptree serial_;
     };
 }

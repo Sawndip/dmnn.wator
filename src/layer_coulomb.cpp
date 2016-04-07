@@ -311,7 +311,8 @@ void CoulombLayer::forward(void)
                         int activeSize = v1->w_ * v1->h_;
                         TRACE_VAR(activeSize);
                         TRACE_VAR(activeSize / v1->sparse_);
-                        while (activeSize > (v1->w_ * v1->h_ / v1->sparse_)) {
+                        const int maxActive = v1->w_ * v1->h_ / v1->sparse_;
+                        while (activeSize >= maxActive) {
                             activeSize = 0;
                             for(int x2 = 0 ;x2 < v1->w_ ;x2++) {
                                 for(int y2 = 0 ;y2 < v1->h_ ;y2++) {
@@ -330,7 +331,7 @@ void CoulombLayer::forward(void)
                             threshold_ += thresholdStep_;
                         }
                         TRACE_VAR(activeSize);
-                        TRACE_VAR(v1->w_ * v1->h_ / v1->sparse_);
+                        TRACE_VAR(maxActive);
                     }
                 }
             }
