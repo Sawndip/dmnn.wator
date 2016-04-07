@@ -110,7 +110,7 @@ namespace Wator {
         
         float  threshold_ = 1;
         float thresholdCenter_ = 1;
-        const float  thresholdStep_ = 0.1;
+        const float  thresholdStep_ = 0.01;
         
         int wGrid_;
         int hGrid_;

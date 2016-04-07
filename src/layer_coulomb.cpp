@@ -46,6 +46,7 @@ CoulombLayer::CoulombLayer()
         for(int x =0;x < w_ ;x++){
             // 电荷中心，在几何中心。高斯分布,中心亮，外部暗。
             float w = (x- w_/2) * (x- w_/2) + (y- h_/2) * (y- h_/2) +1;
+//            float w = std::abs(x- w_/2) + std::abs(y- h_/2) +1;
             w = 1/w;
             TRACE_VAR(x);
             TRACE_VAR(y);
