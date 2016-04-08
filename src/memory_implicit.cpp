@@ -57,10 +57,15 @@ ImplicitMemory::ImplicitMemory(const pt::ptree& info)
 /**
  * update
  **/
-void ImplicitMemory::update(int pinch,uint64_t index,int sparse)
+void ImplicitMemory::update(int pinch,uint64_t index,int sparse,int w,int h)
 {
-    const auto itST = shotThough_.find(index);
-    if(itST == shotThough_.end())
+#if 0
+    const map<uint64_t,bool> &shotThough = shotThough_3X3_;
+    if(w == 5  && h == 5) {
+        shotThough = shotThough_5X5_;
+    }
+    const auto itST = shotThough_3X3_.find(index);
+    if(itST == shotThough.end())
     {
         return;
     }
@@ -85,6 +90,7 @@ void ImplicitMemory::update(int pinch,uint64_t index,int sparse)
    } else {
         memory.insert({index,1});
     }
+#endif
 }
 
 /**
@@ -168,6 +174,106 @@ void ImplicitMemory::sort()
     }
 }
 
+#define _3X3(a,b,c) (0b##a##b##c)
+
+const map<uint64_t,bool> ImplicitMemory::shotThough_3X3_ = {
+    {_3X3(000,
+          000,
+          111),true},
+    {_3X3(000,
+          111,
+          000),true},
+    {_3X3(111,
+          000,
+          000),true},
+    {_3X3(100,
+          100,
+          100),true},
+    {_3X3(010,
+          010,
+          010),true},
+    {_3X3(001,
+          001,
+          001),true},
+    {_3X3(100,
+          010,
+          001),true},
+    {_3X3(001,
+          010,
+          100),true},
+    {_3X3(100,
+          010,
+          100),true},
+    {_3X3(100,
+          010,
+          010),true},
+    {_3X3(010,
+          100,
+          100),true},
+    {_3X3(010,
+          100,
+          010),true},
+    {_3X3(010,
+          010,
+          100),true},
+    {_3X3(010,
+          010,
+          001),true},
+    {_3X3(010,
+          001,
+          001),true},
+    {_3X3(010,
+          001,
+          010),true},
+    {_3X3(001,
+          010,
+          010),true},
+    {_3X3(001,
+          010,
+          001),true},
+    {_3X3(001,
+          001,
+          010),true},
+    {_3X3(110,
+          001,
+          000),true},
+    {_3X3(100,
+          011,
+          000),true},
+    {_3X3(101,
+          010,
+          000),true},
+    {_3X3(011,
+          100,
+          000),true},
+    {_3X3(010,
+          101,
+          000),true},
+    {_3X3(001,
+          110,
+          000),true},
+    {_3X3(000,
+          110,
+          001),true},
+    {_3X3(000,
+          101,
+          010),true},
+    {_3X3(000,
+          100,
+          011),true},
+    {_3X3(000,
+          011,
+          100),true},
+    {_3X3(000,
+          010,
+          101),true},
+    {_3X3(000,
+          001,
+          110),true}
+};
+
+
+
 /*
  1000010000100000000000000
  1000010000100000000000000
@@ -205,7 +311,7 @@ void ImplicitMemory::sort()
  
  */
 
-const map<uint64_t,bool> ImplicitMemory::shotThough_ = {
+const map<uint64_t,bool> ImplicitMemory::shotThough_5X5_ = {
     {0b0000000000000000000011111,true},
     {0b0000000000000000000111110,true},
     {0b0000000000000000001011101,true},

@@ -274,13 +274,13 @@ void CoulombLayer::forward(void)
         INFO_VAR(this->wGrid_);
         INFO_VAR(this->hGrid_);
         auto raw = shared_ptr<Blob<float>>(new Blob<float>(this->wGrid_,this->hGrid_,this->chGrid_));
-        max_ = 0;
-        min_ = INT32_MAX;
+        max_ = 0.0;
+        min_ = 255.0 *255.0;
         for(int i = 0 ;i < size_ ;i++) {
-            int sum =0;
+            float sum =0;
             for(int j = 0;j<weight_.size();j++) {
                 int index = i*weight_.size() + j;
-                sum += weight_[j] * (inBlob->data_[index]);
+                sum += weight_[j] * (float)(inBlob->data_[index]);
             }
             if(sum > max_) {
                 max_ = sum;
@@ -297,40 +297,35 @@ void CoulombLayer::forward(void)
         for (auto top:top_) {
             auto blob = shared_ptr<Blob<bool>>(new Blob<bool>(this->wGrid_,this->hGrid_,this->chGrid_));
             V1CortexLayer *v1 = dynamic_cast<V1CortexLayer*>(top);
-            auto gridW = this->wGrid_/v1->w_;
-            auto gridH = this->hGrid_/v1->h_;
+            auto gridW = this->wGrid_/v1->iW_;
+            auto gridH = this->hGrid_/v1->iH_;
             for (int ch = 0; ch <this->chGrid_;ch++) {
                 for (int x = 0;x < gridW;x++){
                     for (int y = 0;y < gridH;y++){
-                        TRACE_VAR(max_);
-                        TRACE_VAR(min_);
-                        thresholdCenter_ = (max_ + min_)/2;
-                        //thresholdCenter_ = fConstCoulombDiff;
-                        threshold_ = std::abs(max_ - min_)/256;
-                        //threshold_ = fConstCoulombDiff/256;
-                        TRACE_VAR(thresholdCenter_);
-                        TRACE_VAR(threshold_);
-                        int activeSize = v1->w_ * v1->h_;
+                        int activeSize = v1->iSparse_ + 1;
                         TRACE_VAR(activeSize);
-                        TRACE_VAR(activeSize / v1->sparse_);
-                        const int maxActive = v1->w_ * v1->h_ / v1->sparse_;
+                        const int maxActive = v1->iSparse_;
                         int iCounter = 0;
-                        while (activeSize >= maxActive) {
-                            max_ = 0;
-                            min_ = INT32_MAX;
+                        while (activeSize > maxActive) {
+                            max_ = 0.0;
+                            min_ = 255.0 *255.0;
                             activeSize = 0;
-                            for(int x2 = 0 ;x2 < v1->w_ ;x2++) {
-                                for(int y2 = 0 ;y2 < v1->h_ ;y2++) {
+                            for(int x2 = 0 ;x2 < v1->iW_ ;x2++) {
+                                for(int y2 = 0 ;y2 < v1->iH_ ;y2++) {
                                     /* index */
-                                    auto index = ch * this->wGrid_* this->hGrid_ + (y * v1->h_+y2) * this->wGrid_ + x*v1->w_ + x2;
-                                    if(raw->data_[index] > max_) {
-                                        max_ = raw->data_[index];
+                                    auto index = ch * this->wGrid_* this->hGrid_ + (y * v1->iH_+y2) * this->wGrid_ + x*v1->iW_ + x2;
+                                    if(iCounter == 0) {
+                                    //if(0) {
+                                        if(raw->data_[index] > max_) {
+                                            max_ = raw->data_[index];
+                                        }
+                                        if(raw->data_[index] < min_) {
+                                            min_ = raw->data_[index];
+                                        }
                                     }
-                                    if(raw->data_[index] < min_) {
-                                        min_ = raw->data_[index];
-                                    }
-                                    int delta = std::abs(raw->data_[index] - thresholdCenter_) - threshold_;
+                                    float delta = std::abs(raw->data_[index] - thresholdCenter_) - threshold_;
                                     TRACE_VAR(delta);
+                                    TRACE_VAR(raw->data_[index])
                                     if(0 < delta ){
                                         blob->data_[index] = true;
                                         activeSize++;
@@ -339,13 +334,21 @@ void CoulombLayer::forward(void)
                                     }
                                 }
                             }
-                            if(iCounter++ > 0) {
-                                threshold_ += thresholdStep_;
-                            } else {
-                                threshold_ = std::abs(max_ - min_)/256;;
+                            if(iCounter == 0) {
+                                // first time count
+                                threshold_ = std::abs(0.8*(max_ - min_)/2);
                                 thresholdCenter_ = (max_ + min_)/2;
-                                activeSize = maxActive;
+                                activeSize = maxActive + 1;
+                                TRACE_VAR(thresholdCenter_);
+                                TRACE_VAR(max_);
+                                TRACE_VAR(min_);
+                            } else {
+                                threshold_ += thresholdStep_;
                             }
+                            TRACE_VAR(iCounter);
+                            TRACE_VAR(activeSize);
+                            TRACE_VAR(threshold_);
+                            iCounter++;
                         }
                         TRACE_VAR(activeSize);
                         TRACE_VAR(maxActive);

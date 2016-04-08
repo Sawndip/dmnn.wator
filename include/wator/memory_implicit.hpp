@@ -45,7 +45,7 @@ namespace Wator {
         /**
          * update
          **/
-        void update(int pinch,uint64_t index,int sparse);
+        void update(int pinch,uint64_t index,int sparse,int w,int h);
 
         /**
          * sort
@@ -74,7 +74,8 @@ namespace Wator {
          **/
         explicit ImplicitMemory(const pt::ptree& info);
     private:
-        static const map<uint64_t,bool> shotThough_;
+        static const map<uint64_t,bool> shotThough_3X3_;
+        static const map<uint64_t,bool> shotThough_5X5_;
         vector<map<uint64_t,uint64_t>> memory_;
         vector<map<uint64_t,vector<uint64_t>>> memRanking_;
         vector<vector<uint64_t>> memSort_;

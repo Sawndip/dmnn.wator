@@ -146,7 +146,7 @@ void V1CortexLayer::forward(void)
                     memIndex++;
                 }
             }
-            memory_->update(index,memIndex,this->sparse_);
+            memory_->update(index,memIndex,this->sparse_,this->w_,this->h_);
         }
     }
     memory_->sort();
