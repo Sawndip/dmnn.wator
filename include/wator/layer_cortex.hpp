@@ -73,9 +73,9 @@ namespace Wator {
         const int h_ = 5;
         const int sparse_ = 5;
  
-        const int iW_ = 25;
-        const int iH_ = 25;
-        const int iSparse_ = 600;
+        const int iW_ = 32;
+        const int iH_ = 32;
+        const int iSparse_ = (iW_*iH_)*5/10;
     private:
     };
 
