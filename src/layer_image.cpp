@@ -50,7 +50,7 @@ using namespace std;
  * Constructor
  **/
 ImageLayer::ImageLayer()
-:extension_({"jpg",".JPG",".png",".PNG",".tif",".TIF"})
+:extension_({"jpg",".JPG",".png",".PNG",".tif",".TIF",".tiff",".TIFF"})
 {
     INFO_VAR(this);
 }
@@ -150,10 +150,42 @@ void ImageLayer::pump(void)
                     index += grid * clm->w_ * clm->h_;
                     index += (y%clm->h_)*clm->w_  + x%clm->w_ ;
                     TRACE_VAR(index);
+                    if(index > blobs_[i]->size_) {
+                        INFO_VAR(index);
+                        INFO_VAR(blobs_[i]->size_);
+                        continue;
+                    }
                     blobs_[i]->data_[index] = byte;
                 }
             }
         }
     }
+    this->dump(planes);
     INFO_VAR(mat_.cols*mat_.rows*mat_.channels());
 }
+
+/**
+ * dump to png
+ * @return None.
+ **/
+void ImageLayer::dump(const std::vector<cv::Mat> &planes){
+    static int counter = 0;
+    for(int ch = 0 ; ch < mat_.channels();ch++){
+        string path = "dump.mat";
+        path += ".";
+        path += std::to_string(counter);
+        if(0 == ch){
+            path += ".B.";
+        }
+        if(1 == ch){
+            path += ".G.";
+        }
+        if(2 == ch){
+            path += ".R.";
+        }
+        path += ".png";
+        cv::imwrite(path ,planes[ch]);
+    }
+    ++counter;
+}
+

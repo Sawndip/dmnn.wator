@@ -267,7 +267,6 @@ void CoulombLayer::forward(void)
         INFO_VAR(inBlob->h_);
         INFO_VAR(inBlob->ch_);
         INFO_VAR(weight_.size());
-        size_ = inBlob->size_/weight_.size();
         this->wGrid_ = inBlob->w_/this->w_;
         this->hGrid_ = inBlob->h_/this->h_;
         this->chGrid_ = inBlob->ch_;
@@ -276,11 +275,22 @@ void CoulombLayer::forward(void)
         auto raw = shared_ptr<Blob<float>>(new Blob<float>(this->wGrid_,this->hGrid_,this->chGrid_));
         max_ = 0.0;
         min_ = 255.0 *255.0;
-        for(int i = 0 ;i < size_ ;i++) {
+        for(int i = 0 ;i < raw->size_ ;i++) {
             float sum =0;
+            float minLocal = 255.0 *255.0;
+            float maxLocal = 0.0;
+            float sumBase = 0.0;
             for(int j = 0;j<weight_.size();j++) {
                 int index = i*weight_.size() + j;
-                sum += weight_[j] * (float)(inBlob->data_[index]);
+                int data = inBlob->data_[index];
+                sum += weight_[j] * (float)(data);
+                sumBase += data;
+                if(data > maxLocal){
+                    maxLocal = data;
+                }
+                if(data < minLocal) {
+                    minLocal = data;
+                }
             }
             if(sum > max_) {
                 max_ = sum;
@@ -288,7 +298,12 @@ void CoulombLayer::forward(void)
             if(sum < min_) {
                 min_ = sum;
             }
-            raw->data_[i] = sum;
+            //float rate = maxLocal-minLocal;
+            float rate = 0;
+            if(sumBase >0) {
+                rate = 255.0/sumBase;
+            }
+            raw->data_[i] = sum * rate;
         }
         blobsRaw_.push_back(raw);
         

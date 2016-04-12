@@ -150,7 +150,7 @@ void V1CortexLayer::forward(void)
         }
     }
     memory_->sort();
-#if 0
+#if 1
     for(int index = 0; index < pinchs_.size();index++) {
         auto &pinch = pinchs_[index];
         auto raw = new Blob<int>(pinch->w_/this->w_,pinch->h_/this->h_,pinch->ch_);

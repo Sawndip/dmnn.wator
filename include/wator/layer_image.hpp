@@ -64,6 +64,7 @@ namespace Wator {
         virtual void load(bool train);
     private:
         void pump(void);
+        void dump(const std::vector<cv::Mat> &planes);
     private:
         cv::Mat mat_;
         ImageLayerParam param_;
