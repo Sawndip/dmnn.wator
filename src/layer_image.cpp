@@ -202,7 +202,8 @@ void ImageLayer::pump(void)
 void ImageLayer::dump(const std::vector<cv::Mat> &planes){
     static int counter = 0;
     for(int ch = 0 ; ch < mat_.channels();ch++){
-        string path = "dump.mat";
+        string path = "dump.image.";
+        path += typeid(this).name();
         path += ".";
         path += std::to_string(counter);
         if(0 == ch){
