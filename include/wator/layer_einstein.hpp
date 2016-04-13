@@ -35,13 +35,13 @@ using namespace std;
 
 namespace Wator {
     class V1CortexLayer;
-    class CoulombLayer :public LayerBase {
+    class EinsteinLayer :public LayerBase {
         friend class ImageLayer;
     public:
         /**
          * Constructor
          **/
-        explicit CoulombLayer();
+        explicit EinsteinLayer();
 
         /**
          * Connect a Layer to Net.
@@ -60,7 +60,7 @@ namespace Wator {
          * @return None.
          **/
         virtual void forward(void);
-
+    
         /**
          * get ptr
          * @return None.

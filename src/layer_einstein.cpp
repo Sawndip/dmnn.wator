@@ -40,7 +40,7 @@ static float const fConstCoulombDiff = 0.0001;
 /**
  * Constructor
  **/
-CoulombLayer::CoulombLayer()
+EinsteinLayer::EinsteinLayer()
 {
     for(int y = 0 ;y < h_;y++){
         for(int x =0;x < w_ ;x++){
@@ -154,7 +154,7 @@ CoulombLayer::CoulombLayer()
  * Connect a Layer to Net.
  * @param [in] layer
  **/
-V1CortexLayer& CoulombLayer::operator << (V1CortexLayer &layer)
+V1CortexLayer& EinsteinLayer::operator << (V1CortexLayer &layer)
 {
     this->top_.push_back(&layer);
     layer.bottom(this);
@@ -167,7 +167,7 @@ V1CortexLayer& CoulombLayer::operator << (V1CortexLayer &layer)
  * update
  * @return None.
  **/
-void CoulombLayer::updateW(void){
+void EinsteinLayer::updateW(void){
 }
 
 
@@ -175,9 +175,9 @@ void CoulombLayer::updateW(void){
  * update
  * @return None.
  **/
-void CoulombLayer::update(void)
+void EinsteinLayer::update(void)
 {
-    INFO_VAR("finnish CoulombLayer::update");
+    INFO_VAR("finnish EinsteinLayer::update");
 }
 
 
@@ -185,11 +185,11 @@ void CoulombLayer::update(void)
  * round
  * @return None.
  **/
-void CoulombLayer::round(void)
+void EinsteinLayer::round(void)
 {
     this->forward();
     this->update();
-    INFO_VAR("finnish CoulombLayer::round");
+    INFO_VAR("finnish EinsteinLayer::round");
     LayerBase::round();
     this->dump();
 }
@@ -244,7 +244,7 @@ void CoulombLayer::round(void)
  * forward
  * @return None.
  **/
-void CoulombLayer::forward(void)
+void EinsteinLayer::forward(void)
 {
     blobsRaw_.clear();
     blobs_.clear();
@@ -370,7 +370,7 @@ void CoulombLayer::forward(void)
  * dump to png
  * @return None.
  **/
-void CoulombLayer::dump(void){
+void EinsteinLayer::dump(void){
     INFO_VAR(blobs_.size());
     for (auto blob:blobs_) {
         blob->dump(typeid(this).name());
@@ -381,7 +381,7 @@ void CoulombLayer::dump(void){
  * get ptr
  * @return None.
  **/
-shared_ptr<Blob<bool>> CoulombLayer::getBlob(const LayerBase* who)
+shared_ptr<Blob<bool>> EinsteinLayer::getBlob(const LayerBase* who)
 {
     int i = 0;
     TRACE_VAR(top_.size());
