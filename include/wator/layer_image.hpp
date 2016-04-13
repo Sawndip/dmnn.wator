@@ -44,6 +44,7 @@ namespace Wator {
         string root_ = "data/retina/";
     };
     class CoulombLayer;
+    class EinsteinLayer;
     class ImageLayer :public LayerInput {
     public:
         /**
@@ -57,6 +58,12 @@ namespace Wator {
          **/
         CoulombLayer& operator << (CoulombLayer &layer);
 
+        /**
+         * Connect a Layer to Net.
+         * @param [in] layer
+         **/
+        EinsteinLayer& operator << (EinsteinLayer &layer);
+        
         /**
          * load
          * @return None.

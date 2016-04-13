@@ -36,6 +36,7 @@ using namespace std;
 namespace Wator {
     class V1CortexLayer :public CortexLayer {
         friend class CoulombLayer;
+        friend class EinsteinLayer;
     public:
         /**
          * Constructor

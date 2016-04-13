@@ -45,11 +45,17 @@ static void train(void){
     V1CortexLayer v1;
     v1 << object;
     
-    CoulombLayer coulom;
-    coulom << v1;
-    
+//    CoulombLayer coulomb;
+//    coulomb << v1;
+
+//    ImageLayer img;
+//    img << coulomb;
+
+    EinsteinLayer einstein;
+    einstein << v1;
+
     ImageLayer img;
-    img << coulom;
+    img << einstein;
 
     Net net;
     net << &img;
@@ -62,11 +68,17 @@ static void test(void){
     V1CortexLayer v1;
     v1 << object;
 
-    CoulombLayer coulom;
-    coulom << v1;
+//    CoulombLayer coulom;
+//    coulom << v1;
+    
+//    ImageLayer img;
+//    img << coulom;
+
+    EinsteinLayer einstein;
+    einstein << v1;
     
     ImageLayer img;
-    img << coulom;
+    img << einstein;
 
     Net net;
     net << &img;

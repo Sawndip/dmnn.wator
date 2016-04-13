@@ -87,28 +87,38 @@ void V1CortexLayer::forward(void)
     raws_.clear();
     blobs_.clear();
     for(auto btm:bottom_){
-        CoulombLayer *coulom  = dynamic_cast<CoulombLayer*>(btm);
-        auto coulomBlob = coulom->getBlob(this);
-        INFO_VAR(coulomBlob->w_);
-        INFO_VAR(coulomBlob->h_);
-        INFO_VAR(coulomBlob->ch_);
-//        const int size = (coulomBlob->w_/this->w_ )* (coulomBlob->h_ /this->h_)* coulomBlob->ch_;
+        shared_ptr<Blob<bool>> inputBlob;
+        CoulombLayer *coulomb  = dynamic_cast<CoulombLayer*>(btm);
+        if(coulomb) {
+            inputBlob = coulomb->getBlob(this);
+        }
+        EinsteinLayer *einstein  = dynamic_cast<EinsteinLayer*>(btm);
+        if(einstein) {
+            inputBlob = einstein->getBlob(this);
+        }
+        if(nullptr == inputBlob) {
+            continue;
+        }
+        INFO_VAR(inputBlob->w_);
+        INFO_VAR(inputBlob->h_);
+        INFO_VAR(inputBlob->ch_);
+//        const int size = (inputBlob->w_/this->w_ )* (inputBlob->h_ /this->h_)* inputBlob->ch_;
         for (auto top:top_) {
-            auto pinch = new Blob<bool>(coulomBlob->w_,coulomBlob->h_,coulomBlob->ch_);
-            for (int ch = 0; ch < coulomBlob->ch_; ch++) {
-                for (int y = 0; y < coulomBlob->h_; y++) {
-                    for (int x = 0; x < coulomBlob->w_; x++) {
-                        int grid = (y/this->h_) * (coulomBlob->w_/this->w_) + (x/this->w_) ;
-                        int index = ch * coulomBlob->w_ * coulomBlob->h_;
+            auto pinch = new Blob<bool>(inputBlob->w_,inputBlob->h_,inputBlob->ch_);
+            for (int ch = 0; ch < inputBlob->ch_; ch++) {
+                for (int y = 0; y < inputBlob->h_; y++) {
+                    for (int x = 0; x < inputBlob->w_; x++) {
+                        int grid = (y/this->h_) * (inputBlob->w_/this->w_) + (x/this->w_) ;
+                        int index = ch * inputBlob->w_ * inputBlob->h_;
                         index += grid * this->w_ * this->h_;
                         index += (y%this->h_)*this->w_  + x%this->w_ ;
                         TRACE_VAR(index);
                         TRACE_VAR(x);
                         TRACE_VAR(y);
-                        int index2 = ch * coulomBlob->w_ * coulomBlob->h_;
-                        index2 += y*coulomBlob->w_ + x;
+                        int index2 = ch * inputBlob->w_ * inputBlob->h_;
+                        index2 += y*inputBlob->w_ + x;
                         TRACE_VAR(index2);
-                        if (index >= coulomBlob->size_|| index2 >= coulomBlob->size_) {
+                        if (index >= inputBlob->size_|| index2 >= inputBlob->size_) {
                             // 无法整除的最后几行，不能的到下一层的完整输出，省略。
                             TRACE_VAR(this->w_);
                             TRACE_VAR(this->h_);
@@ -117,12 +127,12 @@ void V1CortexLayer::forward(void)
                             TRACE_VAR(y);
                             TRACE_VAR(index);
                             TRACE_VAR(index2);
-                            TRACE_VAR(coulomBlob->w_);
-                            TRACE_VAR(coulomBlob->h_);
-                            TRACE_VAR(coulomBlob->size_);
+                            TRACE_VAR(inputBlob->w_);
+                            TRACE_VAR(inputBlob->h_);
+                            TRACE_VAR(inputBlob->size_);
                             continue;
                         }
-                        pinch->data_[index] = coulomBlob->data_[index2];
+                        pinch->data_[index] = inputBlob->data_[index2];
                     }
                 }
             }

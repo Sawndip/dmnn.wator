@@ -68,6 +68,19 @@ CoulombLayer& ImageLayer::operator << (CoulombLayer &layer)
 }
 
 /**
+ * Connect a Layer to Net.
+ * @param [in] layer
+ **/
+EinsteinLayer& ImageLayer::operator << (EinsteinLayer &layer)
+{
+    this->top_.push_back(&layer);
+    layer.bottom(this);
+    INFO_VAR(top_.size());
+    return layer;
+}
+
+
+/**
  * load
  * @return None.
  **/
@@ -138,17 +151,27 @@ void ImageLayer::pump(void)
                 TRACE_VAR(x);
                 TRACE_VAR(y);
                 for(int i = 0;i < top_.size();i++){
+                    int outH = 0;
+                    int outW = 0;
                     CoulombLayer *clm = dynamic_cast<CoulombLayer*>(top_[i]);
-                    //clm->aspect(mat.cols/clm->w_,mat.rows/clm->h_,mat_.channels());
-                    TRACE_VAR(clm->w_);
-                    TRACE_VAR(clm->h_);
-                    int grid = ((y/clm->h_) * (mat_.cols/clm->w_))+ (x/clm->w_) ;
+                    if(clm) {
+                        outH = clm->h_;
+                        outW = clm->w_;
+                    }
+                    EinsteinLayer *est = dynamic_cast<EinsteinLayer*>(top_[i]);
+                    if(est) {
+                        outH = est->h_;
+                        outW = est->w_;
+                    }
+                    TRACE_VAR(outW);
+                    TRACE_VAR(outH);
+                    int grid = ((y/outH) * (mat_.cols/outW))+ (x/outW) ;
                     TRACE_VAR(grid);
                     TRACE_VAR(channel);
                     
                     int index = channel * mat_.cols * mat_.rows;
-                    index += grid * clm->w_ * clm->h_;
-                    index += (y%clm->h_)*clm->w_  + x%clm->w_ ;
+                    index += grid * outW * outH;
+                    index += (y%outH)*outW  + x%outW ;
                     TRACE_VAR(index);
                     if(index > blobs_[i]->size_) {
                         INFO_VAR(index);
