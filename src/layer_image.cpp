@@ -165,11 +165,19 @@ void ImageLayer::pump(void)
                     }
                     TRACE_VAR(outW);
                     TRACE_VAR(outH);
-                    int grid = ((y/outH) * (mat_.cols/outW))+ (x/outW) ;
+                    const int grid = ((y/outH) * (mat_.cols/outW))+ (x/outW) ;
                     TRACE_VAR(grid);
                     TRACE_VAR(channel);
                     
-                    int index = channel * mat_.cols * mat_.rows;
+                    const int groundW = (mat_.cols/outW)*outW;
+                    const int groundH = (mat_.rows/outH)*outH;
+                    if(groundW < x || groundH < y) {
+                        // out side of last grid.
+                        continue;
+                    }
+                    TRACE_VAR(groundW);
+                    TRACE_VAR(groundH);
+                    int index = channel * groundW * groundH;
                     index += grid * outW * outH;
                     index += (y%outH)*outW  + x%outW ;
                     TRACE_VAR(index);
