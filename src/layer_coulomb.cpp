@@ -298,12 +298,12 @@ void CoulombLayer::forward(void)
             if(sum < min_) {
                 min_ = sum;
             }
-            //float rate = maxLocal-minLocal;
-            float rate = 0;
+            float rate1 = maxLocal-minLocal;
+            float rate2 = 0;
             if(sumBase >0) {
-                rate = 255.0/sumBase;
+                rate2 = 255.0/sumBase;
             }
-            raw->data_[i] = sum * rate;
+            raw->data_[i] = sum * rate1 * rate2;
         }
         blobsRaw_.push_back(raw);
         

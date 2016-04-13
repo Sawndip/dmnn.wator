@@ -92,8 +92,8 @@ namespace Wator {
          **/
         void dump(void);
     private:
-        const int w_ = 7;
-        const int h_ = 7;
+        const int w_ = 3;
+        const int h_ = 3;
         int size_ = 0;
         float max_ = 0;
         float min_ = INT32_MAX;
