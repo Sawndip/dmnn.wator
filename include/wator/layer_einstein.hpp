@@ -85,30 +85,30 @@ namespace Wator {
          * @return None.
          **/
         void dump(void);
+        
+        /**
+         * cal 4 vecotor.
+         * @return None.
+         **/
+        void cal4Vec(uint8_t *start,uint8_t &maxDiff,uint8_t &avg);
+        
     private:
-        const int w_ = 3;
-        const int h_ = 3;
-        int size_ = 0;
-        float max_ = 0;
-        float min_ = INT32_MAX;
+        const int w_ = 2;
+        const int h_ = 2;
         
-        vector<float> weight_;
-        //vector<float> weight_R_;
         
-        vector<shared_ptr<Blob<float>>> blobsRaw_;
-        //vector<shared_ptr<Blob<float>>> blobsRawR_;
+        vector<shared_ptr<Blob<uint8_t>>> blobsRaw2X2_;
+        vector<shared_ptr<Blob<uint8_t>>> blobsRaw4X4_;
+        
         vector<shared_ptr<Blob<bool>>> blobs_;
 
-        // K Coulomb
-        vector<float> kCoulomb_;
         
-        float  threshold_ = 0.1;
-        float thresholdCenter_ = 0.1;
-        const float  thresholdStep_ = 0.5;
         
-        int wGrid_;
-        int hGrid_;
-        int chGrid_;
+        int wGrid2x2_;
+        int hGrid2x2_;
+  
+        int wGrid4x4_;
+        int hGrid4x4_;
     };
 
 }

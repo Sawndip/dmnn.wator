@@ -42,112 +42,6 @@ static float const fConstCoulombDiff = 0.0001;
  **/
 EinsteinLayer::EinsteinLayer()
 {
-    for(int y = 0 ;y < h_;y++){
-        for(int x =0;x < w_ ;x++){
-            // 电荷中心，在几何中心。高斯分布,中心亮，外部暗。
-            float w = (x- w_/2) * (x- w_/2) + (y- h_/2) * (y- h_/2) +1;
-//            float w = std::abs(x- w_/2) + std::abs(y- h_/2) +1;
-            w = 1/w;
-            TRACE_VAR(x);
-            TRACE_VAR(y);
-            weight_.push_back(w);
-            TRACE_VAR(w);
-        }
-    }
-    
-    /// weight bias cal. 调整截距，使相同亮度的输出为0
-    float sum = 1.0;
-    bool minus = true;
-    bool shock = false;
-    float fConstCoulombStepOne = fConstCoulombDiff * weight_.size();
-    float fConstCoulombStepTwo = fConstCoulombDiff / weight_.size();
-    
-    do {
-        auto rate = fConstCoulombStepOne;
-        if(shock) {
-            rate = fConstCoulombStepTwo;
-        }
-        sum = 0.0;
-        for (int i = 0;i < weight_.size();i++) {
-            if (minus) {
-                weight_[i] -= rate;
-            } else {
-                weight_[i] += rate;
-            }
-            
-            sum += weight_[i];
-        }
-        TRACE_VAR(sum);
-        if( sum - fConstCoulombDiff < 0) {
-            minus = false;
-        } else {
-            if (false == minus) {
-                shock = true;
-            }
-            minus = true;
-        }
-        TRACE_VAR(minus);
-    } while (std::abs(sum) > fConstCoulombDiff);
-    
-    
-    for (int i = 0;i < weight_.size();i++) {
-        INFO_VAR(weight_[i]);
-    }
-    INFO_VAR(sum);
-    INFO_VAR(weight_.size());
-
-/*
- not use it.
-    for(int y = 0 ;y < h_;y++){
-        for(int x =0;x < w_ ;x++){
-            // 电荷中心，在几何中心。高斯分布,中心暗，外部亮。
-            float w = (x- w_/2) * (x- w_/2) + (y- h_/2) * (y- h_/2) +1;
-            w = 1- 1/w;
-            TRACE_VAR(x);
-            TRACE_VAR(y);
-            weight_R_.push_back(w);
-            TRACE_VAR(w);
-        }
-    }
-
-    /// weight bias cal. 调整截距，使相同亮度的输出为0
-    fConstCoulombStepOne = fConstCoulombDiff * weight_R_.size();
-    fConstCoulombStepTwo = fConstCoulombDiff / weight_R_.size();
-    sum = 1.0;
-    
-    do {
-        auto rate = fConstCoulombStepOne;
-        if(shock) {
-            rate = fConstCoulombStepTwo;
-        }
-        sum = 0.0;
-        for (int i = 0;i < weight_R_.size();i++) {
-            if (minus) {
-                weight_R_[i] -= rate;
-            } else {
-                weight_R_[i] += rate;
-            }
-            
-            sum += weight_R_[i];
-        }
-        TRACE_VAR(sum);
-        if( sum - fConstCoulombDiff < 0) {
-            minus = false;
-        } else {
-            if (false == minus) {
-                shock = true;
-            }
-            minus = true;
-        }
-        TRACE_VAR(minus);
-    } while (std::abs(sum) > fConstCoulombDiff);
-
-    for (int i = 0;i < weight_R_.size();i++) {
-        INFO_VAR(weight_R_[i]);
-    }
-    INFO_VAR(sum);
-    INFO_VAR(weight_R_.size());
- */
 }
 
 /**
@@ -239,6 +133,39 @@ void EinsteinLayer::round(void)
  */
 
 
+/**
+ * cal 4 vecotor.
+ * @return None.
+ **/
+void EinsteinLayer::cal4Vec(uint8_t *start,uint8_t &maxDiff,uint8_t &avg)
+{
+    uint8_t diff1 = std::abs(start[0] - start[1]);
+    uint8_t diff2 = std::abs(start[0] - start[2]);
+    uint8_t diff3 = std::abs(start[0] - start[3]);
+    uint8_t diff4 = std::abs(start[1] - start[2]);
+    uint8_t diff5 = std::abs(start[1] - start[3]);
+    uint8_t diff6 = std::abs(start[2] - start[3]);
+    
+    maxDiff = diff1;
+    if(diff2 > maxDiff) {
+        maxDiff = diff2;
+    }
+    if(diff3 > maxDiff) {
+        maxDiff = diff3;
+    }
+    if(diff4 > maxDiff) {
+        maxDiff = diff4;
+    }
+    if(diff5 > maxDiff) {
+        maxDiff = diff5;
+    }
+    if(diff6 > maxDiff) {
+        maxDiff = diff6;
+    }
+    
+    avg = (start[0] + start[1] + start[2] + start[3])/4;
+}
+
 
 /**
  * forward
@@ -246,119 +173,38 @@ void EinsteinLayer::round(void)
  **/
 void EinsteinLayer::forward(void)
 {
-    blobsRaw_.clear();
+    blobsRaw2X2_.clear();
+    blobsRaw4X4_.clear();
     blobs_.clear();
     for(auto btm:bottom_){
+        // 2x2
         LayerInput *input = dynamic_cast<LayerInput*>(btm);
         auto inBlob = input->getBlob(this);
         INFO_VAR(inBlob->w_);
         INFO_VAR(inBlob->h_);
         INFO_VAR(inBlob->ch_);
-        INFO_VAR(weight_.size());
-        this->wGrid_ = inBlob->w_/this->w_;
-        this->hGrid_ = inBlob->h_/this->h_;
-        this->chGrid_ = inBlob->ch_;
-        INFO_VAR(this->wGrid_);
-        INFO_VAR(this->hGrid_);
-        auto raw = shared_ptr<Blob<float>>(new Blob<float>(this->wGrid_,this->hGrid_,this->chGrid_));
-        max_ = 0.0;
-        min_ = 255.0 *255.0;
+        this->wGrid2x2_ = inBlob->w_/this->w_;
+        this->hGrid2x2_ = inBlob->h_/this->h_;
+        INFO_VAR(this->wGrid2x2_);
+        INFO_VAR(this->hGrid2x2_);
+        auto raw = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(this->wGrid2x2_,this->hGrid2x2_,inBlob->ch_));
+        auto rawNext = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(this->wGrid2x2_,this->hGrid2x2_,inBlob->ch_));
         for(int i = 0 ;i < raw->size_ ;i++) {
-            float sum =0;
-            float minLocal = 255.0 *255.0;
-            float maxLocal = 0.0;
-            float sumBase = 0.0;
-            for(int j = 0;j<weight_.size();j++) {
-                int index = i*weight_.size() + j;
-                int data = inBlob->data_[index];
-                sum += weight_[j] * (float)(data);
-                sumBase += data;
-                if(data > maxLocal){
-                    maxLocal = data;
-                }
-                if(data < minLocal) {
-                    minLocal = data;
-                }
-            }
-            if(sum > max_) {
-                max_ = sum;
-            }
-            if(sum < min_) {
-                min_ = sum;
-            }
-            float rate1 = maxLocal-minLocal;
-            float rate2 = 0;
-            if(sumBase >0) {
-                rate2 = 255.0/sumBase;
-            }
-            raw->data_[i] = sum * rate1 * rate2;
+            uint8_t maxDiff = 0;
+            uint8_t avg = 0;
+            int index = i*this->w_*this->h_;
+            cal4Vec(&(inBlob->data_[index]),maxDiff,avg);
+            raw->data_[i] = maxDiff;
+            rawNext->data_[i] = maxDiff;
         }
-        blobsRaw_.push_back(raw);
-        
-        
-        /// cal every blob for every top
-        for (auto top:top_) {
-            auto blob = shared_ptr<Blob<bool>>(new Blob<bool>(this->wGrid_,this->hGrid_,this->chGrid_));
-            V1CortexLayer *v1 = dynamic_cast<V1CortexLayer*>(top);
-            auto gridW = this->wGrid_/v1->iW_;
-            auto gridH = this->hGrid_/v1->iH_;
-            for (int ch = 0; ch <this->chGrid_;ch++) {
-                for (int x = 0;x < gridW;x++){
-                    for (int y = 0;y < gridH;y++){
-                        int activeSize = v1->iSparse_ + 1;
-                        TRACE_VAR(activeSize);
-                        const int maxActive = v1->iSparse_;
-                        int iCounter = 0;
-                        while (activeSize > maxActive) {
-                            max_ = 0.0;
-                            min_ = 255.0 *255.0;
-                            activeSize = 0;
-                            for(int x2 = 0 ;x2 < v1->iW_ ;x2++) {
-                                for(int y2 = 0 ;y2 < v1->iH_ ;y2++) {
-                                    /* index */
-                                    auto index = ch * this->wGrid_* this->hGrid_ + (y * v1->iH_+y2) * this->wGrid_ + x*v1->iW_ + x2;
-                                    if(iCounter == 0) {
-                                    //if(0) {
-                                        if(raw->data_[index] > max_) {
-                                            max_ = raw->data_[index];
-                                        }
-                                        if(raw->data_[index] < min_) {
-                                            min_ = raw->data_[index];
-                                        }
-                                    }
-                                    float delta = std::abs(raw->data_[index] - thresholdCenter_) - threshold_;
-                                    TRACE_VAR(delta);
-                                    TRACE_VAR(raw->data_[index])
-                                    if(0 < delta ){
-                                        blob->data_[index] = true;
-                                        activeSize++;
-                                    }else{
-                                        blob->data_[index] = false;
-                                    }
-                                }
-                            }
-                            if(iCounter == 0) {
-                                // first time count
-                                threshold_ = std::abs(0.8*(max_ - min_)/2);
-                                thresholdCenter_ = (max_ + min_)/2;
-                                activeSize = maxActive + 1;
-                                TRACE_VAR(thresholdCenter_);
-                                TRACE_VAR(max_);
-                                TRACE_VAR(min_);
-                            } else {
-                                threshold_ += thresholdStep_;
-                            }
-                            TRACE_VAR(iCounter);
-                            TRACE_VAR(activeSize);
-                            TRACE_VAR(threshold_);
-                            iCounter++;
-                        }
-                        TRACE_VAR(activeSize);
-                        TRACE_VAR(maxActive);
-                    }
+        blobsRaw2X2_.push_back(raw);
+        // 4x4
+        for(int channel = 0 ; channel < inBlob->ch_;channel++){
+            for(int y = 0;y < this->hGrid2x2_;y++){
+                for(int x = 0;x < this->wGrid2x2_;x++){
+                    
                 }
             }
-            blobs_.push_back(blob);
         }
     }
     INFO_VAR(blobs_.size());
