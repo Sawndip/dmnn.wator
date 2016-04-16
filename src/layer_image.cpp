@@ -206,17 +206,31 @@ void ImageLayer::dump(const std::vector<cv::Mat> &planes){
         path += typeid(this).name();
         path += ".";
         path += std::to_string(counter);
+        
+        cv::Mat zero(planes[ch].rows,planes[ch].cols,planes[ch].depth(),cv::Scalar::all(0));
+        std::vector<cv::Mat> array_to_merge;
+        cv::Mat color;
         if(0 == ch){
             path += ".B.";
+            array_to_merge.push_back(planes[ch]);
+            array_to_merge.push_back(zero);
+            array_to_merge.push_back(zero);
         }
         if(1 == ch){
             path += ".G.";
+            array_to_merge.push_back(zero);
+            array_to_merge.push_back(planes[ch]);
+            array_to_merge.push_back(zero);
         }
         if(2 == ch){
             path += ".R.";
+            array_to_merge.push_back(zero);
+            array_to_merge.push_back(zero);
+            array_to_merge.push_back(planes[ch]);
         }
+        cv::merge(array_to_merge, color);
         path += ".png";
-        cv::imwrite(path ,planes[ch]);
+        cv::imwrite(path ,color);
     }
     ++counter;
 }
