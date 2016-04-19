@@ -175,6 +175,8 @@ void EinsteinLayer::forward(void)
 {
     blobsRaw2X2_.clear();
     blobsRaw4X4_.clear();
+    blobs2x2_.clear();
+    blobs4x4_.clear();
     blobs_.clear();
     for(auto btm:bottom_){
         // 2x2
@@ -187,26 +189,197 @@ void EinsteinLayer::forward(void)
         this->hGrid2x2_ = inBlob->h_/this->h_;
         INFO_VAR(this->wGrid2x2_);
         INFO_VAR(this->hGrid2x2_);
-        auto raw = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(this->wGrid2x2_,this->hGrid2x2_,inBlob->ch_));
-        auto rawNext = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(this->wGrid2x2_,this->hGrid2x2_,inBlob->ch_));
-        for(int i = 0 ;i < raw->size_ ;i++) {
+        auto raw2x2 = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(this->wGrid2x2_,this->hGrid2x2_,inBlob->ch_));
+        auto nextInput2x2 = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(this->wGrid2x2_,this->hGrid2x2_,inBlob->ch_));
+        for(int i = 0 ;i < raw2x2->size_ ;i++) {
             uint8_t maxDiff = 0;
             uint8_t avg = 0;
             int index = i*this->w_*this->h_;
             cal4Vec(&(inBlob->data_[index]),maxDiff,avg);
-            raw->data_[i] = maxDiff;
-            rawNext->data_[i] = maxDiff;
+            raw2x2->data_[i] = maxDiff;
+            nextInput2x2->data_[i] = avg;
         }
-        blobsRaw2X2_.push_back(raw);
+        blobsRaw2X2_.push_back(raw2x2);
         // 4x4
+        this->wGrid4x4_ =this->wGrid2x2_/2;
+        this->hGrid4x4_ =this->hGrid2x2_/2;
+        INFO_VAR(this->wGrid4x4_);
+        INFO_VAR(this->hGrid4x4_);
+        auto swap4x4 = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(this->wGrid2x2_,this->hGrid2x2_,inBlob->ch_));
         for(int channel = 0 ; channel < inBlob->ch_;channel++){
             for(int y = 0;y < this->hGrid2x2_;y++){
                 for(int x = 0;x < this->wGrid2x2_;x++){
+                    int indexInput = channel *(this->hGrid2x2_ * this->wGrid2x2_) + y*this->wGrid2x2_ + x;
+                    auto byte = nextInput2x2->data_[indexInput];
                     
-                }
+                    const int grid = ((y/2) * (wGrid2x2_/2))+ (x/2) ;
+                    TRACE_VAR(grid);
+                    const int groundW = (wGrid2x2_/2)*2;
+                    const int groundH = (hGrid2x2_/2)*2;
+                    if(groundW < x || groundH < y) {
+                        // out side of last grid.
+                        continue;
+                    }
+                    int index = channel * groundW * groundH;
+                    index += grid * 2 * 2;
+                    index += (y%2)*2  + x%2 ;
+                    TRACE_VAR(index);
+                    if(index > swap4x4->size_) {
+                        INFO_VAR(index);
+                        INFO_VAR(swap4x4->size_);
+                        continue;
+                    }
+                    swap4x4->data_[index] = byte;
+               }
             }
         }
+        //
+        auto raw4x4 = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(this->wGrid4x4_,this->hGrid4x4_,inBlob->ch_));
+        auto nextInput4x4 = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(this->wGrid4x4_,this->hGrid4x4_,inBlob->ch_));
+        for(int i = 0 ;i < raw4x4->size_ ;i++) {
+            uint8_t maxDiff = 0;
+            uint8_t avg = 0;
+            int index = i*this->w_*this->h_;
+            cal4Vec(&(swap4x4->data_[index]),maxDiff,avg);
+            raw4x4->data_[i] = maxDiff;
+            nextInput4x4->data_[i] = avg;
+        }
+        blobsRaw4X4_.push_back(raw4x4);
+
+        for (auto top:top_) {
+            V1CortexLayer *v1 = dynamic_cast<V1CortexLayer*>(top);
+
+            auto blob2x2 = shared_ptr<Blob<bool>>(new Blob<bool>(this->wGrid2x2_,this->hGrid2x2_,inBlob->ch_));
+            auto gridW2x2 = this->wGrid2x2_/(2*v1->iW_);
+            auto gridH2x2 = this->hGrid2x2_/(2*v1->iH_);
+            for (int ch = 0; ch < inBlob->ch_; ch++) {
+                for (int x = 0;x < gridW2x2;x++){
+                    for (int y = 0;y < gridH2x2;y++){
+                        TRACE_VAR(activeSize);
+                        const int maxActive = v1->iSparse_;
+                        int activeSize = maxActive +1;
+                        int iCounter = 0;
+                        uint8_t max_ = 0;
+                        uint8_t min_ = 255;
+                        uint8_t threshold_ = 0;
+                        uint8_t thresholdStep_ = 1;
+                        while (activeSize > maxActive) {
+                            activeSize = 0;
+                            for(int x2 = 0 ;x2 < 2*v1->iW_ ;x2++) {
+                                for(int y2 = 0 ;y2 < 2*v1->iH_ ;y2++) {
+                                    /* index */
+                                    auto index = ch * this->wGrid2x2_* this->hGrid2x2_ + (y * 2*v1->iH_+y2) * this->wGrid2x2_ + x*2*v1->iW_ + x2;
+                                    if(iCounter == 0) {
+                                        //if(0) {
+                                        if(raw2x2->data_[index] > max_) {
+                                            max_ = raw2x2->data_[index];
+                                        }
+                                        if(raw2x2->data_[index] < min_) {
+                                            min_ = raw2x2->data_[index];
+                                        }
+                                    } else {
+                                        int delta = raw2x2->data_[index] - threshold_;
+                                        TRACE_VAR(delta);
+                                        TRACE_VAR((int)raw2x2->data_[index])
+                                        if(0 < delta ){
+                                            blob2x2->data_[index] = true;
+                                            activeSize++;
+                                        }else{
+                                            blob2x2->data_[index] = false;
+                                        }
+                                    }
+                                }
+                            }
+                            if(iCounter == 0) {
+                                // first time count
+                                threshold_ = min_;
+                                activeSize = maxActive +1;
+                                TRACE_VAR((double)max_);
+                                TRACE_VAR((double)min_);
+                            } else {
+                                threshold_ += thresholdStep_;
+                            }
+                            TRACE_VAR((double)max_);
+                            TRACE_VAR((double)min_);
+                            TRACE_VAR(iCounter);
+                            TRACE_VAR(activeSize);
+                            TRACE_VAR((double)threshold_);
+                            iCounter++;
+                        }
+                        TRACE_VAR(activeSize);
+                        TRACE_VAR(maxActive);
+                    }
+                }
+            }
+            blobs2x2_.push_back(blob2x2);
+            
+            auto blob4x4 = shared_ptr<Blob<bool>>(new Blob<bool>(this->wGrid4x4_,this->hGrid4x4_,inBlob->ch_));
+            auto gridW4x4 = this->wGrid4x4_/v1->iW_;
+            auto gridH4x4 = this->hGrid4x4_/v1->iH_;
+            for (int ch = 0; ch < inBlob->ch_; ch++) {
+                for (int x = 0;x < gridW4x4;x++){
+                    for (int y = 0;y < gridH4x4;y++){
+                        TRACE_VAR(activeSize);
+                        const int maxActive = v1->iSparse_;
+                        int activeSize = maxActive +1;
+                        int iCounter = 0;
+                        uint8_t max_ = 0;
+                        uint8_t min_ = 255;
+                        uint8_t threshold_ = 0;
+                        uint8_t thresholdStep_ = 1;
+                        while (activeSize > maxActive) {
+                            activeSize = 0;
+                            for(int x2 = 0 ;x2 < v1->iW_ ;x2++) {
+                                for(int y2 = 0 ;y2 < v1->iH_ ;y2++) {
+                                    /* index */
+                                    auto index = ch * this->wGrid4x4_* this->hGrid4x4_ + (y * v1->iH_+y2) * this->wGrid4x4_ + x*v1->iW_ + x2;
+                                    if(iCounter == 0) {
+                                        //if(0) {
+                                        if(raw4x4->data_[index] > max_) {
+                                            max_ = raw4x4->data_[index];
+                                        }
+                                        if(raw4x4->data_[index] < min_) {
+                                            min_ = raw4x4->data_[index];
+                                        }
+                                    } else {
+                                        int delta = raw4x4->data_[index] - threshold_;
+                                        TRACE_VAR(delta);
+                                        TRACE_VAR((int)raw4x4->data_[index])
+                                        if(0 < delta ){
+                                            blob4x4->data_[index] = true;
+                                            activeSize++;
+                                        }else{
+                                            blob4x4->data_[index] = false;
+                                        }
+                                    }
+                                }
+                            }
+                            if(iCounter == 0) {
+                                // first time count
+                                threshold_ = min_;
+                                activeSize = maxActive +1;
+                                TRACE_VAR((double)max_);
+                                TRACE_VAR((double)min_);
+                            } else {
+                                threshold_ += thresholdStep_;
+                            }
+                            TRACE_VAR((double)max_);
+                            TRACE_VAR((double)min_);
+                            TRACE_VAR(iCounter);
+                            TRACE_VAR(activeSize);
+                            TRACE_VAR((double)threshold_);
+                            iCounter++;
+                        }
+                        TRACE_VAR(activeSize);
+                        TRACE_VAR(maxActive);
+                    }
+                }
+            }
+            blobs4x4_.push_back(blob4x4);
+        }
     }
+    
+    
     INFO_VAR(blobs_.size());
     INFO_VAR("finnish CoulombLayer::forward");
 }
@@ -217,9 +390,16 @@ void EinsteinLayer::forward(void)
  * @return None.
  **/
 void EinsteinLayer::dump(void){
-    INFO_VAR(blobs_.size());
-    for (auto blob:blobs_) {
-        blob->dump(typeid(this).name());
+    INFO_VAR(blobs2x2_.size());
+    for (auto blob:blobs2x2_) {
+        string name = typeid(this).name();
+        name += "_2x2";
+        blob->dump( name);
+    }
+    for (auto blob:blobs4x4_) {
+        string name = typeid(this).name();
+        name += "_4x4";
+        blob->dump( name);
     }
 }
 

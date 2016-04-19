@@ -100,8 +100,10 @@ namespace Wator {
         vector<shared_ptr<Blob<uint8_t>>> blobsRaw2X2_;
         vector<shared_ptr<Blob<uint8_t>>> blobsRaw4X4_;
         
+        vector<shared_ptr<Blob<bool>>> blobs2x2_;
+        vector<shared_ptr<Blob<bool>>> blobs4x4_;
         vector<shared_ptr<Blob<bool>>> blobs_;
-
+        
         
         
         int wGrid2x2_;
