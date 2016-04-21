@@ -75,12 +75,6 @@ namespace Wator {
         virtual void update(void);
     private:
         /**
-         * update
-         * @return None.
-         **/
-        void updateW(void);
-
-        /**
          * dump to png
          * @return None.
          **/
@@ -91,7 +85,19 @@ namespace Wator {
          * @return None.
          **/
         void cal4Vec(uint8_t *start,uint8_t &maxDiff,uint8_t &avg);
-        
+
+        /**
+         * cut point that is not connect to anthers.
+         * @return None.
+         **/
+        void cutIsolation(void);
+ 
+        /**
+         * cut point that is not connect to anthers.
+         * @return None.
+         **/
+        void cutIsolation(shared_ptr<Blob<bool>> blob);
+       
     private:
         const int w_ = 2;
         const int h_ = 2;

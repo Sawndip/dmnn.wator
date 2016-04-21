@@ -61,14 +61,6 @@ V1CortexLayer& EinsteinLayer::operator << (V1CortexLayer &layer)
  * update
  * @return None.
  **/
-void EinsteinLayer::updateW(void){
-}
-
-
-/**
- * update
- * @return None.
- **/
 void EinsteinLayer::update(void)
 {
     INFO_VAR("finnish EinsteinLayer::update");
@@ -83,9 +75,10 @@ void EinsteinLayer::round(void)
 {
     this->forward();
     this->update();
+    this->cutIsolation();
+    this->dump();
     INFO_VAR("finnish EinsteinLayer::round");
     LayerBase::round();
-    this->dump();
 }
 
 
@@ -382,6 +375,45 @@ void EinsteinLayer::forward(void)
     
     INFO_VAR(blobs_.size());
     INFO_VAR("finnish CoulombLayer::forward");
+}
+
+
+/**
+ * cut point that is not connect to anthers.
+ * @return None.
+ **/
+void EinsteinLayer::cutIsolation(shared_ptr<Blob<bool>> blob)
+{
+#if 0 // do 3x3 filter.
+    for (int ch = 0; ch < blob->ch_; ch++) {
+        for (int x = 0;x < blob->w_;x++){
+            for (int y = 0;y < blob->h_;y++){
+                int index = ch * blob->w_ * blob->h_ + y*blob->w_ + x;
+                
+                int xL = x ;
+                
+                if(blob->data_[index]) {
+                    
+                }
+            }
+        }
+    }
+#endif
+}
+
+
+/**
+ * cut point that is not connect to anthers.
+ * @return None.
+ **/
+void EinsteinLayer::cutIsolation(void)
+{
+    for (auto &blob:blobs2x2_) {
+        cutIsolation(blob);
+    }
+    for (auto &blob:blobs4x4_) {
+        cutIsolation(blob);
+    }
 }
 
 
