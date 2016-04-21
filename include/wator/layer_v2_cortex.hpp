@@ -28,17 +28,46 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
-#include <wator/debug.hpp>
-#include <wator/blob.hpp>
-#include <wator/layer.hpp>
-#include <wator/layer_image.hpp>
-#include <wator/layer_coulomb.hpp>
-#include <wator/layer_einstein.hpp>
-#include <wator/layer_cortex.hpp>
-#include <wator/layer_v1_cortex.hpp>
-#include <wator/layer_v2_cortex.hpp>
-#include <wator/layer_object.hpp>
-#include <wator/memory_implicit.hpp>
-#include <wator/memory_explicit.hpp>
-#include <wator/net.hpp>
+#include <fstream>
+#include <memory>
+using namespace std;
+#include "wator/layer.hpp"
 
+namespace Wator {
+    class V2CortexLayer :public CortexLayer {
+    public:
+        /**
+         * Constructor
+         **/
+        explicit V2CortexLayer();
+        
+        virtual ~V2CortexLayer();
+
+        /**
+         * round
+         * @return None.
+         **/
+        virtual void round(void);
+        
+        /**
+         * forward
+         * @return None.
+         **/
+        virtual void forward(void);
+
+    protected:
+        /**
+         * update
+         * @return None.
+         **/
+        virtual void update(void);
+    private:
+        /**
+         * dump to png
+         * @return None.
+         **/
+        void dump(void);
+    private:
+    };
+
+}
