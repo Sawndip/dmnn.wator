@@ -34,7 +34,7 @@ using namespace std;
 #include "wator/layer.hpp"
 
 namespace Wator {
-    class V1CortexLayer;
+    class GanglionLayer;
     class EinsteinLayer :public LayerBase {
         friend class ImageLayer;
     public:
@@ -47,7 +47,7 @@ namespace Wator {
          * Connect a Layer to Net.
          * @param [in] layer
          **/
-        V1CortexLayer& operator << (V1CortexLayer &layer);
+        GanglionLayer& operator << (GanglionLayer &layer);
 
         /**
          * round

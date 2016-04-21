@@ -36,6 +36,7 @@ using namespace std;
 namespace Wator {
     class ObjectLayer;
     class GanglionLayer :public LayerHidden {
+        friend class EinsteinLayer;
     public:
         /**
          * Constructor
@@ -68,6 +69,12 @@ namespace Wator {
          **/
         virtual void update(void);
     private:
+        /**
+         * dump to png
+         * @return None.
+         **/
+        void dump(void);
+        
     protected:
         const int w_ = 5;
         const int h_ = 5;

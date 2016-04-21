@@ -47,6 +47,17 @@ GanglionLayer::~GanglionLayer()
     INFO_VAR(this);
 }
 
+/**
+ * Connect a Layer to Net.
+ * @param [in] layer
+ **/
+ObjectLayer& GanglionLayer::operator << (ObjectLayer &layer)
+{
+    this->top_.push_back(&layer);
+    layer.bottom(this);
+    INFO_VAR(top_.size());
+    return layer;
+}
 
 
 

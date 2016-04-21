@@ -48,7 +48,7 @@ EinsteinLayer::EinsteinLayer()
  * Connect a Layer to Net.
  * @param [in] layer
  **/
-V1CortexLayer& EinsteinLayer::operator << (V1CortexLayer &layer)
+GanglionLayer& EinsteinLayer::operator << (GanglionLayer &layer)
 {
     this->top_.push_back(&layer);
     layer.bottom(this);
@@ -240,16 +240,16 @@ void EinsteinLayer::forward(void)
         blobsRaw4X4_.push_back(raw4x4);
 
         for (auto top:top_) {
-            V1CortexLayer *v1 = dynamic_cast<V1CortexLayer*>(top);
+            GanglionLayer *gang = dynamic_cast<GanglionLayer*>(top);
 
             auto blob2x2 = shared_ptr<Blob<bool>>(new Blob<bool>(this->wGrid2x2_,this->hGrid2x2_,inBlob->ch_));
-            auto gridW2x2 = this->wGrid2x2_/(2*v1->iW_);
-            auto gridH2x2 = this->hGrid2x2_/(2*v1->iH_);
+            auto gridW2x2 = this->wGrid2x2_/(2*gang->iW_);
+            auto gridH2x2 = this->hGrid2x2_/(2*gang->iH_);
             for (int ch = 0; ch < inBlob->ch_; ch++) {
                 for (int x = 0;x < gridW2x2;x++){
                     for (int y = 0;y < gridH2x2;y++){
                         TRACE_VAR(activeSize);
-                        const int maxActive = v1->iSparse_;
+                        const int maxActive = gang->iSparse_;
                         int activeSize = maxActive +1;
                         int iCounter = 0;
                         uint8_t max_ = 0;
@@ -258,10 +258,10 @@ void EinsteinLayer::forward(void)
                         uint8_t thresholdStep_ = 1;
                         while (activeSize > maxActive) {
                             activeSize = 0;
-                            for(int x2 = 0 ;x2 < 2*v1->iW_ ;x2++) {
-                                for(int y2 = 0 ;y2 < 2*v1->iH_ ;y2++) {
+                            for(int x2 = 0 ;x2 < 2*gang->iW_ ;x2++) {
+                                for(int y2 = 0 ;y2 < 2*gang->iH_ ;y2++) {
                                     /* index */
-                                    auto index = ch * this->wGrid2x2_* this->hGrid2x2_ + (y * 2*v1->iH_+y2) * this->wGrid2x2_ + x*2*v1->iW_ + x2;
+                                    auto index = ch * this->wGrid2x2_* this->hGrid2x2_ + (y * 2*gang->iH_+y2) * this->wGrid2x2_ + x*2*gang->iW_ + x2;
                                     if(iCounter == 0) {
                                         //if(0) {
                                         if(raw2x2->data_[index] > max_) {
@@ -307,13 +307,13 @@ void EinsteinLayer::forward(void)
             blobs2x2_.push_back(blob2x2);
             
             auto blob4x4 = shared_ptr<Blob<bool>>(new Blob<bool>(this->wGrid4x4_,this->hGrid4x4_,inBlob->ch_));
-            auto gridW4x4 = this->wGrid4x4_/v1->iW_;
-            auto gridH4x4 = this->hGrid4x4_/v1->iH_;
+            auto gridW4x4 = this->wGrid4x4_/gang->iW_;
+            auto gridH4x4 = this->hGrid4x4_/gang->iH_;
             for (int ch = 0; ch < inBlob->ch_; ch++) {
                 for (int x = 0;x < gridW4x4;x++){
                     for (int y = 0;y < gridH4x4;y++){
                         TRACE_VAR(activeSize);
-                        const int maxActive = v1->iSparse_;
+                        const int maxActive = gang->iSparse_;
                         int activeSize = maxActive +1;
                         int iCounter = 0;
                         uint8_t max_ = 0;
@@ -322,10 +322,10 @@ void EinsteinLayer::forward(void)
                         uint8_t thresholdStep_ = 1;
                         while (activeSize > maxActive) {
                             activeSize = 0;
-                            for(int x2 = 0 ;x2 < v1->iW_ ;x2++) {
-                                for(int y2 = 0 ;y2 < v1->iH_ ;y2++) {
+                            for(int x2 = 0 ;x2 < gang->iW_ ;x2++) {
+                                for(int y2 = 0 ;y2 < gang->iH_ ;y2++) {
                                     /* index */
-                                    auto index = ch * this->wGrid4x4_* this->hGrid4x4_ + (y * v1->iH_+y2) * this->wGrid4x4_ + x*v1->iW_ + x2;
+                                    auto index = ch * this->wGrid4x4_* this->hGrid4x4_ + (y * gang->iH_+y2) * this->wGrid4x4_ + x*gang->iW_ + x2;
                                     if(iCounter == 0) {
                                         //if(0) {
                                         if(raw4x4->data_[index] > max_) {
