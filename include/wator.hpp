@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <wator/layer_image.hpp>
 #include <wator/layer_coulomb.hpp>
 #include <wator/layer_einstein.hpp>
+#include <wator/layer_ganglion.hpp>
 #include <wator/layer_cortex.hpp>
 #include <wator/layer_v1_cortex.hpp>
 #include <wator/layer_v2_cortex.hpp>

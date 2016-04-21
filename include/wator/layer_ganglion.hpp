@@ -30,57 +30,53 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 #include <fstream>
 #include <memory>
-#include <vector>
-#include <map>
-#include <string>
 using namespace std;
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-namespace pt = boost::property_tree;
+#include "wator/layer.hpp"
 
 namespace Wator {
-    class ImplicitMemory {
-        friend class V1CortexLayer;
-        friend class V2CortexLayer;
+    class ObjectLayer;
+    class GanglionLayer :public LayerHidden {
     public:
         /**
-         * update
+         * Constructor
          **/
-        void update(int pinch,uint64_t index,int sparse,int w,int h);
+        explicit GanglionLayer();
+
+        virtual ~GanglionLayer();
+        /**
+         * Connect a Layer to Net.
+         * @param [in] layer
+         **/
+        ObjectLayer& operator << (ObjectLayer &layer);
 
         /**
-         * sort
+         * round
+         * @return None.
          **/
-        void sort();
+        virtual void round(void);
         
         /**
-         * clear once loop.
+         * forward
+         * @return None.
          **/
-        void clearSearchOnce(){
-            searchIndex_ = 0;
-        }
-        /**
-         * get parter.
-         **/
-        uint64_t getNext(int id);
+        virtual void forward(void);
+
     protected:
         /**
-         * Constructor
+         * update
+         * @return None.
          **/
-        explicit ImplicitMemory();
-        
-        /**
-         * Constructor
-         * @param [in] info layer parameter.
-         **/
-        explicit ImplicitMemory(const pt::ptree& info);
+        virtual void update(void);
     private:
-        static const map<uint64_t,bool> shotThough_3X3_;
-        static const map<uint64_t,bool> shotThough_5X5_;
-        vector<map<uint64_t,uint64_t>> memory_;
-        vector<map<uint64_t,vector<uint64_t>>> memRanking_;
-        vector<vector<uint64_t>> memSort_;
-        int searchIndex_;
-        pt::ptree serial_;
+    protected:
+        const int w_ = 5;
+        const int h_ = 5;
+        const int sparse_ = 5;
+ 
+        const int iW_ = 8;
+        const int iH_ = 8;
+        const int iSparse_ = (iW_*iH_)*25/100;
+    private:
     };
+
 }

@@ -42,17 +42,17 @@ namespace log = boost::log;
 static void train(void){
     ObjectLayer object;
     
-    V1CortexLayer v1;
-    v1 << object;
+    GanglionLayer ganglion;
+    ganglion << object;
     
 //    CoulombLayer coulomb;
-//    coulomb << v1;
+//    coulomb << ganglion;
 
 //    ImageLayer img;
 //    img << coulomb;
 
     EinsteinLayer einstein;
-    einstein << v1;
+    einstein << ganglion;
 
     ImageLayer img;
     img << einstein;
@@ -65,17 +65,17 @@ static void train(void){
 static void test(void){
     ObjectLayer object;
     
-    V1CortexLayer v1;
-    v1 << object;
+    GanglionLayer ganglion;
+    ganglion << object;
 
 //    CoulombLayer coulom;
-//    coulom << v1;
+//    coulom << ganglion;
     
 //    ImageLayer img;
 //    img << coulom;
 
     EinsteinLayer einstein;
-    einstein << v1;
+    einstein << ganglion;
     
     ImageLayer img;
     img << einstein;
