@@ -56,31 +56,6 @@ ImageLayer::ImageLayer()
 }
 
 /**
- * Connect a Layer to Net.
- * @param [in] layer
- **/
-CoulombLayer& ImageLayer::operator << (CoulombLayer &layer)
-{
-    this->top_.push_back(&layer);
-    layer.bottom(this);
-    INFO_VAR(top_.size());
-    return layer;
-}
-
-/**
- * Connect a Layer to Net.
- * @param [in] layer
- **/
-EinsteinLayer& ImageLayer::operator << (EinsteinLayer &layer)
-{
-    this->top_.push_back(&layer);
-    layer.bottom(this);
-    INFO_VAR(top_.size());
-    return layer;
-}
-
-
-/**
  * load
  * @return None.
  **/
@@ -153,12 +128,12 @@ void ImageLayer::pump(void)
                 for(int i = 0;i < top_.size();i++){
                     int outH = 0;
                     int outW = 0;
-                    CoulombLayer *clm = dynamic_cast<CoulombLayer*>(top_[i]);
+                    auto clm = dynamic_pointer_cast<CoulombLayer>(top_[i]);
                     if(clm) {
                         outH = clm->h_;
                         outW = clm->w_;
                     }
-                    EinsteinLayer *est = dynamic_cast<EinsteinLayer*>(top_[i]);
+                    auto est = dynamic_pointer_cast<EinsteinLayer>(top_[i]);
                     if(est) {
                         outH = est->h_;
                         outW = est->w_;

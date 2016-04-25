@@ -53,18 +53,6 @@ namespace Wator {
         explicit ImageLayer();
         
         /**
-         * Connect a Layer to Net.
-         * @param [in] layer
-         **/
-        CoulombLayer& operator << (CoulombLayer &layer);
-
-        /**
-         * Connect a Layer to Net.
-         * @param [in] layer
-         **/
-        EinsteinLayer& operator << (EinsteinLayer &layer);
-        
-        /**
          * load
          * @return None.
          **/

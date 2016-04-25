@@ -50,6 +50,25 @@ LayerBase::LayerBase(const ptree& info)
 }
 
 
+/**
+ * bottom
+ * @param [in] lyr layer.
+ * @return None.
+ **/
+void LayerBase::bottom(LayerBasePtr lyr)
+{
+    this->bottom_.push_back(lyr);
+}
+
+/**
+ * top
+ * @param [in] lyr layer.
+ * @return None.
+ **/
+void LayerBase::top(LayerBasePtr lyr)
+{
+    this->top_.push_back(lyr);
+}
 
 
 /**
@@ -111,13 +130,13 @@ void LayerInput::load(bool train)
  * get ptr
  * @return None.
  **/
-Blob<uint8_t>* LayerInput::getBlob(const LayerBase* who)
+Blob<uint8_t>* LayerInput::getBlob(const LayerBase *who)
 {
     int i = 0;
     TRACE_VAR(top_.size());
     for(auto top:top_)
     {
-        if(who == top)
+        if(who == top.get())
         {
             TRACE_VAR(blobs_.size());
             if(blobs_.size() > i)

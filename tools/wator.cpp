@@ -40,51 +40,27 @@ namespace log = boost::log;
 
 
 static void train(void){
-    ObjectLayer object;
+    shared_ptr<ObjectLayer> object(new ObjectLayer);
     
-    GanglionLayer ganglion;
-    ganglion << object;
+    shared_ptr<GanglionLayer> ganglion(new GanglionLayer);
+    object->bottom(ganglion);
+    ganglion->top(object);
     
-//    CoulombLayer coulomb;
-//    coulomb << ganglion;
 
-//    ImageLayer img;
-//    img << coulomb;
+    shared_ptr<EinsteinLayer> einstein(new EinsteinLayer);
+    ganglion->bottom(einstein);
+    einstein->top(ganglion);
 
-    EinsteinLayer einstein;
-    einstein << ganglion;
-
-    ImageLayer img;
-    img << einstein;
+    shared_ptr<ImageLayer> img(new ImageLayer);
+    einstein->bottom(img);
+    img->top(einstein);
 
     Net net;
-    net << &img;
+    net << img;
     
     net.train();
 }
 static void test(void){
-    ObjectLayer object;
-    
-    GanglionLayer ganglion;
-    ganglion << object;
-
-//    CoulombLayer coulom;
-//    coulom << ganglion;
-    
-//    ImageLayer img;
-//    img << coulom;
-
-    EinsteinLayer einstein;
-    einstein << ganglion;
-    
-    ImageLayer img;
-    img << einstein;
-
-    Net net;
-    net << &img;
-    
-    net.test();
-    
 }
 
 int main(int ac,char *av[]){

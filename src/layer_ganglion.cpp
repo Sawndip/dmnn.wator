@@ -47,18 +47,6 @@ GanglionLayer::~GanglionLayer()
     INFO_VAR(this);
 }
 
-/**
- * Connect a Layer to Net.
- * @param [in] layer
- **/
-ObjectLayer& GanglionLayer::operator << (ObjectLayer &layer)
-{
-    this->top_.push_back(&layer);
-    layer.bottom(this);
-    INFO_VAR(top_.size());
-    return layer;
-}
-
 
 
 /**
@@ -98,11 +86,11 @@ void GanglionLayer::forward(void)
     blobs_.clear();
     for(auto btm:bottom_){
         shared_ptr<Blob<bool>> inputBlob;
-        CoulombLayer *coulomb  = dynamic_cast<CoulombLayer*>(btm);
+        auto coulomb  = dynamic_pointer_cast<CoulombLayer>(btm);
         if(coulomb) {
             inputBlob = coulomb->getBlob(this);
         }
-        EinsteinLayer *einstein  = dynamic_cast<EinsteinLayer*>(btm);
+        auto einstein  = dynamic_pointer_cast<EinsteinLayer>(btm);
         if(einstein) {
             inputBlob = einstein->getBlob(this);
         }

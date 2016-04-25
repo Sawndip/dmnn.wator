@@ -44,11 +44,6 @@ namespace Wator {
         explicit GanglionLayer();
 
         virtual ~GanglionLayer();
-        /**
-         * Connect a Layer to Net.
-         * @param [in] layer
-         **/
-        ObjectLayer& operator << (ObjectLayer &layer);
 
         /**
          * round

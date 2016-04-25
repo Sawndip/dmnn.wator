@@ -150,17 +150,6 @@ CoulombLayer::CoulombLayer()
  */
 }
 
-/**
- * Connect a Layer to Net.
- * @param [in] layer
- **/
-V1CortexLayer& CoulombLayer::operator << (V1CortexLayer &layer)
-{
-    this->top_.push_back(&layer);
-    layer.bottom(this);
-    INFO_VAR(top_.size());
-    return layer;
-}
 
 
 /**
@@ -249,7 +238,7 @@ void CoulombLayer::forward(void)
     blobsRaw_.clear();
     blobs_.clear();
     for(auto btm:bottom_){
-        LayerInput *input = dynamic_cast<LayerInput*>(btm);
+        auto input = dynamic_pointer_cast<LayerInput>(btm);
         auto inBlob = input->getBlob(this);
         INFO_VAR(inBlob->w_);
         INFO_VAR(inBlob->h_);
@@ -299,7 +288,7 @@ void CoulombLayer::forward(void)
         /// cal every blob for every top
         for (auto top:top_) {
             auto blob = shared_ptr<Blob<bool>>(new Blob<bool>(this->wGrid_,this->hGrid_,this->chGrid_));
-            V1CortexLayer *v1 = dynamic_cast<V1CortexLayer*>(top);
+            auto v1 = dynamic_pointer_cast<V1CortexLayer>(top);
             auto gridW = this->wGrid_/v1->iW_;
             auto gridH = this->hGrid_/v1->iH_;
             for (int ch = 0; ch <this->chGrid_;ch++) {
@@ -387,7 +376,7 @@ shared_ptr<Blob<bool>> CoulombLayer::getBlob(const LayerBase* who)
     TRACE_VAR(top_.size());
     for(auto top:top_)
     {
-        if(who == top)
+        if(who == top.get())
         {
             TRACE_VAR(blobs_.size());
             if(blobs_.size() > i)

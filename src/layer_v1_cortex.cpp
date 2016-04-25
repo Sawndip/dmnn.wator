@@ -88,11 +88,11 @@ void V1CortexLayer::forward(void)
     blobs_.clear();
     for(auto btm:bottom_){
         shared_ptr<Blob<bool>> inputBlob;
-        CoulombLayer *coulomb  = dynamic_cast<CoulombLayer*>(btm);
+        auto coulomb  = dynamic_pointer_cast<CoulombLayer>(btm);
         if(coulomb) {
             inputBlob = coulomb->getBlob(this);
         }
-        EinsteinLayer *einstein  = dynamic_cast<EinsteinLayer*>(btm);
+        auto einstein  = dynamic_pointer_cast<EinsteinLayer>(btm);
         if(einstein) {
             inputBlob = einstein->getBlob(this);
         }

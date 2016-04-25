@@ -40,6 +40,8 @@ using namespace std;
 using namespace boost::property_tree;
 
 namespace Wator {
+    class LayerBase;
+    typedef shared_ptr<LayerBase> LayerBasePtr;
     /**
      * BaseLayer Base of all type Net layers.
      **/ 
@@ -64,7 +66,15 @@ namespace Wator {
          * @param [in] lyr layer.
          * @return None.
          **/
-        void bottom(LayerBase *lyr){this->bottom_.push_back(lyr);}
+        void bottom(LayerBasePtr lyr);
+
+        /**
+         * top
+         * @param [in] lyr layer.
+         * @return None.
+         **/
+        void top(LayerBasePtr lyr);
+        
     protected:
         /**
          * Constructor 
@@ -78,8 +88,8 @@ namespace Wator {
         explicit LayerBase(const ptree& info);
 
     protected:
-        vector<LayerBase*> bottom_;
-        vector<LayerBase*> top_;
+        vector<LayerBasePtr> bottom_;
+        vector<LayerBasePtr> top_;
     };
 
     /**
@@ -113,7 +123,7 @@ namespace Wator {
          * get ptr
          * @return None.
          **/
-        Blob<uint8_t> *getBlob(const LayerBase* who);
+        Blob<uint8_t> *getBlob(const LayerBase *who);
     protected:
         int threshold_;
         vector<Blob<uint8_t>*> blobs_;
@@ -143,7 +153,7 @@ namespace Wator {
          * get ptr
          * @return None.
          **/
-        Blob<bool>* getBlob(const LayerBase* who);
+        Blob<bool>* getBlob(const LayerBase *who);
     protected:
         vector<Blob<bool>*> pinchs_;
         vector<Blob<int>*> raws_;

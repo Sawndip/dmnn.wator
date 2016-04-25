@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace std;
 namespace Wator {
     class LayerBase;
+    typedef shared_ptr<LayerBase> LayerBasePtr;
     
     
     
@@ -65,7 +66,7 @@ namespace Wator {
          * Connect a Layer to Net.
          * @param [in] layer
         **/
-        Net& operator << (LayerBase *layer);
+        Net& operator << (LayerBasePtr layer);
 
         /**
          * Train net
@@ -77,7 +78,7 @@ namespace Wator {
         **/
         void test();
     private:
-        vector<LayerBase*> layers_;
+        vector<LayerBasePtr> layers_;
         
         /// configureable
         NetParam param_;

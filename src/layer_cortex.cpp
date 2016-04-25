@@ -82,15 +82,3 @@ void CortexLayer::forward(void)
     INFO_VAR("finnish CortexLayer::forward");
 }
 
-/**
- * Connect a Layer to Net.
- * @param [in] layer
- **/
-ObjectLayer& CortexLayer::operator << (ObjectLayer &layer)
-{
-    this->top_.push_back(&layer);
-    layer.bottom(this);
-    INFO_VAR(top_.size());
-    return layer;
-}
-

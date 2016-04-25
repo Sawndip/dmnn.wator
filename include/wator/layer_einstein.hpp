@@ -44,12 +44,6 @@ namespace Wator {
         explicit EinsteinLayer();
 
         /**
-         * Connect a Layer to Net.
-         * @param [in] layer
-         **/
-        GanglionLayer& operator << (GanglionLayer &layer);
-
-        /**
          * round
          * @return None.
          **/

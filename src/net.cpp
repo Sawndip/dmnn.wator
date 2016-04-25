@@ -51,7 +51,7 @@ Net::Net(const ifstream &in)
  * Connect a Layer to Net.
  * @param [in] layer
 **/
-Net& Net::operator << (LayerBase *layer)
+Net& Net::operator << (LayerBasePtr layer)
 {
   this->layers_.push_back(layer);
   return *this;
@@ -65,7 +65,7 @@ void Net::train()
     {
         for(int j  =0 ;j<param_.epoch_ ;j++)
         {
-            auto input = dynamic_cast<LayerInput*>(layers_.front());
+            auto input = dynamic_pointer_cast<LayerInput>(layers_.front());
             input->load(true);
         }
     }
@@ -77,7 +77,7 @@ void Net::train()
 **/
 void Net::test()
 {
-    auto input = dynamic_cast<LayerInput*>(layers_.front());
+    auto input = dynamic_pointer_cast<LayerInput>(layers_.front());
     input->load(false);
 }
         

@@ -43,11 +43,6 @@ namespace Wator {
         explicit CortexLayer();
 
         virtual ~CortexLayer();
-        /**
-         * Connect a Layer to Net.
-         * @param [in] layer
-         **/
-        ObjectLayer& operator << (ObjectLayer &layer);
 
         /**
          * round

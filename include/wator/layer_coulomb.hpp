@@ -43,13 +43,7 @@ namespace Wator {
          **/
         explicit CoulombLayer();
 
-        /**
-         * Connect a Layer to Net.
-         * @param [in] layer
-         **/
-        V1CortexLayer& operator << (V1CortexLayer &layer);
-
-        /**
+       /**
          * round
          * @return None.
          **/

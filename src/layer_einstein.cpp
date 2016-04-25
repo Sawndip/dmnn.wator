@@ -45,19 +45,6 @@ EinsteinLayer::EinsteinLayer()
 }
 
 /**
- * Connect a Layer to Net.
- * @param [in] layer
- **/
-GanglionLayer& EinsteinLayer::operator << (GanglionLayer &layer)
-{
-    this->top_.push_back(&layer);
-    layer.bottom(this);
-    INFO_VAR(top_.size());
-    return layer;
-}
-
-
-/**
  * update
  * @return None.
  **/
@@ -173,7 +160,7 @@ void EinsteinLayer::forward(void)
     blobs_.clear();
     for(auto btm:bottom_){
         // 2x2
-        LayerInput *input = dynamic_cast<LayerInput*>(btm);
+        auto input = dynamic_pointer_cast<LayerInput>(btm);
         auto inBlob = input->getBlob(this);
         INFO_VAR(inBlob->w_);
         INFO_VAR(inBlob->h_);
@@ -240,7 +227,7 @@ void EinsteinLayer::forward(void)
         blobsRaw4X4_.push_back(raw4x4);
 
         for (auto top:top_) {
-            GanglionLayer *gang = dynamic_cast<GanglionLayer*>(top);
+            auto gang = dynamic_pointer_cast<GanglionLayer>(top);
 
             auto blob2x2 = shared_ptr<Blob<bool>>(new Blob<bool>(this->wGrid2x2_,this->hGrid2x2_,inBlob->ch_));
             auto gridW2x2 = this->wGrid2x2_/(2*gang->iW_);
@@ -445,7 +432,7 @@ shared_ptr<Blob<bool>> EinsteinLayer::getBlob(const LayerBase* who)
     TRACE_VAR(top_.size());
     for(auto top:top_)
     {
-        if(who == top)
+        if(who == top.get())
         {
             TRACE_VAR(blobs_.size());
             if(blobs_.size() > i)
