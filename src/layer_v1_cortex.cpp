@@ -41,7 +41,6 @@ using namespace boost::property_tree;
  **/
 V1CortexLayer::V1CortexLayer()
 {
-    memory_ = new ImplicitMemory;
 }
 V1CortexLayer::~V1CortexLayer()
 {

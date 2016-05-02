@@ -136,6 +136,8 @@ void GanglionLayer::forward(void)
     for(int index = 0; index < pinchs_.size();index++) {
         auto pinch = pinchs_[index];
         TRACE_VAR(pinch->size_);
+        auto blob = new Blob<bool>(pinch->w_/this->w_,pinch->h_/this->h_,pinch->ch_);
+        int blobIndex = 0;
         for (int i = 0;i < pinch->size_;i += this->w_*this->h_) {
             uint64_t memIndex = 0;
             for (int j = 0; j < this->w_*this->h_; j++) {
@@ -149,55 +151,10 @@ void GanglionLayer::forward(void)
                     memIndex++;
                 }
             }
-            memory_->update(index,memIndex,this->sparse_,this->w_,this->h_);
-        }
-    }
-    memory_->sort();
-#if 1
-    for(int index = 0; index < pinchs_.size();index++) {
-        auto &pinch = pinchs_[index];
-        auto raw = new Blob<int>(pinch->w_/this->w_,pinch->h_/this->h_,pinch->ch_);
-        int rawIndex = 0;
-        for (int i =0; i < pinch->size_; i += this->w_*this->h_) {
-            memory_->clearSearchOnce();
-            auto line = memory_->getNext(index);
-            while(0 != line) {
-                std::bitset<25> memBit(line);
-//                INFO_VAR(memBit);
-                auto sum = 0;
-                for (int j = 0; j < this->w_*this->h_; j++) {
-                    int index = i+j;
-                    if(pinch->data_[index] && memBit[j]) {
-                        sum++;
-                    }
-                }
-                TRACE_VAR(memBit);
-                TRACE_VAR(sum);
-                TRACE_VAR(raw->size_);
-                TRACE_VAR(rawIndex);
-                if(rawIndex >= raw->size_) {
-                    break;
-                }
-                if(sum > raw->data_[rawIndex]) {
-                    raw->data_[rawIndex] = sum;
-                }
-                line = memory_->getNext(index);
+            if(blobIndex++ >= blob->size_) {
+                continue;
             }
-            rawIndex++;
-        }
-        raws_.push_back(raw);
-    }
-#endif
-    for(int index = 0; index < raws_.size();index++) {
-        auto &raw = raws_[index];
-        auto blob = new Blob<bool>(raw->w_,raw->h_,raw->ch_);
-        int rawIndex = 0;
-        for (int i =0; i < raw->size_; i++) {
-            if(raw->data_[i] >= this->sparse_) {
-                blob->data_[i] = true;
-            } else {
-                blob->data_[i] = false;
-            }
+            blob->data_[blobIndex] = memory_->filter3x3(memIndex);
         }
         blobs_.push_back(blob);
     }

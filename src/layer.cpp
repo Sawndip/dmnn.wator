@@ -158,6 +158,7 @@ Blob<uint8_t>* LayerInput::getBlob(const LayerBase *who)
  * Constructor
  **/
 LayerHidden::LayerHidden()
+:memory_(new ImplicitMemory)
 {
 }
 

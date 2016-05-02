@@ -94,6 +94,24 @@ void ImplicitMemory::update(int pinch,uint64_t index,int sparse,int w,int h)
 }
 
 /**
+ * filter
+ **/
+bool ImplicitMemory::filter3x3(uint64_t index)
+{
+    bool ret = false;
+    for(const auto &shot:shotThough_3X3_) {
+        auto result = shot.first & index;
+        std::bitset<9> memBit(result);
+        TRACE_VAR(memBit);
+        if(memBit.count() >= 2) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
  * get parter.
  **/
 uint64_t ImplicitMemory::getNext(int id)

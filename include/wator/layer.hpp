@@ -131,6 +131,7 @@ namespace Wator {
 
     
     class ImplicitMemory;
+    typedef unique_ptr<ImplicitMemory> ImplicitMemoryPtr;
     /**
      * LayerOutput Base of Hidden layers.
      **/
@@ -158,7 +159,7 @@ namespace Wator {
         vector<Blob<bool>*> pinchs_;
         vector<Blob<int>*> raws_;
         vector<Blob<bool>*> blobs_;
-        ImplicitMemory* memory_;
+        ImplicitMemoryPtr memory_;
     };
 
     /**

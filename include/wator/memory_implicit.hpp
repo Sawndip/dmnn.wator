@@ -42,12 +42,18 @@ namespace Wator {
     class ImplicitMemory {
         friend class V1CortexLayer;
         friend class V2CortexLayer;
+        friend class LayerHidden;
     public:
         /**
          * update
          **/
         void update(int pinch,uint64_t index,int sparse,int w,int h);
 
+        /**
+         * filter
+         **/
+        bool filter3x3(uint64_t index);
+        
         /**
          * sort
          **/
