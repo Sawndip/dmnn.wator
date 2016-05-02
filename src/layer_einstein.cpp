@@ -448,3 +448,59 @@ shared_ptr<Blob<bool>> EinsteinLayer::getBlob(const LayerBase* who)
     }
     return nullptr;
 }
+
+
+/**
+ * get ptr
+ * @return None.
+ **/
+shared_ptr<Blob<bool>> EinsteinLayer::getBlob2X2(const LayerBase* who)
+{
+    int i = 0;
+    TRACE_VAR(top_.size());
+    for(auto top:top_)
+    {
+        if(who == top.get())
+        {
+            TRACE_VAR(blobs2x2_.size());
+            if(blobs2x2_.size() > i)
+            {
+                return blobs2x2_[i];
+            }
+            else
+            {
+                FATAL_VAR("fatal errro");
+            }
+        }
+        i++;
+    }
+    return nullptr;
+}
+
+/**
+ * get ptr
+ * @return None.
+ **/
+shared_ptr<Blob<bool>> EinsteinLayer::getBlob4X4(const LayerBase* who)
+{
+    int i = 0;
+    TRACE_VAR(top_.size());
+    for(auto top:top_)
+    {
+        if(who == top.get())
+        {
+            TRACE_VAR(blobs4x4_.size());
+            if(blobs4x4_.size() > i)
+            {
+                return blobs4x4_[i];
+            }
+            else
+            {
+                FATAL_VAR("fatal errro");
+            }
+        }
+        i++;
+    }
+    return nullptr;
+}
+

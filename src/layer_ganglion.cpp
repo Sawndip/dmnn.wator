@@ -86,13 +86,9 @@ void GanglionLayer::forward(void)
     blobs_.clear();
     for(auto btm:bottom_){
         shared_ptr<Blob<bool>> inputBlob;
-        auto coulomb  = dynamic_pointer_cast<CoulombLayer>(btm);
-        if(coulomb) {
-            inputBlob = coulomb->getBlob(this);
-        }
         auto einstein  = dynamic_pointer_cast<EinsteinLayer>(btm);
         if(einstein) {
-            inputBlob = einstein->getBlob(this);
+            inputBlob = einstein->getBlob2X2(this);
         }
         if(nullptr == inputBlob) {
             continue;
@@ -100,7 +96,6 @@ void GanglionLayer::forward(void)
         INFO_VAR(inputBlob->w_);
         INFO_VAR(inputBlob->h_);
         INFO_VAR(inputBlob->ch_);
-//        const int size = (inputBlob->w_/this->w_ )* (inputBlob->h_ /this->h_)* inputBlob->ch_;
         for (auto top:top_) {
             auto pinch = new Blob<bool>(inputBlob->w_,inputBlob->h_,inputBlob->ch_);
             for (int ch = 0; ch < inputBlob->ch_; ch++) {
@@ -207,7 +202,7 @@ void GanglionLayer::forward(void)
         blobs_.push_back(blob);
     }
     INFO_VAR(blobs_.size());
-    INFO_VAR("finnish V1CortexLayer::forward");
+    INFO_VAR("finnish GanglionLayer::forward");
 }
 
 
