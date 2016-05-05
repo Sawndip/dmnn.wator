@@ -97,12 +97,16 @@ void GanglionLayer::forward(void)
         INFO_VAR(inputBlob->h_);
         INFO_VAR(inputBlob->ch_);
         for (auto top:top_) {
-            auto pinch = new Blob<bool>(inputBlob->w_,inputBlob->h_,inputBlob->ch_);
+            int roundW = inputBlob->w_ - (inputBlob->w_%this->w_);
+            int roundH = inputBlob->h_ - (inputBlob->h_%this->h_);
+            INFO_VAR(roundW);
+            INFO_VAR(roundH);
+            auto pinch = new Blob<bool>(roundW,roundH,inputBlob->ch_);
             for (int ch = 0; ch < inputBlob->ch_; ch++) {
-                for (int y = 0; y < inputBlob->h_; y++) {
-                    for (int x = 0; x < inputBlob->w_; x++) {
-                        int grid = (y/this->h_) * (inputBlob->w_/this->w_) + (x/this->w_) ;
-                        int index = ch * inputBlob->w_ * inputBlob->h_;
+                for (int y = 0; y < roundH; y++) {
+                    for (int x = 0; x < roundW; x++) {
+                        int grid = (y/this->h_) * (roundW/this->w_) + (x/this->w_) ;
+                        int index = ch * roundW * roundH;
                         index += grid * this->w_ * this->h_;
                         index += (y%this->h_)*this->w_  + x%this->w_ ;
                         TRACE_VAR(index);
@@ -113,16 +117,18 @@ void GanglionLayer::forward(void)
                         TRACE_VAR(index2);
                         if (index >= inputBlob->size_|| index2 >= inputBlob->size_) {
                             // 无法整除的最后几行，不能的到下一层的完整输出，省略。
-                            TRACE_VAR(this->w_);
-                            TRACE_VAR(this->h_);
-                            TRACE_VAR(grid);
-                            TRACE_VAR(x);
-                            TRACE_VAR(y);
-                            TRACE_VAR(index);
-                            TRACE_VAR(index2);
-                            TRACE_VAR(inputBlob->w_);
-                            TRACE_VAR(inputBlob->h_);
-                            TRACE_VAR(inputBlob->size_);
+                            INFO_VAR(this->w_);
+                            INFO_VAR(this->h_);
+                            INFO_VAR(grid);
+                            INFO_VAR(x);
+                            INFO_VAR(y);
+                            INFO_VAR(index);
+                            INFO_VAR(index2);
+                            INFO_VAR(inputBlob->w_);
+                            INFO_VAR(inputBlob->h_);
+                            INFO_VAR(roundW);
+                            INFO_VAR(roundH);
+                            INFO_VAR(inputBlob->size_);
                             continue;
                         }
                         pinch->data_[index] = inputBlob->data_[index2];
