@@ -107,6 +107,7 @@ void ImageLayer::load(bool train)
 void ImageLayer::pump(void)
 {
     blobs_.clear();
+/*
     for(int i = 0;i < top_.size();i++ )
     {
         INFO_VAR(mat_.cols);
@@ -116,36 +117,37 @@ void ImageLayer::pump(void)
         INFO_VAR(this);
         blobs_.push_back(blob);
     }
+*/
     std::vector<cv::Mat> planes;
     cv::split(mat_, planes);
-    for(int channel = 0 ; channel < mat_.channels();channel++){
-        auto &mat = planes[channel];
-        for(int y = 0;y < mat.rows;y++){
-            for(int x = 0;x < mat.cols;x++){
-                auto byte = mat.at<uint8_t>(y, x);
-                TRACE_VAR(x);
-                TRACE_VAR(y);
-                for(int i = 0;i < top_.size();i++){
-                    int outH = 0;
-                    int outW = 0;
-                    auto clm = dynamic_pointer_cast<CoulombLayer>(top_[i]);
-                    if(clm) {
-                        outH = clm->h_;
-                        outW = clm->w_;
-                    }
-                    auto est = dynamic_pointer_cast<EinsteinLayer>(top_[i]);
-                    if(est) {
-                        outH = est->h_;
-                        outW = est->w_;
-                    }
-                    TRACE_VAR(outW);
-                    TRACE_VAR(outH);
+    for(int i = 0;i < top_.size();i++){
+        int outH = 0;
+        int outW = 0;
+        auto clm = dynamic_pointer_cast<CoulombLayer>(top_[i]);
+        if(clm) {
+            outH = clm->h_;
+            outW = clm->w_;
+        }
+        auto est = dynamic_pointer_cast<EinsteinLayer>(top_[i]);
+        if(est) {
+            outH = est->h_;
+            outW = est->w_;
+        }
+        TRACE_VAR(outW);
+        TRACE_VAR(outH);
+        const int groundW = (mat_.cols/outW)*outW;
+        const int groundH = (mat_.rows/outH)*outH;
+        auto blob = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(groundW,groundH,mat_.channels()));
+        for(int channel = 0 ; channel < mat_.channels();channel++){
+            auto &mat = planes[channel];
+            for(int y = 0;y < mat.rows;y++){
+                for(int x = 0;x < mat.cols;x++){
+                    auto byte = mat.at<uint8_t>(y, x);
+                    TRACE_VAR(x);
+                    TRACE_VAR(y);
                     const int grid = ((y/outH) * (mat_.cols/outW))+ (x/outW) ;
                     TRACE_VAR(grid);
                     TRACE_VAR(channel);
-                    
-                    const int groundW = (mat_.cols/outW)*outW;
-                    const int groundH = (mat_.rows/outH)*outH;
                     if(groundW < x || groundH < y) {
                         // out side of last grid.
                         continue;
@@ -156,15 +158,16 @@ void ImageLayer::pump(void)
                     index += grid * outW * outH;
                     index += (y%outH)*outW  + x%outW ;
                     TRACE_VAR(index);
-                    if(index > blobs_[i]->size_) {
+                    if(index > blob->size_) {
                         INFO_VAR(index);
-                        INFO_VAR(blobs_[i]->size_);
+                        INFO_VAR(blob->size_);
                         continue;
                     }
-                    blobs_[i]->data_[index] = byte;
+                    blob->data_[index] = byte;
                 }
             }
         }
+        blobs_.push_back(blob);
     }
     this->dump(planes);
     INFO_VAR(mat_.cols*mat_.rows*mat_.channels());

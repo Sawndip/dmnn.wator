@@ -83,7 +83,7 @@ namespace Wator {
  
         const int iW_ = 8;
         const int iH_ = 8;
-        const int iSparse_ = (iW_*iH_)*25/100;
+        const int iSparse_ = (iW_*iH_)*20/100;
     private:
     };
 
