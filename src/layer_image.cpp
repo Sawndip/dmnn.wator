@@ -112,7 +112,7 @@ void ImageLayer::pump(void)
         INFO_VAR(mat_.cols);
         INFO_VAR(mat_.rows);
         INFO_VAR(mat_.channels());
-        auto blob = new Blob<uint8_t>(mat_.cols,mat_.rows,mat_.channels());
+        auto blob = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(mat_.cols,mat_.rows,mat_.channels()));
         INFO_VAR(this);
         blobs_.push_back(blob);
     }

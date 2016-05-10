@@ -64,13 +64,6 @@ namespace Wator {
         virtual void update(void);
     private:
     protected:
-        const int w_ = 5;
-        const int h_ = 5;
-        const int sparse_ = 5;
- 
-        const int iW_ = 8;
-        const int iH_ = 8;
-        const int iSparse_ = (iW_*iH_)*25/100;
     private:
     };
 

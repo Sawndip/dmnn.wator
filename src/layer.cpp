@@ -100,9 +100,6 @@ LayerInput::LayerInput()
 }
 LayerInput::~LayerInput()
 {
-    for (auto blob:blobs_) {
-        delete blob;
-    }
     blobs_.clear();
 }
 
@@ -130,7 +127,7 @@ void LayerInput::load(bool train)
  * get ptr
  * @return None.
  **/
-Blob<uint8_t>* LayerInput::getBlob(const LayerBase *who)
+shared_ptr<Blob<uint8_t>> LayerInput::getBlob(const LayerBase *who)
 {
     int i = 0;
     TRACE_VAR(top_.size());
@@ -165,13 +162,7 @@ LayerHidden::LayerHidden()
 LayerHidden::~LayerHidden()
 {
     INFO_VAR(this);
-    for (auto pinch:pinchs_) {
-        delete pinch;
-    }
     pinchs_.clear();
-    for (auto blob:blobs_) {
-        delete blob;
-    }
     blobs_.clear();
 }
 

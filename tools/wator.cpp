@@ -41,10 +41,18 @@ namespace log = boost::log;
 
 static void train(void){
     shared_ptr<ObjectLayer> object(new ObjectLayer);
+
+    shared_ptr<V2CortexLayer> v2(new V2CortexLayer);
+    object->bottom(v2);
+    v2->top(object);
+
+    shared_ptr<V1CortexLayer> v1(new V1CortexLayer);
+    v2->bottom(v1);
+    v1->top(v2);
     
     shared_ptr<GanglionLayer> ganglion(new GanglionLayer);
-    object->bottom(ganglion);
-    ganglion->top(object);
+    v1->bottom(ganglion);
+    ganglion->top(v1);
     
 
     shared_ptr<EinsteinLayer> einstein(new EinsteinLayer);

@@ -123,10 +123,10 @@ namespace Wator {
          * get ptr
          * @return None.
          **/
-        Blob<uint8_t> *getBlob(const LayerBase *who);
+        shared_ptr<Blob<uint8_t>> getBlob(const LayerBase *who);
     protected:
         int threshold_;
-        vector<Blob<uint8_t>*> blobs_;
+        vector<shared_ptr<Blob<uint8_t>>> blobs_;
     };
 
     
@@ -154,11 +154,11 @@ namespace Wator {
          * get ptr
          * @return None.
          **/
-        Blob<bool>* getBlob(const LayerBase *who);
+        shared_ptr<Blob<bool>> getBlob(const LayerBase *who);
     protected:
-        vector<Blob<bool>*> pinchs_;
-        vector<Blob<int>*> raws_;
-        vector<Blob<bool>*> blobs_;
+        vector<shared_ptr<Blob<bool>>> pinchs_;
+        vector<shared_ptr<Blob<int>>> raws_;
+        vector<shared_ptr<Blob<bool>>> blobs_;
         ImplicitMemoryPtr memory_;
     };
 

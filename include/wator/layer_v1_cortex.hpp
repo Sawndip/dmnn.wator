@@ -57,6 +57,12 @@ namespace Wator {
          **/
         virtual void forward(void);
 
+        /**
+         * get ptr
+         * @return None.
+         **/
+        shared_ptr<Blob<bool>> getBlob(const LayerBase* who);
+        
     protected:
         /**
          * update
@@ -69,7 +75,15 @@ namespace Wator {
          * @return None.
          **/
         void dump(void);
+
     private:
+        const int w_ = 3;
+        const int h_ = 3;
+        const int sparse_ = 5;
+        
+        const int iW_ = 8;
+        const int iH_ = 8;
+        const int iSparse_ = (iW_*iH_)*25/100;
     };
 
 }

@@ -96,14 +96,14 @@ void ImplicitMemory::update(int pinch,uint64_t index,int sparse,int w,int h)
 /**
  * filter
  **/
-bool ImplicitMemory::filter3x3(uint64_t index)
+bool ImplicitMemory::filter3x3(uint64_t index,int threshold)
 {
     bool ret = false;
     for(const auto &shot:shotThough_3X3_) {
         auto result = shot.first & index;
         std::bitset<9> memBit(result);
         TRACE_VAR(memBit);
-        if(memBit.count() >= 2) {
+        if(memBit.count() >= threshold) {
             return true;
         }
     }

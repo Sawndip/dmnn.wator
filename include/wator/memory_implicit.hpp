@@ -52,7 +52,7 @@ namespace Wator {
         /**
          * filter
          **/
-        bool filter3x3(uint64_t index);
+        bool filter3x3(uint64_t index,int threshold =3);
         
         /**
          * sort

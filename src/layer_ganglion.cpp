@@ -101,7 +101,7 @@ void GanglionLayer::forward(void)
             int roundH = inputBlob->h_ - (inputBlob->h_%this->h_);
             INFO_VAR(roundW);
             INFO_VAR(roundH);
-            auto pinch = new Blob<bool>(roundW,roundH,inputBlob->ch_);
+            auto pinch = shared_ptr<Blob<bool>>(new Blob<bool>(roundW,roundH,inputBlob->ch_));
             for (int ch = 0; ch < inputBlob->ch_; ch++) {
                 for (int y = 0; y < roundH; y++) {
                     for (int x = 0; x < roundW; x++) {
@@ -142,7 +142,7 @@ void GanglionLayer::forward(void)
     for(int index = 0; index < pinchs_.size();index++) {
         auto pinch = pinchs_[index];
         TRACE_VAR(pinch->size_);
-        auto blob = new Blob<bool>(pinch->w_/this->w_,pinch->h_/this->h_,pinch->ch_);
+        auto blob = shared_ptr<Blob<bool>>(new Blob<bool>(pinch->w_/this->w_,pinch->h_/this->h_,pinch->ch_));
         int blobIndex = 0;
         for (int i = 0;i < pinch->size_;i += this->w_*this->h_) {
             uint64_t memIndex = 0;
@@ -179,3 +179,31 @@ void GanglionLayer::dump(void){
         blob->dump(typeid(this).name());
     }
 }
+
+/**
+ * get ptr
+ * @return None.
+ **/
+shared_ptr<Blob<bool>> GanglionLayer::getBlob(const LayerBase* who)
+{
+    int i = 0;
+    TRACE_VAR(top_.size());
+    for(auto top:top_)
+    {
+        if(who == top.get())
+        {
+            TRACE_VAR(blobs_.size());
+            if(blobs_.size() > i)
+            {
+                return blobs_[i];
+            }
+            else
+            {
+                FATAL_VAR("fatal errro");
+            }
+        }
+        i++;
+    }
+    return nullptr;
+}
+

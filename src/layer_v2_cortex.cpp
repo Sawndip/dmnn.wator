@@ -87,20 +87,27 @@ void V2CortexLayer::forward(void)
     blobs_.clear();
     for(auto btm:bottom_){
         shared_ptr<Blob<bool>> inputBlob;
+        auto v1  = dynamic_pointer_cast<V1CortexLayer>(btm);
+        if(v1) {
+            inputBlob = v1->getBlob(this);
+        }
         if(nullptr == inputBlob) {
             continue;
         }
         INFO_VAR(inputBlob->w_);
         INFO_VAR(inputBlob->h_);
         INFO_VAR(inputBlob->ch_);
-//        const int size = (inputBlob->w_/this->w_ )* (inputBlob->h_ /this->h_)* inputBlob->ch_;
         for (auto top:top_) {
-            auto pinch = new Blob<bool>(inputBlob->w_,inputBlob->h_,inputBlob->ch_);
+            int roundW = inputBlob->w_ - (inputBlob->w_%this->w_);
+            int roundH = inputBlob->h_ - (inputBlob->h_%this->h_);
+            INFO_VAR(roundW);
+            INFO_VAR(roundH);
+            auto pinch = shared_ptr<Blob<bool>>(new Blob<bool>(roundW,roundH,inputBlob->ch_));
             for (int ch = 0; ch < inputBlob->ch_; ch++) {
-                for (int y = 0; y < inputBlob->h_; y++) {
-                    for (int x = 0; x < inputBlob->w_; x++) {
-                        int grid = (y/this->h_) * (inputBlob->w_/this->w_) + (x/this->w_) ;
-                        int index = ch * inputBlob->w_ * inputBlob->h_;
+                for (int y = 0; y < roundH; y++) {
+                    for (int x = 0; x < roundW; x++) {
+                        int grid = (y/this->h_) * (roundW/this->w_) + (x/this->w_) ;
+                        int index = ch * roundW * roundH;
                         index += grid * this->w_ * this->h_;
                         index += (y%this->h_)*this->w_  + x%this->w_ ;
                         TRACE_VAR(index);
@@ -111,16 +118,18 @@ void V2CortexLayer::forward(void)
                         TRACE_VAR(index2);
                         if (index >= inputBlob->size_|| index2 >= inputBlob->size_) {
                             // 无法整除的最后几行，不能的到下一层的完整输出，省略。
-                            TRACE_VAR(this->w_);
-                            TRACE_VAR(this->h_);
-                            TRACE_VAR(grid);
-                            TRACE_VAR(x);
-                            TRACE_VAR(y);
-                            TRACE_VAR(index);
-                            TRACE_VAR(index2);
-                            TRACE_VAR(inputBlob->w_);
-                            TRACE_VAR(inputBlob->h_);
-                            TRACE_VAR(inputBlob->size_);
+                            INFO_VAR(this->w_);
+                            INFO_VAR(this->h_);
+                            INFO_VAR(grid);
+                            INFO_VAR(x);
+                            INFO_VAR(y);
+                            INFO_VAR(index);
+                            INFO_VAR(index2);
+                            INFO_VAR(inputBlob->w_);
+                            INFO_VAR(inputBlob->h_);
+                            INFO_VAR(roundW);
+                            INFO_VAR(roundH);
+                            INFO_VAR(inputBlob->size_);
                             continue;
                         }
                         pinch->data_[index] = inputBlob->data_[index2];
@@ -134,6 +143,8 @@ void V2CortexLayer::forward(void)
     for(int index = 0; index < pinchs_.size();index++) {
         auto pinch = pinchs_[index];
         TRACE_VAR(pinch->size_);
+        auto blob = shared_ptr<Blob<bool>>(new Blob<bool>(pinch->w_/this->w_,pinch->h_/this->h_,pinch->ch_));
+        int blobIndex = 0;
         for (int i = 0;i < pinch->size_;i += this->w_*this->h_) {
             uint64_t memIndex = 0;
             for (int j = 0; j < this->w_*this->h_; j++) {
@@ -147,55 +158,11 @@ void V2CortexLayer::forward(void)
                     memIndex++;
                 }
             }
-            memory_->update(index,memIndex,this->sparse_,this->w_,this->h_);
-        }
-    }
-    memory_->sort();
-#if 1
-    for(int index = 0; index < pinchs_.size();index++) {
-        auto &pinch = pinchs_[index];
-        auto raw = new Blob<int>(pinch->w_/this->w_,pinch->h_/this->h_,pinch->ch_);
-        int rawIndex = 0;
-        for (int i =0; i < pinch->size_; i += this->w_*this->h_) {
-            memory_->clearSearchOnce();
-            auto line = memory_->getNext(index);
-            while(0 != line) {
-                std::bitset<25> memBit(line);
-//                INFO_VAR(memBit);
-                auto sum = 0;
-                for (int j = 0; j < this->w_*this->h_; j++) {
-                    int index = i+j;
-                    if(pinch->data_[index] && memBit[j]) {
-                        sum++;
-                    }
-                }
-                TRACE_VAR(memBit);
-                TRACE_VAR(sum);
-                TRACE_VAR(raw->size_);
-                TRACE_VAR(rawIndex);
-                if(rawIndex >= raw->size_) {
-                    break;
-                }
-                if(sum > raw->data_[rawIndex]) {
-                    raw->data_[rawIndex] = sum;
-                }
-                line = memory_->getNext(index);
+            if(blobIndex++ >= blob->size_) {
+                continue;
             }
-            rawIndex++;
-        }
-        raws_.push_back(raw);
-    }
-#endif
-    for(int index = 0; index < raws_.size();index++) {
-        auto &raw = raws_[index];
-        auto blob = new Blob<bool>(raw->w_,raw->h_,raw->ch_);
-        int rawIndex = 0;
-        for (int i =0; i < raw->size_; i++) {
-            if(raw->data_[i] >= this->sparse_) {
-                blob->data_[i] = true;
-            } else {
-                blob->data_[i] = false;
-            }
+            //blob->data_[blobIndex] = memory_->filter3x3(memIndex,2);
+            blob->data_[blobIndex] = memory_->filter3x3(memIndex);
         }
         blobs_.push_back(blob);
     }
