@@ -76,6 +76,18 @@ namespace Wator {
         
     protected:
         /**
+         * forward1
+         * @return None.
+         **/
+        void forward1(void);
+     
+        /**
+         * forward2
+         * @return None.
+         **/
+        void forward2(void);
+
+        /**
          * update
          * @return None.
          **/
@@ -124,6 +136,11 @@ namespace Wator {
   
         int wGrid4x4_;
         int hGrid4x4_;
+        
+        // 20%
+        const int sparseFractions_ = 20;
+        const int sparseNumerator_ = 100;
+        
     };
 
 }

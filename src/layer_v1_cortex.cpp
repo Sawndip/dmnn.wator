@@ -169,8 +169,8 @@ void V1CortexLayer::forward(void)
             if(blobIndex++ >= blob->size_) {
                 continue;
             }
-            blob->data_[blobIndex] = memory_->filter3x3(memIndex,2);
-//            blob->data_[blobIndex] = memory_->filter3x3(memIndex);
+//            blob->data_[blobIndex] = memory_->filter3x3(memIndex,2);
+            blob->data_[blobIndex] = memory_->filter3x3(memIndex);
         }
         blobs_.push_back(blob);
     }

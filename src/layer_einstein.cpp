@@ -146,7 +146,6 @@ void EinsteinLayer::cal4Vec(uint8_t *start,uint8_t &maxDiff,uint8_t &avg)
     avg = (start[0] + start[1] + start[2] + start[3])/4;
 }
 
-
 /**
  * forward
  * @return None.
@@ -158,6 +157,20 @@ void EinsteinLayer::forward(void)
     blobs2x2_.clear();
     blobs4x4_.clear();
     blobs_.clear();
+
+    forward2();
+
+    INFO_VAR(blobs_.size());
+    INFO_VAR("finnish EinsteinLayer::forward");
+}
+
+
+/**
+ * forward1
+ * @return None.
+ **/
+void EinsteinLayer::forward1(void)
+{
     for(auto btm:bottom_){
         // 2x2
         auto input = dynamic_pointer_cast<LayerInput>(btm);
@@ -358,10 +371,156 @@ void EinsteinLayer::forward(void)
             blobs4x4_.push_back(blob4x4);
         }
     }
-    
-    
-    INFO_VAR(blobs_.size());
-    INFO_VAR("finnish CoulombLayer::forward");
+}
+
+
+
+/**
+ * forward2
+ * @return None.
+ **/
+void EinsteinLayer::forward2(void)
+{
+    for(auto btm:bottom_){
+        // 2x2
+        auto input = dynamic_pointer_cast<LayerInput>(btm);
+        auto inBlob = input->getBlob(this);
+        INFO_VAR(inBlob->w_);
+        INFO_VAR(inBlob->h_);
+        INFO_VAR(inBlob->ch_);
+        this->wGrid2x2_ = inBlob->w_/this->w_;
+        this->hGrid2x2_ = inBlob->h_/this->h_;
+        INFO_VAR(this->wGrid2x2_);
+        INFO_VAR(this->hGrid2x2_);
+        auto raw2x2 = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(this->wGrid2x2_,this->hGrid2x2_,inBlob->ch_));
+        auto nextInput2x2 = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(this->wGrid2x2_,this->hGrid2x2_,inBlob->ch_));
+
+        uint8_t max_2x2 = 0;
+        uint8_t min_2x2 = 255;
+        
+        for(int i = 0 ;i < raw2x2->size_ ;i++) {
+            uint8_t maxDiff = 0;
+            uint8_t avg = 0;
+            int index = i*this->w_*this->h_;
+            cal4Vec(&(inBlob->data_[index]),maxDiff,avg);
+            raw2x2->data_[i] = maxDiff;
+            nextInput2x2->data_[i] = avg;
+
+            if(raw2x2->data_[i] > max_2x2) {
+                max_2x2 = raw2x2->data_[i];
+            }
+            if(raw2x2->data_[i] < min_2x2) {
+                min_2x2 = raw2x2->data_[i];
+            }
+        }
+        blobsRaw2X2_.push_back(raw2x2);
+        // 4x4
+        this->wGrid4x4_ =this->wGrid2x2_/2;
+        this->hGrid4x4_ =this->hGrid2x2_/2;
+        INFO_VAR(this->wGrid4x4_);
+        INFO_VAR(this->hGrid4x4_);
+        auto swap4x4 = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(this->wGrid2x2_,this->hGrid2x2_,inBlob->ch_));
+        for(int channel = 0 ; channel < inBlob->ch_;channel++){
+            for(int y = 0;y < this->hGrid2x2_;y++){
+                for(int x = 0;x < this->wGrid2x2_;x++){
+                    int indexInput = channel *(this->hGrid2x2_ * this->wGrid2x2_) + y*this->wGrid2x2_ + x;
+                    auto byte = nextInput2x2->data_[indexInput];
+                    
+                    const int grid = ((y/2) * (wGrid2x2_/2))+ (x/2) ;
+                    TRACE_VAR(grid);
+                    const int groundW = (wGrid2x2_/2)*2;
+                    const int groundH = (hGrid2x2_/2)*2;
+                    if(groundW < x || groundH < y) {
+                        // out side of last grid.
+                        continue;
+                    }
+                    int index = channel * groundW * groundH;
+                    index += grid * 2 * 2;
+                    index += (y%2)*2  + x%2 ;
+                    TRACE_VAR(index);
+                    if(index > swap4x4->size_) {
+                        INFO_VAR(index);
+                        INFO_VAR(swap4x4->size_);
+                        continue;
+                    }
+                    swap4x4->data_[index] = byte;
+                }
+            }
+        }
+        //
+        auto raw4x4 = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(this->wGrid4x4_,this->hGrid4x4_,inBlob->ch_));
+        auto nextInput4x4 = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(this->wGrid4x4_,this->hGrid4x4_,inBlob->ch_));
+        uint8_t max_4x4 = 0;
+        uint8_t min_4x4 = 255;
+        for(int i = 0 ;i < raw4x4->size_ ;i++) {
+            uint8_t maxDiff = 0;
+            uint8_t avg = 0;
+            int index = i*this->w_*this->h_;
+            cal4Vec(&(swap4x4->data_[index]),maxDiff,avg);
+            raw4x4->data_[i] = maxDiff;
+            nextInput4x4->data_[i] = avg;
+
+            if(raw4x4->data_[i] > max_4x4) {
+                max_4x4 = raw4x4->data_[i];
+            }
+            if(raw4x4->data_[i] < min_4x4) {
+                min_4x4 = raw4x4->data_[i];
+            }
+        }
+        blobsRaw4X4_.push_back(raw4x4);
+        
+        for (auto top:top_) {
+            auto blob2x2 = shared_ptr<Blob<bool>>(new Blob<bool>(this->wGrid2x2_,this->hGrid2x2_,inBlob->ch_));
+            for (int ch = 0; ch < inBlob->ch_; ch++) {
+                const int oneChannel = this->wGrid2x2_ * this->hGrid2x2_;
+                const int maxActive = oneChannel * this->sparseFractions_ / sparseNumerator_;
+                int activeSize = maxActive +1;
+                uint8_t threshold_ = min_2x2;
+                uint8_t thresholdStep_ = 1;
+                while (activeSize > maxActive) {
+                    activeSize = 0;
+                    for(int i =0;i < oneChannel;i++)
+                    {
+                        int index = ch * oneChannel + i;
+                        int delta = raw2x2->data_[index] - threshold_;
+                        if(0 < delta ){
+                            blob2x2->data_[index] = true;
+                            activeSize++;
+                        }else{
+                            blob2x2->data_[index] = false;
+                        }
+                    }
+                    threshold_ += thresholdStep_;
+                }
+            }
+            blobs2x2_.push_back(blob2x2);
+            
+            auto blob4x4 = shared_ptr<Blob<bool>>(new Blob<bool>(this->wGrid4x4_,this->hGrid4x4_,inBlob->ch_));
+            for (int ch = 0; ch < inBlob->ch_; ch++) {
+                const int oneChannel = this->wGrid4x4_ * this->hGrid4x4_;
+                const int maxActive = oneChannel * this->sparseFractions_ / sparseNumerator_;
+                int activeSize = maxActive +1;
+                uint8_t threshold_ = min_4x4;
+                uint8_t thresholdStep_ = 1;
+                while (activeSize > maxActive) {
+                    activeSize = 0;
+                    for(int i =0;i < oneChannel;i++)
+                    {
+                        int index = ch * oneChannel + i;
+                        int delta = raw4x4->data_[index] - threshold_;
+                        if(0 < delta ){
+                            blob4x4->data_[index] = true;
+                            activeSize++;
+                        }else{
+                            blob4x4->data_[index] = false;
+                        }
+                    }
+                    threshold_ += thresholdStep_;
+                }
+            }
+            blobs4x4_.push_back(blob4x4);
+        }
+    }
 }
 
 
