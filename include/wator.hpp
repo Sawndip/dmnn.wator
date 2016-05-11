@@ -32,13 +32,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <wator/blob.hpp>
 #include <wator/layer.hpp>
 #include <wator/layer_image.hpp>
+
 #include <wator/layer_coulomb.hpp>
-#include <wator/layer_einstein.hpp>
-#include <wator/layer_ganglion.hpp>
+#include <wator/layer_newton.hpp>
+#include <wator/layer_leibniz.hpp>
+
 #include <wator/layer_cortex.hpp>
 #include <wator/layer_v1_cortex.hpp>
 #include <wator/layer_v2_cortex.hpp>
+
 #include <wator/layer_object.hpp>
+
 #include <wator/memory_implicit.hpp>
 #include <wator/memory_explicit.hpp>
 #include <wator/net.hpp>

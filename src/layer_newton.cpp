@@ -40,7 +40,7 @@ static float const fConstCoulombDiff = 0.0001;
 /**
  * Constructor
  **/
-EinsteinLayer::EinsteinLayer()
+NewtonLayer::NewtonLayer()
 {
 }
 
@@ -48,9 +48,9 @@ EinsteinLayer::EinsteinLayer()
  * update
  * @return None.
  **/
-void EinsteinLayer::update(void)
+void NewtonLayer::update(void)
 {
-    INFO_VAR("finnish EinsteinLayer::update");
+    INFO_VAR("finnish NewtonLayer::update");
 }
 
 
@@ -58,13 +58,13 @@ void EinsteinLayer::update(void)
  * round
  * @return None.
  **/
-void EinsteinLayer::round(void)
+void NewtonLayer::round(void)
 {
     this->forward();
     this->update();
     this->cutIsolation();
     this->dump();
-    INFO_VAR("finnish EinsteinLayer::round");
+    INFO_VAR("finnish NewtonLayer::round");
     LayerBase::round();
 }
 
@@ -117,7 +117,7 @@ void EinsteinLayer::round(void)
  * cal 4 vecotor.
  * @return None.
  **/
-void EinsteinLayer::cal4Vec(uint8_t *start,uint8_t &maxDiff,uint8_t &avg)
+void NewtonLayer::cal4Vec(uint8_t *start,uint8_t &maxDiff,uint8_t &avg)
 {
     uint8_t diff1 = std::abs(start[0] - start[1]);
     uint8_t diff2 = std::abs(start[0] - start[2]);
@@ -150,7 +150,7 @@ void EinsteinLayer::cal4Vec(uint8_t *start,uint8_t &maxDiff,uint8_t &avg)
  * forward
  * @return None.
  **/
-void EinsteinLayer::forward(void)
+void NewtonLayer::forward(void)
 {
     blobsRaw2X2_.clear();
     blobsRaw4X4_.clear();
@@ -161,7 +161,7 @@ void EinsteinLayer::forward(void)
     forward2();
 
     INFO_VAR(blobs_.size());
-    INFO_VAR("finnish EinsteinLayer::forward");
+    INFO_VAR("finnish NewtonLayer::forward");
 }
 
 
@@ -169,7 +169,7 @@ void EinsteinLayer::forward(void)
  * forward1
  * @return None.
  **/
-void EinsteinLayer::forward1(void)
+void NewtonLayer::forward1(void)
 {
     for(auto btm:bottom_){
         // 2x2
@@ -240,16 +240,16 @@ void EinsteinLayer::forward1(void)
         blobsRaw4X4_.push_back(raw4x4);
 
         for (auto top:top_) {
-            auto gang = dynamic_pointer_cast<GanglionLayer>(top);
+            auto leib = dynamic_pointer_cast<LeibnizLayer>(top);
 
             auto blob2x2 = shared_ptr<Blob<bool>>(new Blob<bool>(this->wGrid2x2_,this->hGrid2x2_,inBlob->ch_));
-            auto gridW2x2 = this->wGrid2x2_/(2*gang->iW_);
-            auto gridH2x2 = this->hGrid2x2_/(2*gang->iH_);
+            auto gridW2x2 = this->wGrid2x2_/(2*leib->iW_);
+            auto gridH2x2 = this->hGrid2x2_/(2*leib->iH_);
             for (int ch = 0; ch < inBlob->ch_; ch++) {
                 for (int x = 0;x < gridW2x2;x++){
                     for (int y = 0;y < gridH2x2;y++){
                         TRACE_VAR(activeSize);
-                        const int maxActive = gang->iSparse_;
+                        const int maxActive = leib->iSparse_;
                         int activeSize = maxActive +1;
                         int iCounter = 0;
                         uint8_t max_ = 0;
@@ -258,10 +258,10 @@ void EinsteinLayer::forward1(void)
                         uint8_t thresholdStep_ = 1;
                         while (activeSize > maxActive) {
                             activeSize = 0;
-                            for(int x2 = 0 ;x2 < 2*gang->iW_ ;x2++) {
-                                for(int y2 = 0 ;y2 < 2*gang->iH_ ;y2++) {
+                            for(int x2 = 0 ;x2 < 2*leib->iW_ ;x2++) {
+                                for(int y2 = 0 ;y2 < 2*leib->iH_ ;y2++) {
                                     /* index */
-                                    auto index = ch * this->wGrid2x2_* this->hGrid2x2_ + (y * 2*gang->iH_+y2) * this->wGrid2x2_ + x*2*gang->iW_ + x2;
+                                    auto index = ch * this->wGrid2x2_* this->hGrid2x2_ + (y * 2*leib->iH_+y2) * this->wGrid2x2_ + x*2*leib->iW_ + x2;
                                     if(iCounter == 0) {
                                         //if(0) {
                                         if(raw2x2->data_[index] > max_) {
@@ -307,13 +307,13 @@ void EinsteinLayer::forward1(void)
             blobs2x2_.push_back(blob2x2);
             
             auto blob4x4 = shared_ptr<Blob<bool>>(new Blob<bool>(this->wGrid4x4_,this->hGrid4x4_,inBlob->ch_));
-            auto gridW4x4 = this->wGrid4x4_/gang->iW_;
-            auto gridH4x4 = this->hGrid4x4_/gang->iH_;
+            auto gridW4x4 = this->wGrid4x4_/leib->iW_;
+            auto gridH4x4 = this->hGrid4x4_/leib->iH_;
             for (int ch = 0; ch < inBlob->ch_; ch++) {
                 for (int x = 0;x < gridW4x4;x++){
                     for (int y = 0;y < gridH4x4;y++){
                         TRACE_VAR(activeSize);
-                        const int maxActive = gang->iSparse_;
+                        const int maxActive = leib->iSparse_;
                         int activeSize = maxActive +1;
                         int iCounter = 0;
                         uint8_t max_ = 0;
@@ -322,10 +322,10 @@ void EinsteinLayer::forward1(void)
                         uint8_t thresholdStep_ = 1;
                         while (activeSize > maxActive) {
                             activeSize = 0;
-                            for(int x2 = 0 ;x2 < gang->iW_ ;x2++) {
-                                for(int y2 = 0 ;y2 < gang->iH_ ;y2++) {
+                            for(int x2 = 0 ;x2 < leib->iW_ ;x2++) {
+                                for(int y2 = 0 ;y2 < leib->iH_ ;y2++) {
                                     /* index */
-                                    auto index = ch * this->wGrid4x4_* this->hGrid4x4_ + (y * gang->iH_+y2) * this->wGrid4x4_ + x*gang->iW_ + x2;
+                                    auto index = ch * this->wGrid4x4_* this->hGrid4x4_ + (y * leib->iH_+y2) * this->wGrid4x4_ + x*leib->iW_ + x2;
                                     if(iCounter == 0) {
                                         //if(0) {
                                         if(raw4x4->data_[index] > max_) {
@@ -379,7 +379,7 @@ void EinsteinLayer::forward1(void)
  * forward2
  * @return None.
  **/
-void EinsteinLayer::forward2(void)
+void NewtonLayer::forward2(void)
 {
     for(auto btm:bottom_){
         // 2x2
@@ -528,7 +528,7 @@ void EinsteinLayer::forward2(void)
  * cut point that is not connect to anthers.
  * @return None.
  **/
-void EinsteinLayer::cutIsolation(shared_ptr<Blob<bool>> blob)
+void NewtonLayer::cutIsolation(shared_ptr<Blob<bool>> blob)
 {
 #if 0 // do 3x3 filter.
     for (int ch = 0; ch < blob->ch_; ch++) {
@@ -552,7 +552,7 @@ void EinsteinLayer::cutIsolation(shared_ptr<Blob<bool>> blob)
  * cut point that is not connect to anthers.
  * @return None.
  **/
-void EinsteinLayer::cutIsolation(void)
+void NewtonLayer::cutIsolation(void)
 {
     for (auto &blob:blobs2x2_) {
         cutIsolation(blob);
@@ -567,7 +567,7 @@ void EinsteinLayer::cutIsolation(void)
  * dump to png
  * @return None.
  **/
-void EinsteinLayer::dump(void){
+void NewtonLayer::dump(void){
     INFO_VAR(blobs2x2_.size());
     for (auto blob:blobs2x2_) {
         string name = typeid(this).name();
@@ -585,7 +585,7 @@ void EinsteinLayer::dump(void){
  * get ptr
  * @return None.
  **/
-shared_ptr<Blob<bool>> EinsteinLayer::getBlob(const LayerBase* who)
+shared_ptr<Blob<bool>> NewtonLayer::getBlob(const LayerBase* who)
 {
     int i = 0;
     TRACE_VAR(top_.size());
@@ -613,7 +613,7 @@ shared_ptr<Blob<bool>> EinsteinLayer::getBlob(const LayerBase* who)
  * get ptr
  * @return None.
  **/
-shared_ptr<Blob<bool>> EinsteinLayer::getBlob2X2(const LayerBase* who)
+shared_ptr<Blob<bool>> NewtonLayer::getBlob2X2(const LayerBase* who)
 {
     int i = 0;
     TRACE_VAR(top_.size());
@@ -640,7 +640,7 @@ shared_ptr<Blob<bool>> EinsteinLayer::getBlob2X2(const LayerBase* who)
  * get ptr
  * @return None.
  **/
-shared_ptr<Blob<bool>> EinsteinLayer::getBlob4X4(const LayerBase* who)
+shared_ptr<Blob<bool>> NewtonLayer::getBlob4X4(const LayerBase* who)
 {
     int i = 0;
     TRACE_VAR(top_.size());

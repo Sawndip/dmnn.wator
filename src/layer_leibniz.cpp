@@ -39,10 +39,10 @@ using namespace boost::property_tree;
 /**
  * Constructor
  **/
-GanglionLayer::GanglionLayer()
+LeibnizLayer::LeibnizLayer()
 {
 }
-GanglionLayer::~GanglionLayer()
+LeibnizLayer::~LeibnizLayer()
 {
     INFO_VAR(this);
 }
@@ -53,9 +53,9 @@ GanglionLayer::~GanglionLayer()
  * update
  * @return None.
  **/
-void GanglionLayer::update(void)
+void LeibnizLayer::update(void)
 {
-    INFO_VAR("finnish GanglionLayer::update");
+    INFO_VAR("finnish LeibnizLayer::update");
 }
 
 
@@ -65,11 +65,11 @@ void GanglionLayer::update(void)
  * round
  * @return None.
  **/
-void GanglionLayer::round(void)
+void LeibnizLayer::round(void)
 {
     this->forward();
     this->update();
-    INFO_VAR("finnish GanglionLayer::round");
+    INFO_VAR("finnish LeibnizLayer::round");
     LayerBase::round();
     this->dump();
 }
@@ -79,16 +79,16 @@ void GanglionLayer::round(void)
  * forward
  * @return None.
  **/
-void GanglionLayer::forward(void)
+void LeibnizLayer::forward(void)
 {
     pinchs_.clear();
     raws_.clear();
     blobs_.clear();
     for(auto btm:bottom_){
         shared_ptr<Blob<bool>> inputBlob;
-        auto einstein  = dynamic_pointer_cast<EinsteinLayer>(btm);
-        if(einstein) {
-            inputBlob = einstein->getBlob2X2(this);
+        auto newton  = dynamic_pointer_cast<NewtonLayer>(btm);
+        if(newton) {
+            inputBlob = newton->getBlob2X2(this);
         }
         if(nullptr == inputBlob) {
             continue;
@@ -165,7 +165,7 @@ void GanglionLayer::forward(void)
         blobs_.push_back(blob);
     }
     INFO_VAR(blobs_.size());
-    INFO_VAR("finnish GanglionLayer::forward");
+    INFO_VAR("finnish LeibnizLayer::forward");
 }
 
 
@@ -173,7 +173,7 @@ void GanglionLayer::forward(void)
  * dump to png
  * @return None.
  **/
-void GanglionLayer::dump(void){
+void LeibnizLayer::dump(void){
     INFO_VAR(blobs_.size());
     for (auto blob:blobs_) {
         blob->dump(typeid(this).name());
@@ -184,7 +184,7 @@ void GanglionLayer::dump(void){
  * get ptr
  * @return None.
  **/
-shared_ptr<Blob<bool>> GanglionLayer::getBlob(const LayerBase* who)
+shared_ptr<Blob<bool>> LeibnizLayer::getBlob(const LayerBase* who)
 {
     int i = 0;
     TRACE_VAR(top_.size());

@@ -97,7 +97,7 @@ namespace Wator {
      **/
     class LayerInput :public LayerBase{
         friend class CoulombLayer;
-        friend class EinsteinLayer;
+        friend class NewtonLayer;
     public:
 
         /**

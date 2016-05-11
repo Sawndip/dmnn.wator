@@ -128,10 +128,10 @@ void ImageLayer::pump(void)
             outH = clm->h_;
             outW = clm->w_;
         }
-        auto est = dynamic_pointer_cast<EinsteinLayer>(top_[i]);
-        if(est) {
-            outH = est->h_;
-            outW = est->w_;
+        auto newton = dynamic_pointer_cast<NewtonLayer>(top_[i]);
+        if(newton) {
+            outH = newton->h_;
+            outW = newton->w_;
         }
         TRACE_VAR(outW);
         TRACE_VAR(outH);

@@ -50,18 +50,18 @@ static void train(void){
     v2->bottom(v1);
     v1->top(v2);
     
-    shared_ptr<GanglionLayer> ganglion(new GanglionLayer);
-    v1->bottom(ganglion);
-    ganglion->top(v1);
+    shared_ptr<LeibnizLayer> leibn(new LeibnizLayer);
+    v1->bottom(leibn);
+    leibn->top(v1);
     
 
-    shared_ptr<EinsteinLayer> einstein(new EinsteinLayer);
-    ganglion->bottom(einstein);
-    einstein->top(ganglion);
+    shared_ptr<NewtonLayer> newton(new NewtonLayer);
+    leibn->bottom(newton);
+    newton->top(leibn);
 
     shared_ptr<ImageLayer> img(new ImageLayer);
-    einstein->bottom(img);
-    img->top(einstein);
+    newton->bottom(img);
+    img->top(newton);
 
     Net net;
     net << img;

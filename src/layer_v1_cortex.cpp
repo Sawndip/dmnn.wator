@@ -91,13 +91,9 @@ void V1CortexLayer::forward(void)
         if(coulomb) {
             inputBlob = coulomb->getBlob(this);
         }
-        auto einstein  = dynamic_pointer_cast<EinsteinLayer>(btm);
-        if(einstein) {
-            inputBlob = einstein->getBlob(this);
-        }
-        auto ganglion  = dynamic_pointer_cast<GanglionLayer>(btm);
-        if(ganglion) {
-            inputBlob = ganglion->getBlob(this);
+        auto leibn  = dynamic_pointer_cast<LeibnizLayer>(btm);
+        if(leibn) {
+            inputBlob = leibn->getBlob(this);
         }
         if(nullptr == inputBlob) {
             continue;

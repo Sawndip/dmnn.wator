@@ -34,16 +34,14 @@ using namespace std;
 #include "wator/layer.hpp"
 
 namespace Wator {
-    class ObjectLayer;
-    class GanglionLayer :public LayerHidden {
-        friend class EinsteinLayer;
+    class LeibnizLayer;
+    class NewtonLayer :public LayerBase {
+        friend class ImageLayer;
     public:
         /**
          * Constructor
          **/
-        explicit GanglionLayer();
-
-        virtual ~GanglionLayer();
+        explicit NewtonLayer();
 
         /**
          * round
@@ -56,14 +54,39 @@ namespace Wator {
          * @return None.
          **/
         virtual void forward(void);
-   
+
         /**
          * get ptr
          * @return None.
          **/
         shared_ptr<Blob<bool>> getBlob(const LayerBase* who);
         
+        
+        /**
+         * get ptr
+         * @return None.
+         **/
+        shared_ptr<Blob<bool>> getBlob2X2(const LayerBase* who);
+
+        /**
+         * get ptr
+         * @return None.
+         **/
+        shared_ptr<Blob<bool>> getBlob4X4(const LayerBase* who);
+        
     protected:
+        /**
+         * forward1
+         * @return None.
+         **/
+        void forward1(void);
+     
+        /**
+         * forward2
+         * @return None.
+         **/
+        void forward2(void);
+
         /**
          * update
          * @return None.
@@ -76,15 +99,48 @@ namespace Wator {
          **/
         void dump(void);
         
-    protected:
-        const int w_ = 3;
-        const int h_ = 3;
-        const int sparse_ = 1;
+        /**
+         * cal 4 vecotor.
+         * @return None.
+         **/
+        void cal4Vec(uint8_t *start,uint8_t &maxDiff,uint8_t &avg);
+
+        /**
+         * cut point that is not connect to anthers.
+         * @return None.
+         **/
+        void cutIsolation(void);
  
-        const int iW_ = 256;
-        const int iH_ = 256;
-        const int iSparse_ = (iW_*iH_)*20/100;
+        /**
+         * cut point that is not connect to anthers.
+         * @return None.
+         **/
+        void cutIsolation(shared_ptr<Blob<bool>> blob);
+       
     private:
+        const int w_ = 2;
+        const int h_ = 2;
+        
+        
+        vector<shared_ptr<Blob<uint8_t>>> blobsRaw2X2_;
+        vector<shared_ptr<Blob<uint8_t>>> blobsRaw4X4_;
+        
+        vector<shared_ptr<Blob<bool>>> blobs2x2_;
+        vector<shared_ptr<Blob<bool>>> blobs4x4_;
+        vector<shared_ptr<Blob<bool>>> blobs_;
+        
+        
+        
+        int wGrid2x2_;
+        int hGrid2x2_;
+  
+        int wGrid4x4_;
+        int hGrid4x4_;
+        
+        // 20%
+        const int sparseFractions_ = 20;
+        const int sparseNumerator_ = 100;
+        
     };
 
 }
