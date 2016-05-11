@@ -574,11 +574,13 @@ void NewtonLayer::dump(void){
         name += "_2x2";
         blob->dump( name);
     }
+#if 0
     for (auto blob:blobs4x4_) {
         string name = typeid(this).name();
         name += "_4x4";
         blob->dump( name);
     }
+#endif
 }
 
 /**
