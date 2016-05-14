@@ -76,6 +76,38 @@ void LeibnizLayer::round(void)
 
 
 /**
+ * cal 4 vecotor.
+ * @return None.
+ **/
+void LeibnizLayer::cal4Vec(uint8_t *start,uint8_t &maxDiff)
+{
+    uint8_t diff1 = std::abs(start[0] - start[1]);
+    uint8_t diff2 = std::abs(start[0] - start[2]);
+    uint8_t diff3 = std::abs(start[0] - start[3]);
+    uint8_t diff4 = std::abs(start[1] - start[2]);
+    uint8_t diff5 = std::abs(start[1] - start[3]);
+    uint8_t diff6 = std::abs(start[2] - start[3]);
+    
+    maxDiff = diff1;
+    if(diff2 > maxDiff) {
+        maxDiff = diff2;
+    }
+    if(diff3 > maxDiff) {
+        maxDiff = diff3;
+    }
+    if(diff4 > maxDiff) {
+        maxDiff = diff4;
+    }
+    if(diff5 > maxDiff) {
+        maxDiff = diff5;
+    }
+    if(diff6 > maxDiff) {
+        maxDiff = diff6;
+    }
+}
+
+
+/**
  * forward
  * @return None.
  **/
@@ -97,47 +129,83 @@ void LeibnizLayer::forward(void)
         INFO_VAR(inputBlob->h_);
         INFO_VAR(inputBlob->ch_);
         for (auto top:top_) {
-            int roundW = inputBlob->w_ - (inputBlob->w_%this->w_);
-            int roundH = inputBlob->h_ - (inputBlob->h_%this->h_);
-            INFO_VAR(roundW);
-            INFO_VAR(roundH);
-            auto pinch = shared_ptr<Blob<bool>>(new Blob<bool>(roundW,roundH,inputBlob->ch_));
-            for (int ch = 0; ch < inputBlob->ch_; ch++) {
-                for (int y = 0; y < roundH; y++) {
-                    for (int x = 0; x < roundW; x++) {
-                        int grid = (y/this->h_) * (roundW/this->w_) + (x/this->w_) ;
-                        int index = ch * roundW * roundH;
-                        index += grid * this->w_ * this->h_;
-                        index += (y%this->h_)*this->w_  + x%this->w_ ;
-                        TRACE_VAR(index);
-                        TRACE_VAR(x);
-                        TRACE_VAR(y);
-                        int index2 = ch * inputBlob->w_ * inputBlob->h_;
-                        index2 += y*inputBlob->w_ + x;
-                        TRACE_VAR(index2);
-                        if (index >= inputBlob->size_|| index2 >= inputBlob->size_) {
-                            // 无法整除的最后几行，不能的到下一层的完整输出，省略。
-                            INFO_VAR(this->w_);
-                            INFO_VAR(this->h_);
-                            INFO_VAR(grid);
-                            INFO_VAR(x);
-                            INFO_VAR(y);
-                            INFO_VAR(index);
-                            INFO_VAR(index2);
-                            INFO_VAR(inputBlob->w_);
-                            INFO_VAR(inputBlob->h_);
-                            INFO_VAR(roundW);
-                            INFO_VAR(roundH);
-                            INFO_VAR(inputBlob->size_);
-                            continue;
-                        }
-                        pinch->data_[index] = inputBlob->data_[index2];
-                    }
-                }
-            }
+            auto pinch = inputBlob->grid(this->w_,this->h_);
             pinchs_.push_back(pinch);
         }
     }
+    INFO_VAR(pinchs_.size());
+    for(int index = 0; index < pinchs_.size();index++) {
+        auto pinch = pinchs_[index];
+        TRACE_VAR(pinch->size_);
+        auto blobRaw = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(pinch->w_/this->w_,pinch->h_/this->h_,pinch->ch_));
+        int blobIndex = 0;
+        for (int i = 0;i < pinch->size_;i += this->w_*this->h_) {
+            uint64_t memIndex = 0;
+            for (int j = 0; j < this->w_*this->h_; j++) {
+                auto index = i + j;
+                // 无法整除的最后几点，不能的到下一层的完整输出，省略。
+                if (index >= pinch->size_) {
+                    continue;
+                }
+                memIndex = memIndex <<1;
+                if (pinch->data_[index]) {
+                    memIndex++;
+                }
+            }
+            if(blobIndex++ >= blobRaw->size_) {
+                continue;
+            }
+            std::bitset<9> memBit(memIndex);
+            blobRaw->data_[blobIndex] = memBit.count();
+        }
+        // 2x2 max diff
+        auto blobRawGrid = blobRaw->grid(2,2);
+        uint8_t max = 0;
+        uint8_t min = 255;
+        auto blobW = blobRawGrid->w_/2;
+        auto blobH = blobRawGrid->h_/2;
+        auto raw = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(blobW,blobH,blobRawGrid->ch_));
+
+        for(int i = 0 ;i < raw->size_ ;i++) {
+            uint8_t maxDiff = 0;
+            uint8_t avg = 0;
+            int index = i*2*2;
+            cal4Vec(&(blobRawGrid->data_[index]),maxDiff);
+            raw->data_[i] = maxDiff;
+            
+            if(raw->data_[i] > max) {
+                max = raw->data_[i];
+            }
+            if(raw->data_[i] < min) {
+                min = raw->data_[i];
+            }
+        }
+        auto blob = shared_ptr<Blob<bool>>(new Blob<bool>(blobW,blobH,blobRawGrid->ch_));
+        for (int ch = 0; ch < blobRawGrid->ch_; ch++) {
+            const int oneChannel = blobW * blobH;
+            const int maxActive = oneChannel * this->sparseFractions_ / sparseNumerator_;
+            int activeSize = maxActive +1;
+            uint8_t threshold_ = min;
+            uint8_t thresholdStep_ = 1;
+            while (activeSize > maxActive) {
+                activeSize = 0;
+                for(int i =0;i < oneChannel;i++)
+                {
+                    int index = ch * oneChannel + i;
+                    int delta = raw->data_[index] - threshold_;
+                    if(0 < delta ){
+                        blob->data_[index] = true;
+                        activeSize++;
+                    }else{
+                        blob->data_[index] = false;
+                    }
+                }
+                threshold_ += thresholdStep_;
+            }
+        }
+        blobs_.push_back(blob);
+    }
+#if 0
     INFO_VAR(pinchs_.size());
     for(int index = 0; index < pinchs_.size();index++) {
         auto pinch = pinchs_[index];
@@ -164,6 +232,7 @@ void LeibnizLayer::forward(void)
         }
         blobs_.push_back(blob);
     }
+#endif
     INFO_VAR(blobs_.size());
     INFO_VAR("finnish LeibnizLayer::forward");
 }

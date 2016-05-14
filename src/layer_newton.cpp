@@ -171,10 +171,12 @@ void NewtonLayer::forward(void)
  **/
 void NewtonLayer::forward1(void)
 {
+#if 0
     for(auto btm:bottom_){
         // 2x2
         auto input = dynamic_pointer_cast<LayerInput>(btm);
-        auto inBlob = input->getBlob(this);
+        auto inBlob_orig = input->getBlob(this);
+        auto inBlob = inBlob_orig->grid(this->w_,this->h_);
         INFO_VAR(inBlob->w_);
         INFO_VAR(inBlob->h_);
         INFO_VAR(inBlob->ch_);
@@ -371,6 +373,7 @@ void NewtonLayer::forward1(void)
             blobs4x4_.push_back(blob4x4);
         }
     }
+#endif
 }
 
 
@@ -384,7 +387,8 @@ void NewtonLayer::forward2(void)
     for(auto btm:bottom_){
         // 2x2
         auto input = dynamic_pointer_cast<LayerInput>(btm);
-        auto inBlob = input->getBlob(this);
+        auto inBlob_orig = input->getBlob(this);
+        auto inBlob = inBlob_orig->grid(this->w_,this->h_);
         INFO_VAR(inBlob->w_);
         INFO_VAR(inBlob->h_);
         INFO_VAR(inBlob->ch_);
@@ -405,6 +409,7 @@ void NewtonLayer::forward2(void)
             cal4Vec(&(inBlob->data_[index]),maxDiff,avg);
             raw2x2->data_[i] = maxDiff;
             nextInput2x2->data_[i] = avg;
+//            nextInput2x2->data_[i] = maxDiff;
 
             if(raw2x2->data_[i] > max_2x2) {
                 max_2x2 = raw2x2->data_[i];
@@ -574,7 +579,7 @@ void NewtonLayer::dump(void){
         name += "_2x2";
         blob->dump( name);
     }
-#if 0
+#if 1
     for (auto blob:blobs4x4_) {
         string name = typeid(this).name();
         name += "_4x4";

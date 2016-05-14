@@ -96,5 +96,60 @@ template <typename T> void Blob<T>::dump(const string &name){
     ++counter;
 }
 
+/**
+ * splite blob to grid.
+ * @param [in] gw grid width
+ * @param [in] gh grid height
+ * @return None.
+ **/
+template <typename T> shared_ptr<Blob<T>> Blob<T>::grid(int gw,int gh)
+{
+    int roundW = (this->w_/gw) * gw;
+    int roundH = (this->h_/gh) * gh;
+    INFO_VAR(roundW);
+    INFO_VAR(roundH);
+    auto gridBlob = shared_ptr<Blob<T>> (new Blob<T>(roundW,roundH,this->ch_));
+    for (int ch = 0; ch < this->ch_; ch++) {
+        for (int y = 0; y < roundH; y++) {
+            for (int x = 0; x < roundW; x++) {
+                int grid = (y/gh) * (roundW/gw) + (x/gw) ;
+                int index = ch * roundW * roundH;
+                index += grid * gw * gh;
+                index += (y%gh)*gw  + x%gw ;
+                TRACE_VAR(index);
+                TRACE_VAR(x);
+                TRACE_VAR(y);
+                int index2 = ch * this->w_ * this->h_;
+                index2 += y*this->w_ + x;
+                TRACE_VAR(index2);
+                if (index >= gridBlob->size_|| index2 >= this->size_) {
+                    // 无法整除的最后几行，不能的到下一层的完整输出，省略。
+                    INFO_VAR(gw);
+                    INFO_VAR(gh);
+                    INFO_VAR(grid);
+                    INFO_VAR(x);
+                    INFO_VAR(y);
+                    INFO_VAR(index);
+                    INFO_VAR(index2);
+                    INFO_VAR(this->w_);
+                    INFO_VAR(this->h_);
+                    INFO_VAR(roundW);
+                    INFO_VAR(roundH);
+                    INFO_VAR(this->size_);
+                    INFO_VAR(gridBlob->size_);
+                    continue;
+                }
+                gridBlob->data_[index] = this->data_[index2];
+            }
+        }
+    }
+    return gridBlob;
+}
+
+
+
 template void Blob<bool>::dump(const string &name);
+template shared_ptr<Blob<uint8_t>> Blob<uint8_t>::grid(int gridW,int gh);
+template shared_ptr<Blob<bool>> Blob<bool>::grid(int gridW,int gh);
+
 

@@ -76,14 +76,19 @@ namespace Wator {
          **/
         void dump(void);
         
+        /**
+         * cal 4 vecotor.
+         * @return None.
+         **/
+        void cal4Vec(uint8_t *start,uint8_t &maxDiff);
+
+        
     protected:
-        const int w_ = 3;
-        const int h_ = 3;
-        const int sparse_ = 1;
- 
-        const int iW_ = 256;
-        const int iH_ = 256;
-        const int iSparse_ = (iW_*iH_)*20/100;
+        const int w_ = 2;
+        const int h_ = 2;
+        // 10%
+        const int sparseFractions_ = 10;
+        const int sparseNumerator_ = 100;
     private:
     };
 

@@ -74,7 +74,15 @@ namespace Wator {
         {
             delete [] data_;
         }
-        
+ 
+        /**
+         * splite blob to grid.
+         * @param [in] gw grid width
+         * @param [in] gh grid height
+         * @return None.
+         **/
+        shared_ptr<Blob<T>> grid(int gridW,int gh);
+       
         /**
          * dump to png
          * @param [in] name

@@ -103,21 +103,10 @@ void ImageLayer::load(bool train)
  u7,u8,u9,v7,v8,v9,w7,w8,w9,
  u10,u11,u12,v10,v11,v12,w10,w11,w12
  */
-
+#if 0
 void ImageLayer::pump(void)
 {
     blobs_.clear();
-/*
-    for(int i = 0;i < top_.size();i++ )
-    {
-        INFO_VAR(mat_.cols);
-        INFO_VAR(mat_.rows);
-        INFO_VAR(mat_.channels());
-        auto blob = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(mat_.cols,mat_.rows,mat_.channels()));
-        INFO_VAR(this);
-        blobs_.push_back(blob);
-    }
-*/
     std::vector<cv::Mat> planes;
     cv::split(mat_, planes);
     for(int i = 0;i < top_.size();i++){
@@ -172,6 +161,35 @@ void ImageLayer::pump(void)
     this->dump(planes);
     INFO_VAR(mat_.cols*mat_.rows*mat_.channels());
 }
+#endif
+
+
+void ImageLayer::pump(void)
+{
+    blobs_.clear();
+    std::vector<cv::Mat> planes;
+    cv::split(mat_, planes);
+    for(int i = 0;i < top_.size();i++){
+        auto blob = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(mat_.cols,mat_.rows,mat_.channels()));
+        for(int channel = 0 ; channel < mat_.channels();channel++){
+            auto &mat = planes[channel];
+            for(int y = 0;y < mat.rows;y++){
+                for(int x = 0;x < mat.cols;x++){
+                    auto byte = mat.at<uint8_t>(y, x);
+                    TRACE_VAR(x);
+                    TRACE_VAR(y);
+                    int index = channel * mat.cols * mat.rows;
+                    index += y * mat.cols + x;
+                    blob->data_[index] = byte;
+                }
+            }
+        }
+        blobs_.push_back(blob);
+    }
+    this->dump(planes);
+    INFO_VAR(mat_.cols*mat_.rows*mat_.channels());
+}
+
 
 /**
  * dump to png
