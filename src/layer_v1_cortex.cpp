@@ -95,6 +95,10 @@ void V1CortexLayer::forward(void)
         if(leibn) {
             inputBlob = leibn->getBlob(this);
         }
+        auto newton  = dynamic_pointer_cast<NewtonLayer>(btm);
+        if(newton) {
+            inputBlob = newton->getBlob(this);
+        }
         if(nullptr == inputBlob) {
             continue;
         }

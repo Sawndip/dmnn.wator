@@ -146,10 +146,92 @@ template <typename T> shared_ptr<Blob<T>> Blob<T>::grid(int gw,int gh)
     return gridBlob;
 }
 
+/**
+ * cutChi.
+ * @return None.
+ **/
+template <typename T> void Blob<T>::cutChi(void)
+{
+    for (int ch = 0; ch < this->ch_; ch++) {
+        for (int y = 0; y < this->h_; y++) {
+            for (int x = 0; x < this->w_; x++) {
+                int index = ch * this->w_ * this->h_;
+                index += y*this->w_ + x;
+                TRACE_VAR(index);
+                bool Chi = true;
+                if(this->data_[index]) {
+                    // left line
+                    if(x-1 >= 0) {
+                        int index1 = ch * this->w_ * this->h_;
+                        index1 += y*this->w_ + x -1;
+                        if(this->data_[index1]) {
+                            Chi = false;
+                        }
+                        if(y-1 >= 0) {
+                            int index2 = ch * this->w_ * this->h_;
+                            index2 += (y-1)*this->w_ + x -1;
+                            if(this->data_[index2]) {
+                                Chi = false;
+                            }
+                        }
+                        if(y+1 <= this->h_) {
+                            int index2 = ch * this->w_ * this->h_;
+                            index2 += (y+1)*this->w_ + x-1;
+                            if(this->data_[index2]) {
+                                Chi = false;
+                            }
+                        }
+                    }
+                    // center line
+                    if(y-1 >= 0) {
+                        int index1 = ch * this->w_ * this->h_;
+                        index1 += (y-1)*this->w_ + x;
+                        if(this->data_[index1]) {
+                            Chi = false;
+                        }
+                    }
+                    if(y+1 <= this->h_) {
+                        int index1 = ch * this->w_ * this->h_;
+                        index1 += (y+1)*this->w_ + x;
+                        if(this->data_[index1]) {
+                            Chi = false;
+                        }
+                    }
+                    // right line
+                    if(x+1 <= this->w_) {
+                        int index1 = ch * this->w_ * this->h_;
+                        index1 += y*this->w_ + x +1;
+                        if(this->data_[index1]) {
+                            Chi = false;
+                        }
+                        if(y-1 >= 0) {
+                            int index2 = ch * this->w_ * this->h_;
+                            index2 += (y-1)*this->w_ + x +1;
+                            if(this->data_[index2]) {
+                                Chi = false;
+                            }
+                        }
+                        if(y+1 <= this->h_) {
+                            int index2 = ch * this->w_ * this->h_;
+                            index2 += (y+1)*this->w_ + x+1;
+                            if(this->data_[index2]) {
+                                Chi = false;
+                            }
+                        }
+                    }
+                }
+                if(Chi) {
+                    this->data_[index] = false;
+                }
+            }
+        }
+    }
+}
 
 
 template void Blob<bool>::dump(const string &name);
 template shared_ptr<Blob<uint8_t>> Blob<uint8_t>::grid(int gridW,int gh);
 template shared_ptr<Blob<bool>> Blob<bool>::grid(int gridW,int gh);
+template void Blob<bool>::cutChi(void);
 
 

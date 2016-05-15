@@ -498,6 +498,7 @@ void NewtonLayer::forward2(void)
                     threshold_ += thresholdStep_;
                 }
             }
+            blob2x2->cutChi();
             blobs2x2_.push_back(blob2x2);
             
             auto blob4x4 = shared_ptr<Blob<bool>>(new Blob<bool>(this->wGrid4x4_,this->hGrid4x4_,inBlob->ch_));
@@ -523,6 +524,7 @@ void NewtonLayer::forward2(void)
                     threshold_ += thresholdStep_;
                 }
             }
+            blob4x4->cutChi();
             blobs4x4_.push_back(blob4x4);
         }
     }
@@ -600,10 +602,10 @@ shared_ptr<Blob<bool>> NewtonLayer::getBlob(const LayerBase* who)
     {
         if(who == top.get())
         {
-            TRACE_VAR(blobs_.size());
-            if(blobs_.size() > i)
+            TRACE_VAR(blobs2x2_.size());
+            if(blobs2x2_.size() > i)
             {
-                return blobs_[i];
+                return blobs2x2_[i];
             }
             else
             {

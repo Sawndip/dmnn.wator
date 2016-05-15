@@ -84,8 +84,8 @@ namespace Wator {
 
         
     protected:
-        const int w_ = 2;
-        const int h_ = 2;
+        const int w_ = 3;
+        const int h_ = 3;
         // 10%
         const int sparseFractions_ = 10;
         const int sparseNumerator_ = 100;

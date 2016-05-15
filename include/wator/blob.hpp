@@ -84,6 +84,11 @@ namespace Wator {
         shared_ptr<Blob<T>> grid(int gridW,int gh);
        
         /**
+         * cutChi.
+         * @return None.
+         **/
+        void cutChi(void);
+        /**
          * dump to png
          * @param [in] name
          * @return None.

@@ -42,22 +42,32 @@ namespace log = boost::log;
 static void train(void){
     shared_ptr<ObjectLayer> object(new ObjectLayer);
 
+    shared_ptr<V3CortexLayer> v3(new V3CortexLayer);
+    object->bottom(v3);
+    v3->top(object);
+
+    
     shared_ptr<V2CortexLayer> v2(new V2CortexLayer);
-    object->bottom(v2);
-    v2->top(object);
+    v3->bottom(v2);
+    v2->top(v3);
 
     shared_ptr<V1CortexLayer> v1(new V1CortexLayer);
     v2->bottom(v1);
     v1->top(v2);
-    
+
+#if 0
     shared_ptr<LeibnizLayer> leibn(new LeibnizLayer);
     v1->bottom(leibn);
     leibn->top(v1);
-    
 
     shared_ptr<NewtonLayer> newton(new NewtonLayer);
     leibn->bottom(newton);
     newton->top(leibn);
+#endif
+
+    shared_ptr<NewtonLayer> newton(new NewtonLayer);
+    v1->bottom(newton);
+    newton->top(v1);
 
     shared_ptr<ImageLayer> img(new ImageLayer);
     newton->bottom(img);

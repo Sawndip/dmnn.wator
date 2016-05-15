@@ -149,7 +149,11 @@ namespace Wator {
          **/
         explicit LayerHidden(const ptree& info);
         
+        /**
+         * Desconstructor
+         **/
         virtual ~LayerHidden();
+        
         /**
          * get ptr
          * @return None.
