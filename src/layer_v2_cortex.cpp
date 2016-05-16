@@ -194,6 +194,12 @@ void V2CortexLayer::dump(void){
     for (auto blob:blobs_) {
         blob->dump(typeid(this).name());
     }
+    for (auto blob:blobs_) {
+        blob->cutChi();
+    }
+    for (auto blob:blobs_) {
+        blob->dump(typeid(this).name());
+    }
 }
 
 
