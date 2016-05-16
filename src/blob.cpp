@@ -229,9 +229,23 @@ template <typename T> void Blob<T>::cutChi(void)
 }
 
 
+/**
+ * splite to connect area.
+ * @return None.
+ **/
+template <typename T> vector<shared_ptr<Blob<T>>> Blob<T>::splite(void)
+{
+    vector<shared_ptr<Blob<T>>> areas;
+    auto area = shared_ptr<Blob<T>> (new Blob<T>(this->w_,this->h_,this->ch_));
+    areas.push_back(area);
+    return areas;
+}
+
+
 template void Blob<bool>::dump(const string &name);
 template shared_ptr<Blob<uint8_t>> Blob<uint8_t>::grid(int gridW,int gh);
 template shared_ptr<Blob<bool>> Blob<bool>::grid(int gridW,int gh);
 template void Blob<bool>::cutChi(void);
+template vector<shared_ptr<Blob<bool>>> Blob<bool>::splite(void);
 
 

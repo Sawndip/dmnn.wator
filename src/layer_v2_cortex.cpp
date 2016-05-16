@@ -73,6 +73,19 @@ void V2CortexLayer::round(void)
     INFO_VAR("finnish V2CortexLayer::round");
     LayerBase::round();
     this->dump();
+    for (auto blob:blobs_) {
+        blob->cutChi();
+    }
+    this->dump();
+    
+    /*
+     */
+    for (auto blob:blobs_) {
+        auto areas = blob->splite();
+        for(auto area:areas) {
+            area->dump(typeid(this).name());
+        }
+    }
 }
 
 
@@ -191,12 +204,6 @@ void V2CortexLayer::forward(void)
  **/
 void V2CortexLayer::dump(void){
     INFO_VAR(blobs_.size());
-    for (auto blob:blobs_) {
-        blob->dump(typeid(this).name());
-    }
-    for (auto blob:blobs_) {
-        blob->cutChi();
-    }
     for (auto blob:blobs_) {
         blob->dump(typeid(this).name());
     }

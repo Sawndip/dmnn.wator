@@ -84,10 +84,17 @@ namespace Wator {
         shared_ptr<Blob<T>> grid(int gridW,int gh);
        
         /**
-         * cutChi.
+         * cut Chi,which is not connect by other.
          * @return None.
          **/
         void cutChi(void);
+
+        /**
+         * splite to connect area.
+         * @return None.
+         **/
+        vector<shared_ptr<Blob<T>>> splite(void);
+        
         /**
          * dump to png
          * @param [in] name
