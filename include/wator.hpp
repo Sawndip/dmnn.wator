@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <wator/layer_v1_cortex.hpp>
 #include <wator/layer_v2_cortex.hpp>
 #include <wator/layer_v3_cortex.hpp>
+#include <wator/layer_v4_cortex.hpp>
 
 #include <wator/layer_object.hpp>
 

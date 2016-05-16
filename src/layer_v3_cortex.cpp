@@ -87,9 +87,9 @@ void V3CortexLayer::forward(void)
     blobs_.clear();
     for(auto btm:bottom_){
         shared_ptr<Blob<bool>> inputBlob;
-        auto v2  = dynamic_pointer_cast<V2CortexLayer>(btm);
-        if(v2) {
-            inputBlob = v2->getBlob(this);
+        auto cortex  = dynamic_pointer_cast<CortexLayer>(btm);
+        if(cortex) {
+            inputBlob = cortex->getBlob(this);
         }
         if(nullptr == inputBlob) {
             continue;

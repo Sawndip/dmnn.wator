@@ -34,14 +34,14 @@ using namespace std;
 #include "wator/layer.hpp"
 
 namespace Wator {
-    class V2CortexLayer :public CortexLayer {
+    class V4CortexLayer :public CortexLayer {
     public:
         /**
          * Constructor
          **/
-        explicit V2CortexLayer();
+        explicit V4CortexLayer();
         
-        virtual ~V2CortexLayer();
+        virtual ~V4CortexLayer();
 
         /**
          * round
@@ -54,6 +54,7 @@ namespace Wator {
          * @return None.
          **/
         virtual void forward(void);
+
     protected:
         /**
          * update

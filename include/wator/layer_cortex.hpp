@@ -56,6 +56,12 @@ namespace Wator {
          **/
         virtual void forward(void);
 
+        /**
+         * get ptr
+         * @return None.
+         **/
+        shared_ptr<Blob<bool>> getBlob(const LayerBase* who);
+        
     protected:
         /**
          * update

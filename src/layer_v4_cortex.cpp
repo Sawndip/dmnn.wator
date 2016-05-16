@@ -39,10 +39,10 @@ using namespace boost::property_tree;
 /**
  * Constructor
  **/
-V2CortexLayer::V2CortexLayer()
+V4CortexLayer::V4CortexLayer()
 {
 }
-V2CortexLayer::~V2CortexLayer()
+V4CortexLayer::~V4CortexLayer()
 {
     INFO_VAR(this);
 }
@@ -54,9 +54,9 @@ V2CortexLayer::~V2CortexLayer()
  * update
  * @return None.
  **/
-void V2CortexLayer::update(void)
+void V4CortexLayer::update(void)
 {
-    INFO_VAR("finnish V2CortexLayer::update");
+    INFO_VAR("finnish V4CortexLayer::update");
 }
 
 
@@ -66,11 +66,11 @@ void V2CortexLayer::update(void)
  * round
  * @return None.
  **/
-void V2CortexLayer::round(void)
+void V4CortexLayer::round(void)
 {
     this->forward();
     this->update();
-    INFO_VAR("finnish V2CortexLayer::round");
+    INFO_VAR("finnish V4CortexLayer::round");
     LayerBase::round();
     this->dump();
 }
@@ -80,7 +80,7 @@ void V2CortexLayer::round(void)
  * forward
  * @return None.
  **/
-void V2CortexLayer::forward(void)
+void V4CortexLayer::forward(void)
 {
     pinchs_.clear();
     raws_.clear();
@@ -167,7 +167,7 @@ void V2CortexLayer::forward(void)
         blobs_.push_back(blob);
     }
     INFO_VAR(blobs_.size());
-    INFO_VAR("finnish V2CortexLayer::forward");
+    INFO_VAR("finnish V3CortexLayer::forward");
 }
 
 /*
@@ -189,12 +189,9 @@ void V2CortexLayer::forward(void)
  * dump to png
  * @return None.
  **/
-void V2CortexLayer::dump(void){
+void V4CortexLayer::dump(void){
     INFO_VAR(blobs_.size());
     for (auto blob:blobs_) {
         blob->dump(typeid(this).name());
     }
 }
-
-
-

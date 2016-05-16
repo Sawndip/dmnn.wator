@@ -82,3 +82,30 @@ void CortexLayer::forward(void)
     INFO_VAR("finnish CortexLayer::forward");
 }
 
+/**
+ * get ptr
+ * @return None.
+ **/
+shared_ptr<Blob<bool>> CortexLayer::getBlob(const LayerBase* who)
+{
+    int i = 0;
+    TRACE_VAR(top_.size());
+    for(auto top:top_)
+    {
+        if(who == top.get())
+        {
+            TRACE_VAR(blobs_.size());
+            if(blobs_.size() > i)
+            {
+                return blobs_[i];
+            }
+            else
+            {
+                FATAL_VAR("fatal errro");
+            }
+        }
+        i++;
+    }
+    return nullptr;
+}
+
