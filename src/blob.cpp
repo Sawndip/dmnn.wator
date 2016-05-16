@@ -160,7 +160,7 @@ template <typename T> void Blob<T>::cutChi(void)
                 TRACE_VAR(index);
                 bool Chi = true;
                 if(this->data_[index]) {
-                    // left line
+                    // left cols
                     if(x-1 >= 0) {
                         int index1 = ch * this->w_ * this->h_;
                         index1 += y*this->w_ + x -1;
@@ -182,7 +182,7 @@ template <typename T> void Blob<T>::cutChi(void)
                             }
                         }
                     }
-                    // center line
+                    // center cols
                     if(y-1 >= 0) {
                         int index1 = ch * this->w_ * this->h_;
                         index1 += (y-1)*this->w_ + x;
@@ -197,7 +197,7 @@ template <typename T> void Blob<T>::cutChi(void)
                             Chi = false;
                         }
                     }
-                    // right line
+                    // right cols
                     if(x+1 <= this->w_) {
                         int index1 = ch * this->w_ * this->h_;
                         index1 += y*this->w_ + x +1;
@@ -236,9 +236,136 @@ template <typename T> void Blob<T>::cutChi(void)
 template <typename T> vector<shared_ptr<Blob<T>>> Blob<T>::splite(void)
 {
     vector<shared_ptr<Blob<T>>> areas;
-    auto area = shared_ptr<Blob<T>> (new Blob<T>(this->w_,this->h_,this->ch_));
-    areas.push_back(area);
+    for (int ch = 0; ch < this->ch_; ch++) {
+        for (int y = 0; y < this->h_; y++) {
+            for (int x = 0; x < this->w_; x++) {
+                int index = ch * this->w_ * this->h_;
+                index += y*this->w_ + x;
+                if(this->data_[index]) {
+                    auto area = shared_ptr<Blob<T>> (new Blob<T>(this->w_,this->h_,this->ch_));
+                    this->data_[index] = false;
+                    area->data_[index] = true;
+                    minX_ = maxX_ = x;
+                    minY_ = maxY_ = y;
+                    this->neighbor(area,x,y,ch);
+                    int areaX = (maxX_-minX_)*(maxY_-minY_);
+                    if(areaX > (this->w_*this->h_)/(5*5)) {
+                        areas.push_back(area);
+                    }
+                }
+            }
+        }
+    }
     return areas;
+}
+
+
+/**
+ * @param [out] area
+ * @param [in] x
+ * @param [in] y
+ * @param [in] ch
+ * @return None.
+ **/
+template <typename T> void Blob<T>::neighbor(shared_ptr<Blob<T>> area,int x,int y,int ch)
+{
+    // left cols
+    if(x-1 >= 0) {
+        // top
+        if(y-1 >= 0) {
+            int index2 = ch * this->w_ * this->h_;
+            index2 += (y-1)*this->w_ + x -1;
+            if(this->data_[index2]) {
+                this->data_[index2] = false;
+                area->data_[index2] = true;
+                this->neighbor(area,x-1,y-1,ch);
+                this->minX_--;
+                this->minY_--;
+            }
+        }
+        // center
+        int index = ch * this->w_ * this->h_;
+        index += y*this->w_ + x -1;
+        if(this->data_[index]) {
+            this->data_[index] = false;
+            area->data_[index] = true;
+            this->neighbor(area,x-1,y,ch);
+            this->minX_--;
+        }
+        // down
+        if(y+1 <= this->h_) {
+            int index2 = ch * this->w_ * this->h_;
+            index2 += (y+1)*this->w_ + x-1;
+            if(this->data_[index2]) {
+                this->data_[index2] = false;
+                area->data_[index2] = true;
+                this->neighbor(area,x-1,y+1,ch);
+                this->minX_--;
+                this->maxY_++;
+            }
+        }
+    }
+    
+    // center cols
+    // top
+    if(y-1 >= 0) {
+        int index1 = ch * this->w_ * this->h_;
+        index1 += (y-1)*this->w_ + x;
+        if(this->data_[index1]) {
+            this->data_[index1] = false;
+            area->data_[index1] = true;
+            this->neighbor(area,x,y-1,ch);
+            this->minY_--;
+        }
+    }
+    // down
+    if(y+1 <= this->h_) {
+        int index1 = ch * this->w_ * this->h_;
+        index1 += (y+1)*this->w_ + x;
+        if(this->data_[index1]) {
+            this->data_[index1] = false;
+            area->data_[index1] = true;
+            this->neighbor(area,x,y+1,ch);
+            this->maxY_++;
+        }
+    }
+    
+    // right cols
+    if(x+1 <= this->w_) {
+        // top
+        if(y-1 >= 0) {
+            int index2 = ch * this->w_ * this->h_;
+            index2 += (y-1)*this->w_ + x +1;
+            if(this->data_[index2]) {
+                this->data_[index2] = false;
+                area->data_[index2] = true;
+                this->neighbor(area,x+1,y-1,ch);
+                this->maxX_++;
+                this->minY_--;
+            }
+        }
+        // center
+        int index1 = ch * this->w_ * this->h_;
+        index1 += y*this->w_ + x +1;
+        if(this->data_[index1]) {
+            this->data_[index1] = false;
+            area->data_[index1] = true;
+            this->neighbor(area,x+1,y,ch);
+            this->maxX_++;
+        }
+        // down
+        if(y+1 <= this->h_) {
+            int index2 = ch * this->w_ * this->h_;
+            index2 += (y+1)*this->w_ + x+1;
+            if(this->data_[index2]) {
+                this->data_[index2] = false;
+                area->data_[index2] = true;
+                this->neighbor(area,x+1,y+1,ch);
+                this->maxX_++;
+                this->maxY_++;
+            }
+        }
+    }
 }
 
 
@@ -247,5 +374,5 @@ template shared_ptr<Blob<uint8_t>> Blob<uint8_t>::grid(int gridW,int gh);
 template shared_ptr<Blob<bool>> Blob<bool>::grid(int gridW,int gh);
 template void Blob<bool>::cutChi(void);
 template vector<shared_ptr<Blob<bool>>> Blob<bool>::splite(void);
-
+template void Blob<bool>::neighbor(shared_ptr<Blob<bool>> conn,int x,int y,int ch);
 

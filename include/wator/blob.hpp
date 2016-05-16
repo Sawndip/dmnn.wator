@@ -90,6 +90,15 @@ namespace Wator {
         void cutChi(void);
 
         /**
+         * @param [out] area
+         * @param [in] x
+         * @param [in] y
+         * @param [in] ch
+         * @return None.
+         **/
+        void neighbor(shared_ptr<Blob<T>> area,int x,int y,int ch);
+        
+        /**
          * splite to connect area.
          * @return None.
          **/
@@ -108,5 +117,9 @@ namespace Wator {
         int ch_;
         int size_ ;
         T *data_;
+        int minX_;
+        int minY_;
+        int maxX_;
+        int maxY_;
     };
 }

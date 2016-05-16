@@ -80,12 +80,14 @@ void V2CortexLayer::round(void)
     
     /*
      */
+#if 0
     for (auto blob:blobs_) {
         auto areas = blob->splite();
         for(auto area:areas) {
             area->dump(typeid(this).name());
         }
     }
+#endif
 }
 
 
