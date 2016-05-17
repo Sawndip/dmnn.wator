@@ -45,9 +45,11 @@ template <typename T> void Blob<T>::dump(const string &name){
     INFO_VAR(this->ch_);
     
     vector<shared_ptr<cv::Mat>> mats;
+    vector<bool> writeOut;
     for (int ch = 0; ch < this->ch_; ch++) {
         shared_ptr<cv::Mat> mat(new cv::Mat(this->h_,this->w_,CV_8UC3,cv::Scalar::all(0)));
         mats.push_back(mat);
+        writeOut.push_back(false);
     }
     for (int x = 0; x < this->w_; x++) {
         for (int y = 0; y < this->h_; y++) {
@@ -59,6 +61,7 @@ template <typename T> void Blob<T>::dump(const string &name){
                     TRACE_VAR(value);
                     if (value) {
                         mats[ch]->at<cv::Vec3b>(y,x)[ch] = 0xff;
+                        writeOut[ch] = true;
                     }
                 }
             }
@@ -71,12 +74,16 @@ template <typename T> void Blob<T>::dump(const string &name){
                     mats[0]->at<cv::Vec3b>(y,x)[0] = 0xff;
                     mats[0]->at<cv::Vec3b>(y,x)[1] = 0xff;
                     mats[0]->at<cv::Vec3b>(y,x)[2] = 0xff;
+                    writeOut[0] = true;
                 }
             }
         }
     }
     static int counter = 0;
     for (int ch = 0; ch < this->ch_; ch++) {
+        if(writeOut[ch] == false) {
+            continue;
+        }
         string path = "dump.image.";
         path += name;
         path += ".";
@@ -90,7 +97,7 @@ template <typename T> void Blob<T>::dump(const string &name){
         if(2 == ch){
             path += ".R.";
         }
-        path += ".png";
+        path += "png";
         cv::imwrite(path ,*mats[ch]);
     }
     ++counter;
@@ -249,7 +256,7 @@ template <typename T> vector<shared_ptr<Blob<T>>> Blob<T>::splite(void)
                     minY_ = maxY_ = y;
                     this->neighbor(area,x,y,ch);
                     int areaX = (maxX_-minX_)*(maxY_-minY_);
-                    if(areaX > (this->w_*this->h_)/(5*5)) {
+                    if(areaX > (this->w_*this->h_)/(20*20)) {
                         areas.push_back(area);
                     }
                 }
