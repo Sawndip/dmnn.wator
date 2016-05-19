@@ -80,7 +80,7 @@ void V2CortexLayer::round(void)
     
     /*
      */
-#if 1
+#if 0
     for (auto blob:blobs_) {
         auto areas = blob->splite();
         for(auto area:areas) {

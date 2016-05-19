@@ -256,7 +256,7 @@ template <typename T> vector<shared_ptr<Blob<T>>> Blob<T>::splite(void)
                     minY_ = maxY_ = y;
                     this->neighbor(area,x,y,ch);
                     int areaX = (maxX_-minX_)*(maxY_-minY_);
-                    if(areaX > (this->w_*this->h_)/(20*20)) {
+                    if(areaX > (this->w_*this->h_)/(10*10)) {
                         areas.push_back(area);
                     }
                 }

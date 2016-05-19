@@ -73,7 +73,7 @@ void V1CortexLayer::round(void)
     INFO_VAR("finnish V1CortexLayer::round");
     LayerBase::round();
     this->dump();
-/*
+
  
     for (auto blob:blobs_) {
         auto areas = blob->splite();
@@ -81,7 +81,7 @@ void V1CortexLayer::round(void)
             area->dump(typeid(this).name());
         }
     }
- */
+
 }
 
 
