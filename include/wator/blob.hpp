@@ -69,6 +69,14 @@ namespace Wator {
         {
             memset(data_,0x0,size_);
         }
+
+        /**
+         * Constructor
+         * @param [in] size
+         **/
+        explicit Blob(const vector<shared_ptr<Blob<T>>> &conv);
+        
+        
         
         ~Blob()
         {
@@ -81,7 +89,7 @@ namespace Wator {
          * @param [in] gh grid height
          * @return None.
          **/
-        shared_ptr<Blob<T>> grid(int gridW,int gh);
+        shared_ptr<Blob<T>> grid(int startX,int startY,int gw,int gh);
        
         /**
          * cut Chi,which is not connect by other.

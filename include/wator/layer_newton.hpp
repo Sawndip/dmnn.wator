@@ -88,6 +88,18 @@ namespace Wator {
         void forward2(void);
 
         /**
+         * forward3
+         * @return None.
+         **/
+        void forward3(void);
+
+        /**
+         * cala one grid.
+         * @return blob.
+         **/
+        shared_ptr<Blob<bool>> cala(shared_ptr<Blob<uint8_t>> blob);
+        
+        /**
          * update
          * @return None.
          **/
@@ -104,19 +116,7 @@ namespace Wator {
          * @return None.
          **/
         void cal4Vec(uint8_t *start,uint8_t &maxDiff,uint8_t &avg);
-
-        /**
-         * cut point that is not connect to anthers.
-         * @return None.
-         **/
-        void cutIsolation(void);
- 
-        /**
-         * cut point that is not connect to anthers.
-         * @return None.
-         **/
-        void cutIsolation(shared_ptr<Blob<bool>> blob);
-       
+      
     private:
         const int w_ = 2;
         const int h_ = 2;

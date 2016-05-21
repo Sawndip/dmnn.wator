@@ -34,7 +34,6 @@ using namespace Wator;
 #include <boost/property_tree/json_parser.hpp>
 using namespace boost::property_tree;
 
-static float const fConstCoulombDiff = 0.0001;
 
 
 /**
@@ -62,7 +61,6 @@ void NewtonLayer::round(void)
 {
     this->forward();
     this->update();
-    this->cutIsolation();
     this->dump();
     INFO_VAR("finnish NewtonLayer::round");
     LayerBase::round();
@@ -158,7 +156,7 @@ void NewtonLayer::forward(void)
     blobs4x4_.clear();
     blobs_.clear();
 
-    forward2();
+    forward3();
 
     INFO_VAR(blobs_.size());
     INFO_VAR("finnish NewtonLayer::forward");
@@ -388,7 +386,7 @@ void NewtonLayer::forward2(void)
         // 2x2
         auto input = dynamic_pointer_cast<LayerInput>(btm);
         auto inBlob_orig = input->getBlob(this);
-        auto inBlob = inBlob_orig->grid(this->w_,this->h_);
+        auto inBlob = inBlob_orig->grid(0,0,this->w_,this->h_);
         INFO_VAR(inBlob->w_);
         INFO_VAR(inBlob->h_);
         INFO_VAR(inBlob->ch_);
@@ -420,8 +418,8 @@ void NewtonLayer::forward2(void)
         }
         blobsRaw2X2_.push_back(raw2x2);
         // 4x4
-        this->wGrid4x4_ =this->wGrid2x2_/2;
-        this->hGrid4x4_ =this->hGrid2x2_/2;
+        this->wGrid4x4_ = this->wGrid2x2_/2;
+        this->hGrid4x4_ = this->hGrid2x2_/2;
         INFO_VAR(this->wGrid4x4_);
         INFO_VAR(this->hGrid4x4_);
         auto swap4x4 = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(this->wGrid2x2_,this->hGrid2x2_,inBlob->ch_));
@@ -531,43 +529,109 @@ void NewtonLayer::forward2(void)
 }
 
 
+
+
+
+
 /**
- * cut point that is not connect to anthers.
+ * forward3 converlution.
  * @return None.
  **/
-void NewtonLayer::cutIsolation(shared_ptr<Blob<bool>> blob)
+void NewtonLayer::forward3(void)
 {
-#if 0 // do 3x3 filter.
-    for (int ch = 0; ch < blob->ch_; ch++) {
-        for (int x = 0;x < blob->w_;x++){
-            for (int y = 0;y < blob->h_;y++){
-                int index = ch * blob->w_ * blob->h_ + y*blob->w_ + x;
-                
-                int xL = x ;
-                
-                if(blob->data_[index]) {
-                    
-                }
+    for(auto btm:bottom_){
+        // 2x2
+        auto input = dynamic_pointer_cast<LayerInput>(btm);
+        auto inBlob_orig = input->getBlob(this);
+        
+        vector<shared_ptr<Blob<bool>>> converlution;
+        for(int x = 0 ;x < this->w_;x++) {
+            for(int y = 0 ;y < this->h_;y++) {
+                auto inBlob = inBlob_orig->grid(x,y,this->w_,this->h_);
+                auto outBlob = this->cala(inBlob);
+
+                string name = typeid(this).name();
+                name += ".conv.";
+                name += "_x";
+                name += std::to_string(x);
+                name += "y";
+                name += std::to_string(y);
+                name += "_";
+                outBlob->dump(name);
+                converlution.push_back(outBlob);
             }
         }
+        INFO_VAR(converlution.size());
+        for (auto top:top_) {
+            auto blob2x2 = shared_ptr<Blob<bool>>(new Blob<bool>(converlution));
+            blobs2x2_.push_back(blob2x2);
+            INFO_VAR(blob2x2->w_);
+            INFO_VAR(blob2x2->h_);
+        }
     }
-#endif
+    INFO_VAR(blobs2x2_.size());
 }
 
 
 /**
- * cut point that is not connect to anthers.
- * @return None.
+ * cala one grid.
+ * @return blob.
  **/
-void NewtonLayer::cutIsolation(void)
+shared_ptr<Blob<bool>> NewtonLayer::cala(shared_ptr<Blob<uint8_t>> blob)
 {
-    for (auto &blob:blobs2x2_) {
-        cutIsolation(blob);
+   INFO_VAR(blob->w_);
+    INFO_VAR(blob->h_);
+    INFO_VAR(blob->ch_);
+    int wGrid2x2_ = blob->w_/this->w_;
+    int hGrid2x2_ = blob->h_/this->h_;
+    INFO_VAR(wGrid2x2_);
+    INFO_VAR(hGrid2x2_);
+    auto raw2x2 = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(wGrid2x2_,hGrid2x2_,blob->ch_));
+    
+    uint8_t max_2x2 = 0;
+    uint8_t min_2x2 = 255;
+    
+    for(int i = 0 ;i < raw2x2->size_ ;i++) {
+        uint8_t maxDiff = 0;
+        uint8_t avg = 0;
+        int index = i*this->w_*this->h_;
+        cal4Vec(&(blob->data_[index]),maxDiff,avg);
+        raw2x2->data_[i] = maxDiff;
+        if(raw2x2->data_[i] > max_2x2) {
+            max_2x2 = raw2x2->data_[i];
+        }
+        if(raw2x2->data_[i] < min_2x2) {
+            min_2x2 = raw2x2->data_[i];
+        }
     }
-    for (auto &blob:blobs4x4_) {
-        cutIsolation(blob);
+    auto blob2x2 = shared_ptr<Blob<bool>>(new Blob<bool>(wGrid2x2_,hGrid2x2_,blob->ch_));
+    for (int ch = 0; ch < blob->ch_; ch++) {
+        const int oneChannel = wGrid2x2_ * hGrid2x2_;
+        const int maxActive = oneChannel * this->sparseFractions_ / sparseNumerator_;
+        int activeSize = maxActive +1;
+        uint8_t threshold_ = min_2x2;
+        uint8_t thresholdStep_ = 1;
+        while (activeSize > maxActive) {
+            activeSize = 0;
+            for(int i =0;i < oneChannel;i++)
+            {
+                int index = ch * oneChannel + i;
+                int delta = raw2x2->data_[index] - threshold_;
+                if(0 < delta ){
+                    blob2x2->data_[index] = true;
+                    activeSize++;
+                }else{
+                    blob2x2->data_[index] = false;
+                }
+            }
+            threshold_ += thresholdStep_;
+        }
     }
+    return blob2x2;
 }
+
+
+
 
 
 /**

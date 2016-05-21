@@ -129,7 +129,7 @@ void LeibnizLayer::forward(void)
         INFO_VAR(inputBlob->h_);
         INFO_VAR(inputBlob->ch_);
         for (auto top:top_) {
-            auto pinch = inputBlob->grid(this->w_,this->h_);
+            auto pinch = inputBlob->grid(0,0,this->w_,this->h_);
             pinchs_.push_back(pinch);
         }
     }
@@ -159,7 +159,7 @@ void LeibnizLayer::forward(void)
             blobRaw->data_[blobIndex] = memBit.count();
         }
         // 2x2 max diff
-        auto blobRawGrid = blobRaw->grid(2,2);
+        auto blobRawGrid = blobRaw->grid(0,0,2,2);
         uint8_t max = 0;
         uint8_t min = 255;
         auto blobW = blobRawGrid->w_/2;

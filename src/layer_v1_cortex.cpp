@@ -74,13 +74,14 @@ void V1CortexLayer::round(void)
     LayerBase::round();
     this->dump();
 
- 
+#if 0
     for (auto blob:blobs_) {
         auto areas = blob->splite();
         for(auto area:areas) {
             area->dump(typeid(this).name());
         }
     }
+#endif
 
 }
 

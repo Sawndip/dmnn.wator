@@ -34,7 +34,57 @@ using namespace Wator;
 #include <opencv/highgui.h>
 #include <vector>
 #include <memory>
+#include <climits>
 using namespace std;
+
+
+
+/**
+ * Constructor
+ * @param [in] size
+ **/
+template <typename T> Blob<T>::Blob(const vector<shared_ptr<Blob<T>>> &conv)
+{
+    this->w_ = INT_MAX;
+    this->h_ = INT_MAX;
+    this->ch_ = 0;
+    for(const auto &blob:conv) {
+        if(this->w_ > blob->w_) {
+            this->w_ = blob->w_;
+        }
+        if(this->h_ > blob->h_) {
+            this->h_ = blob->h_;
+        }
+        if(this->ch_ < blob->ch_) {
+            this->ch_ = blob->ch_;
+        }
+    }
+    INFO_VAR(this->w_);
+    INFO_VAR(this->h_);
+    INFO_VAR(this->ch_);
+    if(this->w_ != INT_MAX && this->h_ != INT_MAX && this->ch_ != 0) {
+        size_ = this->w_* this->h_ * this->ch_;
+        data_ = new T[size_];
+        //memset(data_,0x0,sizeof(T)*size_);
+        for (int ch = 0; ch < this->ch_; ch++) {
+            for (int x = 0; x < this->w_; x++) {
+                for (int y = 0; y < this->h_; y++) {
+                    int index = ch * this->w_ * this->h_ + y * this->w_ + x;
+                    bool convBit = false;
+                    for(const auto &blob:conv) {
+                        int index2 = ch * blob->w_ * blob->h_ + y* blob->w_ +x;
+                        if(blob->data_[index2]) {
+                            convBit = true;;
+                        }
+                    }
+                    this->data_[index] = convBit;
+                }
+            }
+        }
+   }
+}
+
+
 /**
  * dump to png
  * @return None.
@@ -109,10 +159,10 @@ template <typename T> void Blob<T>::dump(const string &name){
  * @param [in] gh grid height
  * @return None.
  **/
-template <typename T> shared_ptr<Blob<T>> Blob<T>::grid(int gw,int gh)
+template <typename T> shared_ptr<Blob<T>> Blob<T>::grid(int startX,int startY,int gw,int gh)
 {
-    int roundW = (this->w_/gw) * gw;
-    int roundH = (this->h_/gh) * gh;
+    int roundW = ((this->w_ - startX)/gw) * gw;
+    int roundH = ((this->h_ - startY)/gh) * gh;
     INFO_VAR(roundW);
     INFO_VAR(roundH);
     auto gridBlob = shared_ptr<Blob<T>> (new Blob<T>(roundW,roundH,this->ch_));
@@ -127,10 +177,9 @@ template <typename T> shared_ptr<Blob<T>> Blob<T>::grid(int gw,int gh)
                 TRACE_VAR(x);
                 TRACE_VAR(y);
                 int index2 = ch * this->w_ * this->h_;
-                index2 += y*this->w_ + x;
+                index2 += (startY+y) * this->w_ + x + startX;
                 TRACE_VAR(index2);
                 if (index >= gridBlob->size_|| index2 >= this->size_) {
-                    // 无法整除的最后几行，不能的到下一层的完整输出，省略。
                     INFO_VAR(gw);
                     INFO_VAR(gh);
                     INFO_VAR(grid);
@@ -376,9 +425,11 @@ template <typename T> void Blob<T>::neighbor(shared_ptr<Blob<T>> area,int x,int 
 }
 
 
+template Blob<bool>::Blob(const vector<shared_ptr<Blob<bool>>> &conv);
+
 template void Blob<bool>::dump(const string &name);
-template shared_ptr<Blob<uint8_t>> Blob<uint8_t>::grid(int gridW,int gh);
-template shared_ptr<Blob<bool>> Blob<bool>::grid(int gridW,int gh);
+template shared_ptr<Blob<uint8_t>> Blob<uint8_t>::grid(int startX,int startY,int gw,int gh);
+template shared_ptr<Blob<bool>> Blob<bool>::grid(int startX,int startY,int gw,int gh);
 template void Blob<bool>::cutChi(void);
 template vector<shared_ptr<Blob<bool>>> Blob<bool>::splite(void);
 template void Blob<bool>::neighbor(shared_ptr<Blob<bool>> conn,int x,int y,int ch);
