@@ -549,7 +549,7 @@ void NewtonLayer::forward3(void)
             for(int y = 0 ;y < this->h_;y++) {
                 auto inBlob = inBlob_orig->grid(x,y,this->w_,this->h_);
                 auto outBlob = this->cala(inBlob);
-
+#if 0
                 string name = typeid(this).name();
                 name += ".conv.";
                 name += "_x";
@@ -558,6 +558,7 @@ void NewtonLayer::forward3(void)
                 name += std::to_string(y);
                 name += "_";
                 outBlob->dump(name);
+#endif
                 converlution.push_back(outBlob);
             }
         }
