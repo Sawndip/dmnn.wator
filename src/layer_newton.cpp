@@ -544,7 +544,7 @@ void NewtonLayer::forward3(void)
         auto input = dynamic_pointer_cast<LayerInput>(btm);
         auto inBlob_orig = input->getBlob(this);
         
-        vector<shared_ptr<Blob<bool>>> converlution;
+        vector<shared_ptr<Blob<bool>>> conv;
         for(int x = 0 ;x < this->w_;x++) {
             for(int y = 0 ;y < this->h_;y++) {
                 auto inBlob = inBlob_orig->grid(x,y,this->w_,this->h_);
@@ -559,12 +559,12 @@ void NewtonLayer::forward3(void)
                 name += "_";
                 outBlob->dump(name);
 #endif
-                converlution.push_back(outBlob);
+                conv.push_back(outBlob);
             }
         }
-        INFO_VAR(converlution.size());
+        INFO_VAR(conv.size());
         for (auto top:top_) {
-            auto blob2x2 = shared_ptr<Blob<bool>>(new Blob<bool>(converlution));
+            auto blob2x2 = shared_ptr<Blob<bool>>(new Blob<bool>(conv));
             blobs2x2_.push_back(blob2x2);
             INFO_VAR(blob2x2->w_);
             INFO_VAR(blob2x2->h_);

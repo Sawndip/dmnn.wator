@@ -68,7 +68,8 @@ void V1CortexLayer::update(void)
  **/
 void V1CortexLayer::round(void)
 {
-    this->forward();
+//    this->forward();
+    this->forward2();
     this->update();
     INFO_VAR("finnish V1CortexLayer::round");
     LayerBase::round();
@@ -188,19 +189,75 @@ void V1CortexLayer::forward(void)
     INFO_VAR("finnish V1CortexLayer::forward");
 }
 
-/*
- 528
- 0001000010000100001000010
- 
- 
- 480
- 00010
- 00010
- 00010
- 00010
- 00010
- 
- */
+/**
+ * forward2
+ * @return None.
+ **/
+void V1CortexLayer::forward2(void)
+{
+    pinchs_.clear();
+    raws_.clear();
+    blobs_.clear();
+    for(auto btm:bottom_){
+        shared_ptr<Blob<bool>> inBlob_orig;
+        auto newton  = dynamic_pointer_cast<NewtonLayer>(btm);
+        if(newton) {
+            inBlob_orig = newton->getBlob(this);
+        }
+        vector<shared_ptr<Blob<bool>>> conv;
+        for(int x = 0 ;x < this->w_;x++) {
+            for(int y = 0 ;y < this->h_;y++) {
+                auto inBlob = inBlob_orig->grid(x,y,this->w_,this->h_);
+                auto outBlob = this->cala(inBlob);
+#if 1
+                string name = typeid(this).name();
+                name += ".conv.";
+                name += "_x";
+                name += std::to_string(x);
+                name += "y";
+                name += std::to_string(y);
+                name += "_";
+                outBlob->dump(name);
+#endif
+                conv.push_back(outBlob);
+            }
+        }
+        INFO_VAR(conv.size());
+        for (auto top:top_) {
+            auto blob = shared_ptr<Blob<bool>>(new Blob<bool>(conv));
+            blobs_.push_back(blob);
+            INFO_VAR(blob->w_);
+            INFO_VAR(blob->h_);
+        }
+    }
+    INFO_VAR(blobs_.size());
+}
+
+shared_ptr<Blob<bool>> V1CortexLayer::cala(shared_ptr<Blob<bool>> inblob)
+{
+    auto blob = shared_ptr<Blob<bool>>(new Blob<bool>(inblob->w_/this->w_,inblob->h_/this->h_,inblob->ch_));
+    int blobIndex = 0;
+    for (int i = 0;i < inblob->size_;i += this->w_*this->h_) {
+        uint64_t memIndex = 0;
+        for (int j = 0; j < this->w_*this->h_; j++) {
+            auto index = i + j;
+            // 无法整除的最后几点，不能的到下一层的完整输出，省略。
+            if (index >= inblob->size_) {
+                continue;
+            }
+            memIndex = memIndex <<1;
+            if (inblob->data_[index]) {
+                memIndex++;
+            }
+        }
+        if(blobIndex++ >= blob->size_) {
+            continue;
+        }
+        //            blob->data_[blobIndex] = memory_->filter3x3(memIndex,2);
+        blob->data_[blobIndex] = memory_->filter3x3(memIndex);
+    }
+    return blob;
+}
 
 
 /**

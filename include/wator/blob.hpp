@@ -107,6 +107,14 @@ namespace Wator {
         void neighbor(shared_ptr<Blob<T>> area,int x,int y,int ch);
         
         /**
+         * @param [in] x
+         * @param [in] y
+         * @param [in] ch
+         * @return None.
+         **/
+        uint16_t label(uint16_t x,uint16_t y,uint16_t ch);
+        
+        /**
          * splite to connect area.
          * @return None.
          **/
@@ -120,14 +128,16 @@ namespace Wator {
         void dump(const string &name);
         
     public:
-        int w_;
-        int h_;
-        int ch_;
-        int size_ ;
+        uint16_t w_;
+        uint16_t h_;
+        uint16_t ch_;
+        uint32_t size_ ;
         T *data_;
-        int minX_;
-        int minY_;
-        int maxX_;
-        int maxY_;
+        uint16_t minX_;
+        uint16_t minY_;
+        uint16_t maxX_;
+        uint16_t maxY_;
+        map<uint32_t,uint16_t> labels_;
+        uint16_t labelCounter_;
     };
 }

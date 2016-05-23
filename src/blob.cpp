@@ -45,8 +45,8 @@ using namespace std;
  **/
 template <typename T> Blob<T>::Blob(const vector<shared_ptr<Blob<T>>> &conv)
 {
-    this->w_ = INT_MAX;
-    this->h_ = INT_MAX;
+    this->w_ = UINT16_MAX;
+    this->h_ = UINT16_MAX;
     this->ch_ = 0;
     for(const auto &blob:conv) {
         if(this->w_ > blob->w_) {
@@ -62,7 +62,7 @@ template <typename T> Blob<T>::Blob(const vector<shared_ptr<Blob<T>>> &conv)
     INFO_VAR(this->w_);
     INFO_VAR(this->h_);
     INFO_VAR(this->ch_);
-    if(this->w_ != INT_MAX && this->h_ != INT_MAX && this->ch_ != 0) {
+    if(this->w_ != UINT16_MAX && this->h_ != UINT16_MAX && this->ch_ != 0) {
         size_ = this->w_* this->h_ * this->ch_;
         data_ = new T[size_];
         //memset(data_,0x0,sizeof(T)*size_);
@@ -289,6 +289,7 @@ template <typename T> void Blob<T>::cutChi(void)
  * splite to connect area.
  * @return None.
  **/
+/*
 template <typename T> vector<shared_ptr<Blob<T>>> Blob<T>::splite(void)
 {
     vector<shared_ptr<Blob<T>>> areas;
@@ -313,6 +314,75 @@ template <typename T> vector<shared_ptr<Blob<T>>> Blob<T>::splite(void)
         }
     }
     return areas;
+}
+*/
+
+template <typename T> vector<shared_ptr<Blob<T>>> Blob<T>::splite(void)
+{
+    labels_.clear();
+    vector<shared_ptr<Blob<T>>> areas;
+    for (uint16_t ch = 0; ch < this->ch_; ch++) {
+        labelCounter_ = 0;
+        for (uint16_t y = 0; y < this->h_; y++) {
+            for (uint16_t x = 0; x < this->w_; x++) {
+                uint16_t index = ch * this->w_ * this->h_;
+                index += y*this->w_ + x;
+                if(this->data_[index]) {
+                    uint32_t labelKey = ((x<<16)&0xffff0000)|(y&0xffff);
+                    uint16_t labelValue = this->label(x,y,ch);
+                    labels_[labelKey] = labelValue;
+                }
+            }
+        }
+    }
+    return areas;
+}
+
+/**
+ * @param [in] x
+ * @param [in] y
+ * @param [in] ch
+ * @return None.
+ **/
+template <typename T> uint16_t Blob<T>::label(uint16_t x,uint16_t y,uint16_t ch)
+{
+    // left top
+    if(x-1 >= 0 && y-1 >= 0) {
+        int index = ch * this->w_ * this->h_;
+        index += (y-1)*this->w_ + x -1;
+        if(this->data_[index]) {
+            uint32_t labelKey = (((x-1)<<16)&0xffff0000)|((y-1)&0xffff);
+            auto ir = labels_.find(labelKey);
+            if(ir!= labels_.end()) {
+                return ir->second;
+            }
+        }
+    }
+    // left center
+    if(x-1 >= 0 /* && y*/) {
+        int index = ch * this->w_ * this->h_;
+        index += (y)*this->w_ + x -1;
+        if(this->data_[index]) {
+            uint32_t labelKey = (((x-1)<<16)&0xffff0000)|((y)&0xffff);
+            auto ir = labels_.find(labelKey);
+            if(ir!= labels_.end()) {
+                return ir->second;
+            }
+        }
+    }
+    // top center.
+    if(/*x && */ y-1 >= 0) {
+        int index = ch * this->w_ * this->h_;
+        index += (y-1)*this->w_ + x;
+        if(this->data_[index]) {
+            uint32_t labelKey = (((x)<<16)&0xffff0000)|((y-1)&0xffff);
+            auto ir = labels_.find(labelKey);
+            if(ir!= labels_.end()) {
+                return ir->second;
+            }
+        }
+    }
+    return labelCounter_++;
 }
 
 

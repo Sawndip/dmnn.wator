@@ -18,3 +18,5 @@ st: build
 		
 clean:
 	rm -rf $(OBJ)
+clean-png:
+	rm -f *.png
