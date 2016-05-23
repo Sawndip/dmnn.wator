@@ -209,7 +209,7 @@ void V1CortexLayer::forward2(void)
             for(int y = 0 ;y < this->h_;y++) {
                 auto inBlob = inBlob_orig->grid(x,y,this->w_,this->h_);
                 auto outBlob = this->cala(inBlob);
-#if 1
+#if 0
                 string name = typeid(this).name();
                 name += ".conv.";
                 name += "_x";
