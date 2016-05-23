@@ -75,7 +75,7 @@ void V1CortexLayer::round(void)
     LayerBase::round();
     this->dump();
 
-#if 0
+#if 1
     for (auto blob:blobs_) {
         auto areas = blob->splite();
         for(auto area:areas) {

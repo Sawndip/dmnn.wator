@@ -54,6 +54,12 @@ namespace Wator {
          * @return None.
          **/
         virtual void forward(void);
+     
+        /**
+         * forward2
+         * @return None.
+         **/
+        virtual void forward2(void);
     protected:
         /**
          * update
@@ -66,6 +72,8 @@ namespace Wator {
          * @return None.
          **/
         void dump(void);
+ 
+        shared_ptr<Blob<bool>> cala(shared_ptr<Blob<bool>> blob);
         
     private:
         const int w_ = 3;
