@@ -56,7 +56,13 @@ namespace Wator {
          * @return None.
          **/
         virtual void forward(void);
-   
+ 
+        /**
+         * forward2
+         * @return None.
+         **/
+        virtual void forward2(void);
+        
         /**
          * get ptr
          * @return None.
@@ -84,8 +90,8 @@ namespace Wator {
 
         
     protected:
-        const int w_ = 3;
-        const int h_ = 3;
+        const int w_ = 2;
+        const int h_ = 2;
         // 10%
         const int sparseFractions_ = 10;
         const int sparseNumerator_ = 100;

@@ -59,7 +59,7 @@ static void train(void){
     v2->bottom(v1);
     v1->top(v2);
 
-#if 0
+#if 1
     shared_ptr<LeibnizLayer> leibn(new LeibnizLayer);
     v1->bottom(leibn);
     leibn->top(v1);
@@ -67,11 +67,11 @@ static void train(void){
     shared_ptr<NewtonLayer> newton(new NewtonLayer);
     leibn->bottom(newton);
     newton->top(leibn);
-#endif
-
+#else
     shared_ptr<NewtonLayer> newton(new NewtonLayer);
     v1->bottom(newton);
     newton->top(v1);
+#endif
 
     shared_ptr<ImageLayer> img(new ImageLayer);
     newton->bottom(img);

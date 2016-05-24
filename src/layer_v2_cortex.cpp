@@ -199,6 +199,11 @@ void V2CortexLayer::forward2(void)
         if(cortex) {
             inBlob_orig = cortex->getBlob(this);
         }
+        INFO_VAR(inBlob_orig->w_);
+        INFO_VAR(inBlob_orig->h_);
+        if(inBlob_orig->w_ < 3*this->w_ || inBlob_orig->h_ < 3*this->h_) {
+            break;
+        }
         vector<shared_ptr<Blob<bool>>> conv;
         for(int x = 0 ;x < this->w_;x++) {
             for(int y = 0 ;y < this->h_;y++) {

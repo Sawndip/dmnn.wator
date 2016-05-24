@@ -137,9 +137,9 @@ namespace Wator {
         int wGrid4x4_;
         int hGrid4x4_;
         
-        // 10%
-        const int sparseFractions_ = 10;
-        const int sparseNumerator_ = 100;
+        // 1/2
+        const int sparseFractions_ = 1;
+        const int sparseNumerator_ = 16;
         
     };
 

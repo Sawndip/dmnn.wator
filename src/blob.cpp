@@ -165,6 +165,10 @@ template <typename T> shared_ptr<Blob<T>> Blob<T>::grid(int startX,int startY,in
     int roundH = ((this->h_ - startY)/gh) * gh;
     INFO_VAR(roundW);
     INFO_VAR(roundH);
+    if(roundW < 0 || roundH < 0) {
+        roundW = 0;
+        roundH = 0;
+    }
     auto gridBlob = shared_ptr<Blob<T>> (new Blob<T>(roundW,roundH,this->ch_));
     for (int ch = 0; ch < this->ch_; ch++) {
         for (int y = 0; y < roundH; y++) {

@@ -204,6 +204,9 @@ void V1CortexLayer::forward2(void)
         if(newton) {
             inBlob_orig = newton->getBlob(this);
         }
+        if(inBlob_orig->w_ < 3*this->w_ || inBlob_orig->h_ < 3*this->h_) {
+            break;
+        }
         vector<shared_ptr<Blob<bool>>> conv;
         for(int x = 0 ;x < this->w_;x++) {
             for(int y = 0 ;y < this->h_;y++) {

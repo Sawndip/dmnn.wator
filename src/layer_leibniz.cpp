@@ -67,7 +67,8 @@ void LeibnizLayer::update(void)
  **/
 void LeibnizLayer::round(void)
 {
-    this->forward();
+//    this->forward();
+    this->forward2();
     this->update();
     INFO_VAR("finnish LeibnizLayer::round");
     LayerBase::round();
@@ -236,6 +237,69 @@ void LeibnizLayer::forward(void)
     INFO_VAR(blobs_.size());
     INFO_VAR("finnish LeibnizLayer::forward");
 }
+
+
+/**
+ * forward2
+ * @return None.
+ **/
+void LeibnizLayer::forward2(void)
+{
+    pinchs_.clear();
+    raws_.clear();
+    blobs_.clear();
+    for(auto btm:bottom_){
+        shared_ptr<Blob<bool>> inputBlob;
+        auto newton  = dynamic_pointer_cast<NewtonLayer>(btm);
+        if(newton) {
+            inputBlob = newton->getBlob2X2(this);
+        }
+        if(nullptr == inputBlob) {
+            continue;
+        }
+        INFO_VAR(inputBlob->w_);
+        INFO_VAR(inputBlob->h_);
+        INFO_VAR(inputBlob->ch_);
+        for (auto top:top_) {
+            auto pinch = inputBlob->grid(0,0,this->w_,this->h_);
+            pinchs_.push_back(pinch);
+        }
+    }
+    INFO_VAR(pinchs_.size());
+    for(int index = 0; index < pinchs_.size();index++) {
+        auto pinch = pinchs_[index];
+        TRACE_VAR(pinch->size_);
+        auto blob = shared_ptr<Blob<bool>>(new Blob<bool>(pinch->w_/this->w_,pinch->h_/this->h_,pinch->ch_));
+        int blobIndex = 0;
+        for (int i = 0;i < pinch->size_;i += this->w_*this->h_) {
+            uint64_t memIndex = 0;
+            for (int j = 0; j < this->w_*this->h_; j++) {
+                auto index = i + j;
+                // 无法整除的最后几点，不能的到下一层的完整输出，省略。
+                if (index >= pinch->size_) {
+                    continue;
+                }
+                memIndex = memIndex <<1;
+                if (pinch->data_[index]) {
+                    memIndex++;
+                }
+            }
+            if(blobIndex++ >= blob->size_) {
+                continue;
+            }
+            std::bitset<4> memBit(memIndex);
+            if(memBit.count() == 4 || memBit.count() == 0) {
+                blob->data_[index] = false;
+            } else {
+                blob->data_[index] = true;
+            }
+        }
+        blobs_.push_back(blob);
+    }
+    INFO_VAR(blobs_.size());
+    INFO_VAR("finnish LeibnizLayer::forward");
+}
+
 
 
 /**

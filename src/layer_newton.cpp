@@ -319,7 +319,7 @@ void NewtonLayer::forward1(void)
                         uint8_t max_ = 0;
                         uint8_t min_ = 255;
                         uint8_t threshold_ = 0;
-                        uint8_t thresholdStep_ = 1;
+                        uint8_t thresholdStep_ = 2;
                         while (activeSize > maxActive) {
                             activeSize = 0;
                             for(int x2 = 0 ;x2 < leib->iW_ ;x2++) {
@@ -611,7 +611,7 @@ shared_ptr<Blob<bool>> NewtonLayer::cala(shared_ptr<Blob<uint8_t>> blob)
         const int maxActive = oneChannel * this->sparseFractions_ / sparseNumerator_;
         int activeSize = maxActive +1;
         uint8_t threshold_ = min_2x2;
-        uint8_t thresholdStep_ = 1;
+        uint8_t thresholdStep_ = 4;
         while (activeSize > maxActive) {
             activeSize = 0;
             for(int i =0;i < oneChannel;i++)
