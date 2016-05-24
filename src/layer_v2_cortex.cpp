@@ -199,6 +199,9 @@ void V2CortexLayer::forward2(void)
         if(cortex) {
             inBlob_orig = cortex->getBlob(this);
         }
+        if(nullptr == inBlob_orig) {
+            continue;
+        }
         INFO_VAR(inBlob_orig->w_);
         INFO_VAR(inBlob_orig->h_);
         if(inBlob_orig->w_ < 3*this->w_ || inBlob_orig->h_ < 3*this->h_) {

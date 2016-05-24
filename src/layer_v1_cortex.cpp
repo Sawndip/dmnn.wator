@@ -204,6 +204,13 @@ void V1CortexLayer::forward2(void)
         if(newton) {
             inBlob_orig = newton->getBlob(this);
         }
+        auto cortex  = dynamic_pointer_cast<CortexLayer>(btm);
+        if(cortex) {
+            inBlob_orig = cortex->getBlob(this);
+        }
+        if(nullptr == inBlob_orig) {
+            continue;
+        }
         if(inBlob_orig->w_ < 3*this->w_ || inBlob_orig->h_ < 3*this->h_) {
             break;
         }

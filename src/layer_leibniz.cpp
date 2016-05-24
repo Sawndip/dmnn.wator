@@ -71,8 +71,8 @@ void LeibnizLayer::round(void)
     this->forward2();
     this->update();
     INFO_VAR("finnish LeibnizLayer::round");
-    LayerBase::round();
     this->dump();
+    LayerBase::round();
 }
 
 
@@ -288,16 +288,18 @@ void LeibnizLayer::forward2(void)
                 continue;
             }
             std::bitset<4> memBit(memIndex);
+            //TRACE_VAR(memBit.count());
             if(memBit.count() == 4 || memBit.count() == 0) {
-                blob->data_[index] = false;
+                blob->data_[blobIndex] = false;
             } else {
-                blob->data_[index] = true;
+                blob->data_[blobIndex] = true;
+                TRACE_VAR(memBit.count());
             }
         }
         blobs_.push_back(blob);
     }
     INFO_VAR(blobs_.size());
-    INFO_VAR("finnish LeibnizLayer::forward");
+    INFO_VAR("finnish LeibnizLayer::forward2");
 }
 
 
