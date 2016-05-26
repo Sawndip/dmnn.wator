@@ -112,14 +112,20 @@ namespace Wator {
          * @param [in] ch
          * @return None.
          **/
-        uint16_t label(uint16_t x,uint16_t y,uint16_t ch);
+        uint32_t label(uint16_t x,uint16_t y,uint16_t ch);
         
         /**
          * splite to connect area.
          * @return None.
          **/
         vector<shared_ptr<Blob<T>>> splite(void);
-        
+
+        /**
+         * cut Small connected area.
+         * @return None.
+         **/
+        void cutSmall(uint16_t x,uint16_t y);
+       
         /**
          * dump to png
          * @param [in] name
@@ -137,7 +143,11 @@ namespace Wator {
         uint16_t minY_;
         uint16_t maxX_;
         uint16_t maxY_;
-        map<uint32_t,uint16_t> labels_;
-        uint16_t labelCounter_;
+        map<uint32_t,uint32_t> labels_;
+        uint32_t labelCounter_;
+        
+        map<uint32_t,shared_ptr<Blob<T>>> areasRaw_;
+        map<uint32_t,vector<uint16_t>> areasGrid_;
+
     };
 }
