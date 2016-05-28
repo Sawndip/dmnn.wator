@@ -325,7 +325,8 @@ template <typename T> vector<shared_ptr<Blob<T>>> Blob<T>::splite(void)
 {
     labels_.clear();
     areasRaw_.clear();
-    areasGrid_.clear();
+    areaMasks_.clear();
+    areasMaxMin_.clear();
     for (uint16_t ch = 0; ch < this->ch_; ch++) {
         labelCounter_ = 0;
         for (uint16_t y = 0; y < this->h_; y++) {
@@ -336,18 +337,17 @@ template <typename T> vector<shared_ptr<Blob<T>>> Blob<T>::splite(void)
                     uint32_t labelKey = ((x<<16)&0xffff0000)|(y&0xffff);
                     uint32_t labelValue = this->label(x,y,ch);
                     labels_[labelKey] = labelValue;
-                    INFO_VAR(labelValue);
-                    auto ir = areasRaw_.find(labelValue);
-                    if(ir == areasRaw_.end()) {
-                        auto area = shared_ptr<Blob<T>> (new Blob<T>(this->w_,this->h_,this->ch_));
-                        area->data_[index] = true;
-                        areasRaw_[labelValue] = area;
+                    //INFO_VAR(labelValue);
+                    auto ir = areaMasks_.find(labelValue);
+                    if(ir == areaMasks_.end()) {
+                        vector<uint32_t> area ={labelKey};
+                        areaMasks_[labelValue] = area;
                     } else {
-                        ir->second->data_[index] = true;
+                        ir->second.push_back(labelKey);
                     }
-                    auto ir2 = areasGrid_.find(labelValue);
-                    if(ir2 == areasGrid_.end()) {
-                        areasGrid_[labelValue] = {x,y,x,y};
+                    auto ir2 = areasMaxMin_.find(labelValue);
+                    if(ir2 == areasMaxMin_.end()) {
+                        areasMaxMin_[labelValue] = {x,y,x,y};
                     } else {
                         if(x < ir2->second[0]){
                             ir2->second[0] = x;
@@ -362,16 +362,29 @@ template <typename T> vector<shared_ptr<Blob<T>>> Blob<T>::splite(void)
                             ir2->second[3] = y;
                         }
                     }
-                    this->cutSmall(x,y);
                 }
             }
         }
     }
-    INFO_VAR(areasRaw_.size());
+    this->cutSmall();
+    INFO_VAR(areaMasks_.size());
     vector<shared_ptr<Blob<T>>> areas;
-    for(auto area:areasRaw_) {
-        areas.push_back(area.second);
+    for(auto area:areasMaxMin_) {
+        uint32_t areaXY = (area.second[2] - area.second[0])*(area.second[3] - area.second[1]);
+        uint32_t areaTheshold = (this->w_*this->h_)/(64*64);
+        if(areaXY > areaTheshold) {
+            TRACE_VAR(area.second[0]);
+            TRACE_VAR(area.second[1]);
+            TRACE_VAR(area.second[2]);
+            TRACE_VAR(area.second[3]);
+            TRACE_VAR(areaXY);
+            TRACE_VAR(areaTheshold);
+            auto label = area.first;
+            auto irLabel = areaMasks_.find(label);
+        }
     }
+    INFO_VAR(areasMaxMin_.size());
+    INFO_VAR(areas.size());
     return areas;
 }
 
@@ -426,8 +439,25 @@ template <typename T> uint32_t Blob<T>::label(uint16_t x,uint16_t y,uint16_t ch)
  * cut Small connected area.
  * @return None.
  **/
-template <typename T> void Blob<T>::cutSmall(uint16_t x,uint16_t y) {
-    
+template <typename T> void Blob<T>::cutSmall() {
+    for(auto area:areasMaxMin_) {
+        uint32_t areaXY = (area.second[2] - area.second[0])*(area.second[3] - area.second[1]);
+        uint32_t areaTheshold = (this->w_*this->h_)/(64*64);
+        if(areaXY < areaTheshold) {
+            TRACE_VAR(area.second[0]);
+            TRACE_VAR(area.second[1]);
+            TRACE_VAR(area.second[2]);
+            TRACE_VAR(area.second[3]);
+            TRACE_VAR(areaXY);
+            TRACE_VAR(areaTheshold);
+            auto label = area.first;
+            auto irLabel = areaMasks_.find(label);
+            if(irLabel != areaMasks_.end()) {
+                
+            }
+        }
+    }
+    INFO_VAR(areasMaxMin_.size());
 }
 
 

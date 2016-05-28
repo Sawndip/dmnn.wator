@@ -124,7 +124,7 @@ namespace Wator {
          * cut Small connected area.
          * @return None.
          **/
-        void cutSmall(uint16_t x,uint16_t y);
+        void cutSmall(void);
        
         /**
          * dump to png
@@ -144,10 +144,11 @@ namespace Wator {
         uint16_t maxX_;
         uint16_t maxY_;
         map<uint32_t,uint32_t> labels_;
+        map<uint32_t,vector<uint32_t>> areaMasks_;
         uint32_t labelCounter_;
         
         map<uint32_t,shared_ptr<Blob<T>>> areasRaw_;
-        map<uint32_t,vector<uint16_t>> areasGrid_;
+        map<uint32_t,vector<uint16_t>> areasMaxMin_;
 
     };
 }
