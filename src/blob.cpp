@@ -43,7 +43,7 @@ using namespace std;
  * Constructor
  * @param [in] size
  **/
-template <typename T> Blob<T>::Blob(const vector<shared_ptr<Blob<T>>> &conv)
+template<> Blob<bool>::Blob(const vector<shared_ptr<Blob<bool>>> &conv)
 {
     this->w_ = UINT16_MAX;
     this->h_ = UINT16_MAX;
@@ -64,7 +64,7 @@ template <typename T> Blob<T>::Blob(const vector<shared_ptr<Blob<T>>> &conv)
     INFO_VAR(this->ch_);
     if(this->w_ != UINT16_MAX && this->h_ != UINT16_MAX && this->ch_ != 0) {
         size_ = this->w_* this->h_ * this->ch_;
-        data_ = new T[size_];
+        data_ = new bool[size_];
         //memset(data_,0x0,sizeof(T)*size_);
         for (int ch = 0; ch < this->ch_; ch++) {
             for (int x = 0; x < this->w_; x++) {
@@ -82,6 +82,52 @@ template <typename T> Blob<T>::Blob(const vector<shared_ptr<Blob<T>>> &conv)
             }
         }
    }
+}
+
+
+/**
+ * Constructor
+ * @param [in] size
+ **/
+template<> Blob<uint8_t>::Blob(const vector<shared_ptr<Blob<uint8_t>>> &conv)
+{
+    this->w_ = UINT16_MAX;
+    this->h_ = UINT16_MAX;
+    this->ch_ = 0;
+    for(const auto &blob:conv) {
+        if(this->w_ > blob->w_) {
+            this->w_ = blob->w_;
+        }
+        if(this->h_ > blob->h_) {
+            this->h_ = blob->h_;
+        }
+        if(this->ch_ < blob->ch_) {
+            this->ch_ = blob->ch_;
+        }
+    }
+    INFO_VAR(this->w_);
+    INFO_VAR(this->h_);
+    INFO_VAR(this->ch_);
+    if(this->w_ != UINT16_MAX && this->h_ != UINT16_MAX && this->ch_ != 0) {
+        size_ = this->w_* this->h_ * this->ch_;
+        data_ = new uint8_t[size_];
+        //memset(data_,0x0,sizeof(T)*size_);
+        for (int ch = 0; ch < this->ch_; ch++) {
+            for (int x = 0; x < this->w_; x++) {
+                for (int y = 0; y < this->h_; y++) {
+                    int index = ch * this->w_ * this->h_ + y * this->w_ + x;
+                    uint8_t convBit = 0;
+                    for(const auto &blob:conv) {
+                        int index2 = ch * blob->w_ * blob->h_ + y* blob->w_ +x;
+                        if(blob->data_[index2] > convBit) {
+                            convBit = blob->data_[index2];
+                        }
+                    }
+                    this->data_[index] = convBit;
+                }
+            }
+        }
+    }
 }
 
 
@@ -571,7 +617,7 @@ template <typename T> void Blob<T>::neighbor(shared_ptr<Blob<T>> area,int x,int 
 }
 
 
-template Blob<bool>::Blob(const vector<shared_ptr<Blob<bool>>> &conv);
+//template Blob<bool>::Blob(const vector<shared_ptr<Blob<bool>>> &conv);
 
 template void Blob<bool>::dump(const string &name);
 template shared_ptr<Blob<uint8_t>> Blob<uint8_t>::grid(int startX,int startY,int gw,int gh);

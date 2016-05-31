@@ -165,7 +165,7 @@ void NewtonLayer::forward(void)
     blobs4x4_.clear();
     blobs_.clear();
 
-    forward3();
+    this->forward4();
 
     INFO_VAR(blobs_.size());
     INFO_VAR("finnish NewtonLayer::forward");
@@ -640,6 +640,101 @@ shared_ptr<Blob<bool>> NewtonLayer::cala(shared_ptr<Blob<uint8_t>> blob)
     return blob2x2;
 }
 
+
+/**
+ * forward4
+ * @return None.
+ **/
+void NewtonLayer::forward4(void)
+{
+    for(auto btm:bottom_){
+        // 2x2
+        auto input = dynamic_pointer_cast<LayerInput>(btm);
+        auto inBlob_orig = input->getBlob(this);
+        
+        vector<shared_ptr<Blob<uint8_t>>> conv;
+        for(int x = 0 ;x < this->w_;x++) {
+            for(int y = 0 ;y < this->h_;y++) {
+                auto inBlob = inBlob_orig->grid(x,y,this->w_,this->h_);
+                auto outBlob = this->calaRaw(inBlob);
+                conv.push_back(outBlob);
+            }
+        }
+        INFO_VAR(conv.size());
+        auto blobRaw2x2 = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(conv));
+        blobsRaw2X2_.push_back(blobRaw2x2);
+        INFO_VAR(blobRaw2x2->w_);
+        INFO_VAR(blobRaw2x2->h_);
+
+        
+        INFO_VAR((int)min_2x2_);
+        //min_2x2_ = 0;
+        
+        auto blob2x2 = shared_ptr<Blob<bool>>(new Blob<bool>(blobRaw2x2->w_,blobRaw2x2->h_,blobRaw2x2->ch_));
+        for (int ch = 0; ch < blob2x2->ch_; ch++) {
+            const int oneChannel = blob2x2->w_ * blob2x2->h_;
+            const int maxActive = oneChannel * this->sparseFractions_ / sparseNumerator_;
+            int activeSize = maxActive +1;
+            uint8_t threshold_ = min_2x2_;
+            uint8_t thresholdStep_ = 1;
+            while (activeSize > maxActive) {
+                activeSize = 0;
+                for(int i =0;i < oneChannel;i++)
+                {
+                    int index = ch * oneChannel + i;
+                    TRACE_VAR(blobRaw2x2->data_[index]);
+                    int delta = blobRaw2x2->data_[index] - threshold_;
+                    if(0 < delta ){
+                        blob2x2->data_[index] = true;
+                        activeSize++;
+                    }else{
+                        blob2x2->data_[index] = false;
+                    }
+                }
+                threshold_ += thresholdStep_;
+            }
+        }
+        // add to...
+        for (auto top:top_) {
+            blobs2x2_.push_back(blob2x2);
+        }
+    }
+    INFO_VAR(blobs2x2_.size());
+}
+
+/**
+ * cala one grid.
+ * @return blob.
+ **/
+shared_ptr<Blob<uint8_t>> NewtonLayer::calaRaw(shared_ptr<Blob<uint8_t>> blob)
+{
+    INFO_VAR(blob->w_);
+    INFO_VAR(blob->h_);
+    INFO_VAR(blob->ch_);
+    int wGrid2x2_ = blob->w_/this->w_;
+    int hGrid2x2_ = blob->h_/this->h_;
+    INFO_VAR(wGrid2x2_);
+    INFO_VAR(hGrid2x2_);
+    auto raw2x2 = shared_ptr<Blob<uint8_t>>(new Blob<uint8_t>(wGrid2x2_,hGrid2x2_,blob->ch_));
+    
+    max_2x2_ = 0;
+    min_2x2_ = 255;
+    
+    for(int i = 0 ;i < raw2x2->size_ ;i++) {
+        uint8_t maxDiff = 0;
+        uint8_t avg = 0;
+        int index = i*this->w_*this->h_;
+        cal4Vec(&(blob->data_[index]),maxDiff,avg);
+        raw2x2->data_[i] = maxDiff;
+        if(raw2x2->data_[i] > max_2x2_) {
+            max_2x2_ = raw2x2->data_[i];
+        }
+        if(raw2x2->data_[i] < min_2x2_) {
+            min_2x2_ = raw2x2->data_[i];
+        }
+    }
+    return raw2x2;
+}
 
 
 

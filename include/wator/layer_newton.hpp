@@ -98,6 +98,18 @@ namespace Wator {
          * @return blob.
          **/
         shared_ptr<Blob<bool>> cala(shared_ptr<Blob<uint8_t>> blob);
+
+        /**
+         * forward4
+         * @return None.
+         **/
+        void forward4(void);
+        
+        /**
+         * cala one grid.
+         * @return blob.
+         **/
+        shared_ptr<Blob<uint8_t>> calaRaw(shared_ptr<Blob<uint8_t>> blob);
         
         /**
          * update
@@ -137,9 +149,12 @@ namespace Wator {
         int wGrid4x4_;
         int hGrid4x4_;
         
+        uint8_t max_2x2_;
+        uint8_t min_2x2_;
+        
         // 1/2
-        const int sparseFractions_ = 8;
-        const int sparseNumerator_ = 16;
+        const int sparseFractions_ = 48;
+        const int sparseNumerator_ = 64;
         
     };
 
