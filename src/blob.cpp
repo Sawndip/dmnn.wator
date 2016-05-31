@@ -488,7 +488,7 @@ template <typename T> uint32_t Blob<T>::label(uint16_t x,uint16_t y,uint16_t ch)
 template <typename T> void Blob<T>::cutSmall() {
     for(auto area:areasMaxMin_) {
         uint32_t areaXY = (area.second[2] - area.second[0])*(area.second[3] - area.second[1]);
-        uint32_t areaTheshold = (this->w_*this->h_)/(64*64);
+        uint32_t areaTheshold = (this->w_*this->h_)/(32*32);
         if(areaXY < areaTheshold) {
             TRACE_VAR(area.second[0]);
             TRACE_VAR(area.second[1]);
@@ -497,9 +497,28 @@ template <typename T> void Blob<T>::cutSmall() {
             TRACE_VAR(areaXY);
             TRACE_VAR(areaTheshold);
             auto label = area.first;
+            INFO_VAR(label);
             auto irLabel = areaMasks_.find(label);
             if(irLabel != areaMasks_.end()) {
-                
+                for(auto key:irLabel->second) {
+                    uint16_t x = key>>16 & 0xffff;
+                    uint16_t y = key & 0xffff;
+                    INFO_VAR(x);
+                    INFO_VAR(y);
+                    
+                    uint16_t index = y*this->w_ + x ;
+                    
+                    INFO_VAR(this->data_[index]);
+                    this->data_[index] = false;
+                    
+                    index += 1 * this->w_ * this->h_;
+                    INFO_VAR(this->data_[index]);
+                    this->data_[index] = false;
+                    
+                    index += 2 * this->w_ * this->h_;
+                    INFO_VAR(this->data_[index]);
+                    this->data_[index] = false;
+                }
             }
         }
     }
