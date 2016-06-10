@@ -64,7 +64,8 @@ void NewtonLayer::round(void)
     for (auto blob:blobs2x2_) {
         auto areas = blob->splite();
         for(auto area:areas) {
-            area->dump(typeid(this).name());
+            string name(typeid(this).name());
+            area->dump("area."+name);
         }
     }
 #endif

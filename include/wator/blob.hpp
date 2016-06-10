@@ -107,6 +107,13 @@ namespace Wator {
         void neighbor(shared_ptr<Blob<T>> area,int x,int y,int ch);
         
         /**
+         * @param [in] a
+         * @param [in] b
+         * @return None.
+         **/
+        void mergeLabel(uint32_t a,uint32_t b);
+
+        /**
          * @param [in] x
          * @param [in] y
          * @param [in] ch

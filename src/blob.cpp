@@ -367,23 +367,44 @@ template <typename T> vector<shared_ptr<Blob<T>>> Blob<T>::splite(void)
 }
 */
 
+/*
+[2016-06-03 06:28:08.824460] [0x00007fff73fab000] [info]    /Users/maeikei/workspace/DL-dev/wator/src/blob.cpp:395:bitset<32>(x32)=<00000000000000000,000000000000011>
+
+[2016-06-03 06:28:08.824466] [0x00007fff73fab000] [info]    /Users/maeikei/workspace/DL-dev/wator/src/blob.cpp:396:bitset<32>(y32)=<000000000000000000,00000000001100>
+
+[2016-06-03 06:28:08.824473] [0x00007fff73fab000] [info]    /Users/maeikei/workspace/DL-dev/wator/src/blob.cpp:397:bitset<32>(c32)=<000000000000000,00000000000000010>
+
+[2016-06-03 06:28:08.824479] [0x00007fff73fab000] [info]    /Users/maeikei/workspace/DL-dev/wator/src/blob.cpp:398:bitset<32>(labelKey)=<10,000,0000,0000,0011,000,0000,0000,1100>
+*/
+
+const static uint32_t iConstCMask = 0xc0000000;
+const static uint32_t iConstXMask = 0x3fff8000;
+const static uint32_t iConstYMask = 0x00007fff;
+
 template <typename T> vector<shared_ptr<Blob<T>>> Blob<T>::splite(void)
 {
     labels_.clear();
     areasRaw_.clear();
     areaMasks_.clear();
     areasMaxMin_.clear();
+    labelCounter_ = 1;
     for (uint16_t ch = 0; ch < this->ch_; ch++) {
-        labelCounter_ = 0;
         for (uint16_t y = 0; y < this->h_; y++) {
             for (uint16_t x = 0; x < this->w_; x++) {
                 uint16_t index = ch * this->w_ * this->h_;
                 index += y*this->w_ + x;
                 if(this->data_[index]) {
-                    uint32_t labelKey = ((x<<16)&0xffff0000)|(y&0xffff);
+                    uint32_t x32 = x;
+                    uint32_t y32 = y;
+                    uint32_t c32 = ch;
+                    uint32_t labelKey = ((c32<<30)&iConstCMask) | ((x32<<15) &iConstXMask)| (y32 &iConstYMask) ;
                     uint32_t labelValue = this->label(x,y,ch);
-                    labels_[labelKey] = labelValue;
-                    //INFO_VAR(labelValue);
+                    INFO_VAR(labelValue);
+                    
+                    TRACE_VAR(bitset<32>(x32));
+                    TRACE_VAR(bitset<32>(y32));
+                    TRACE_VAR(bitset<32>(c32));
+                    TRACE_VAR(bitset<32>(labelKey));
                     auto ir = areaMasks_.find(labelValue);
                     if(ir == areaMasks_.end()) {
                         vector<uint32_t> area ={labelKey};
@@ -412,21 +433,33 @@ template <typename T> vector<shared_ptr<Blob<T>>> Blob<T>::splite(void)
             }
         }
     }
-    this->cutSmall();
+//    this->cutSmall();
+    INFO_VAR(labelCounter_);
     INFO_VAR(areaMasks_.size());
     vector<shared_ptr<Blob<T>>> areas;
-    for(auto area:areasMaxMin_) {
-        uint32_t areaXY = (area.second[2] - area.second[0])*(area.second[3] - area.second[1]);
-        uint32_t areaTheshold = (this->w_*this->h_)/(64*64);
-        if(areaXY > areaTheshold) {
-            TRACE_VAR(area.second[0]);
-            TRACE_VAR(area.second[1]);
-            TRACE_VAR(area.second[2]);
-            TRACE_VAR(area.second[3]);
-            TRACE_VAR(areaXY);
-            TRACE_VAR(areaTheshold);
-            auto label = area.first;
-            auto irLabel = areaMasks_.find(label);
+    for(auto areaMask:areaMasks_) {
+//        uint32_t areaTheshold = (this->w_*this->h_)/(96*96);
+        uint32_t areaTheshold = 0*0;
+        if(areaMask.second.size() > areaTheshold) {
+            INFO_VAR(areaTheshold);
+            INFO_VAR(areaMask.second.size());
+            auto area = shared_ptr<Blob<T>> (new Blob<T>(this->w_,this->h_,this->ch_));
+            for(auto mask:areaMask.second) {
+                uint16_t ch = mask>>30 & 0x3;
+                uint16_t x = mask>>15 & 0x7fff;
+                uint16_t y = mask & 0x7fff;
+                INFO_VAR(bitset<16>(ch));
+                INFO_VAR(bitset<16>(x));
+                INFO_VAR(bitset<16>(y));
+                INFO_VAR(bitset<32>(mask));
+                INFO_VAR(ch);
+                INFO_VAR(x);
+                INFO_VAR(y);
+                int index = ch * this->w_ * this->h_;
+                index += (y)*this->w_ + x;
+                area->data_[index] = true;
+            }
+            areas.push_back(area);
         }
     }
     INFO_VAR(areasMaxMin_.size());
@@ -442,15 +475,36 @@ template <typename T> vector<shared_ptr<Blob<T>>> Blob<T>::splite(void)
  **/
 template <typename T> uint32_t Blob<T>::label(uint16_t x,uint16_t y,uint16_t ch)
 {
+    uint32_t labelValue = 0;
+    // if(x,y)
+    {
+        uint32_t x32 = x;
+        uint32_t y32 = y;
+        uint32_t c32 = ch;
+        uint32_t labelKey = ((c32<<30)&iConstCMask) | ((x32<<15) &iConstXMask)| (y32 &iConstYMask) ;
+        auto ir = labels_.find(labelKey);
+        if(ir!= labels_.end()) {
+            labelValue =  ir->second;
+        } else {
+            labelValue = labelCounter_++;
+            labels_[labelKey] = labelValue;
+        }
+    }
+
     // left top
     if(x-1 >= 0 && y-1 >= 0) {
         int index = ch * this->w_ * this->h_;
         index += (y-1)*this->w_ + x -1;
         if(this->data_[index]) {
-            uint32_t labelKey = (((x-1)<<16)&0xffff0000)|((y-1)&0xffff);
+            uint32_t x32 = x-1;
+            uint32_t y32 = y-1;
+            uint32_t c32 = ch;
+            uint32_t labelKey = ((c32<<30)&iConstCMask) | ((x32<<15) &iConstXMask)| (y32 &iConstYMask) ;
             auto ir = labels_.find(labelKey);
             if(ir!= labels_.end()) {
-                return ir->second;
+                this->mergeLabel(labelValue,ir->second);
+            } else {
+                labels_[labelKey] = labelValue;
             }
         }
     }
@@ -459,27 +513,132 @@ template <typename T> uint32_t Blob<T>::label(uint16_t x,uint16_t y,uint16_t ch)
         int index = ch * this->w_ * this->h_;
         index += (y)*this->w_ + x -1;
         if(this->data_[index]) {
-            uint32_t labelKey = (((x-1)<<16)&0xffff0000)|((y)&0xffff);
+            uint32_t x32 = x-1;
+            uint32_t y32 = y;
+            uint32_t c32 = ch;
+            uint32_t labelKey = ((c32<<30)&iConstCMask) | ((x32<<15) &iConstXMask)| (y32 &iConstYMask) ;
             auto ir = labels_.find(labelKey);
             if(ir!= labels_.end()) {
-                return ir->second;
+                this->mergeLabel(labelValue,ir->second);
+            } else {
+                labels_[labelKey] = labelValue;
             }
         }
     }
-    // top center.
-    if(/*x && */ y-1 >= 0) {
+    // left down
+    if(x-1 >=0 && y+1 < this->h_) {
+        int index = ch * this->w_ * this->h_;
+        index += (y+1)*this->w_ + x;
+        if(this->data_[index]) {
+            uint32_t x32 = x-1;
+            uint32_t y32 = y+1;
+            uint32_t c32 = ch;
+            uint32_t labelKey = ((c32<<30)&iConstCMask) | ((x32<<15) &iConstXMask)| (y32 &iConstYMask) ;
+            auto ir = labels_.find(labelKey);
+            if(ir!= labels_.end()) {
+                this->mergeLabel(labelValue,ir->second);
+            } else {
+                labels_[labelKey] = labelValue;
+            }
+        }
+    }
+    // center top
+    if(/*x && */y-1 >=0 ) {
         int index = ch * this->w_ * this->h_;
         index += (y-1)*this->w_ + x;
         if(this->data_[index]) {
-            uint32_t labelKey = (((x)<<16)&0xffff0000)|((y-1)&0xffff);
+            uint32_t x32 = x;
+            uint32_t y32 = y-1;
+            uint32_t c32 = ch;
+            uint32_t labelKey = ((c32<<30)&iConstCMask) | ((x32<<15) &iConstXMask)| (y32 &iConstYMask) ;
             auto ir = labels_.find(labelKey);
             if(ir!= labels_.end()) {
-                return ir->second;
+                this->mergeLabel(labelValue,ir->second);
+            } else {
+                labels_[labelKey] = labelValue;
             }
         }
     }
-    return labelCounter_++;
+    // center down
+    if(/*x && */y+1 < this->h_) {
+        int index = ch * this->w_ * this->h_;
+        index += (y+1)*this->w_ + x;
+        if(this->data_[index]) {
+            uint32_t x32 = x;
+            uint32_t y32 = y+1;
+            uint32_t c32 = ch;
+            uint32_t labelKey = ((c32<<30)&iConstCMask) | ((x32<<15) &iConstXMask)| (y32 &iConstYMask) ;
+            auto ir = labels_.find(labelKey);
+            if(ir!= labels_.end()) {
+                this->mergeLabel(labelValue,ir->second);
+            } else {
+                labels_[labelKey] = labelValue;
+            }
+        }
+    }
+    // right top
+    if(x+1 < this->w_ && y-1 >= 0) {
+        int index = ch * this->w_ * this->h_;
+        index += (y-1)*this->w_ + x +1;
+        if(this->data_[index]) {
+            uint32_t x32 = x+1;
+            uint32_t y32 = y-1;
+            uint32_t c32 = ch;
+            uint32_t labelKey = ((c32<<30)&iConstCMask) | ((x32<<15) &iConstXMask)| (y32 &iConstYMask) ;
+            auto ir = labels_.find(labelKey);
+            if(ir!= labels_.end()) {
+                this->mergeLabel(labelValue,ir->second);
+            } else {
+                labels_[labelKey] = labelValue;
+            }
+        }
+    }
+    // right center
+    if(x+1 < this->w_ /* && y*/) {
+        int index = ch * this->w_ * this->h_;
+        index += (y)*this->w_ + x +1;
+        if(this->data_[index]) {
+            uint32_t x32 = x+1;
+            uint32_t y32 = y;
+            uint32_t c32 = ch;
+            uint32_t labelKey = ((c32<<30)&iConstCMask) | ((x32<<15) &iConstXMask)| (y32 &iConstYMask) ;
+            auto ir = labels_.find(labelKey);
+            if(ir!= labels_.end()) {
+                this->mergeLabel(labelValue,ir->second);
+            } else {
+                labels_[labelKey] = labelValue;
+            }
+        }
+    }
+    // right down
+    if(x+1 < this->w_ && y+1 < this->h_) {
+        int index = ch * this->w_ * this->h_;
+        index += (y+1)*this->w_ + x+1;
+        if(this->data_[index]) {
+            uint32_t x32 = x+1;
+            uint32_t y32 = y+1;
+            uint32_t c32 = ch;
+            uint32_t labelKey = ((c32<<30)&iConstCMask) | ((x32<<15) &iConstXMask)| (y32 &iConstYMask) ;
+            auto ir = labels_.find(labelKey);
+            if(ir!= labels_.end()) {
+                this->mergeLabel(labelValue,ir->second);
+            } else {
+                labels_[labelKey] = labelValue;
+            }
+        }
+    }
+    return labelValue;
 }
+
+/**
+ * @param [in] a
+ * @param [in] b
+ * @return None.
+ **/
+template <typename T> void Blob<T>::mergeLabel(uint32_t a,uint32_t b) {
+    
+}
+
 
 /**
  * cut Small connected area.
@@ -489,7 +648,7 @@ template <typename T> void Blob<T>::cutSmall() {
     for(auto area:areasMaxMin_) {
         uint32_t areaXY = (area.second[2] - area.second[0])*(area.second[3] - area.second[1]);
         uint32_t areaTheshold = (this->w_*this->h_)/(32*32);
-        if(areaXY < areaTheshold) {
+        if(areaXY > areaTheshold) {
             TRACE_VAR(area.second[0]);
             TRACE_VAR(area.second[1]);
             TRACE_VAR(area.second[2]);
@@ -497,26 +656,16 @@ template <typename T> void Blob<T>::cutSmall() {
             TRACE_VAR(areaXY);
             TRACE_VAR(areaTheshold);
             auto label = area.first;
-            INFO_VAR(label);
+            TRACE_VAR(label);
             auto irLabel = areaMasks_.find(label);
             if(irLabel != areaMasks_.end()) {
                 for(auto key:irLabel->second) {
-                    uint16_t x = key>>16 & 0xffff;
-                    uint16_t y = key & 0xffff;
-                    INFO_VAR(x);
-                    INFO_VAR(y);
-                    
-                    uint16_t index = y*this->w_ + x ;
-                    
-                    INFO_VAR(this->data_[index]);
-                    this->data_[index] = false;
-                    
-                    index += 1 * this->w_ * this->h_;
-                    INFO_VAR(this->data_[index]);
-                    this->data_[index] = false;
-                    
-                    index += 2 * this->w_ * this->h_;
-                    INFO_VAR(this->data_[index]);
+                    uint16_t ch = key>>30 & 0x3;
+                    uint16_t x = key>>15 & 0x7fff;
+                    uint16_t y = key & 0x7fff;
+                    TRACE_VAR(x);
+                    TRACE_VAR(y);
+                    uint16_t index = ch*this->w_ * this->h_+ y*this->w_ + x ;
                     this->data_[index] = false;
                 }
             }
