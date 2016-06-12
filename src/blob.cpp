@@ -386,7 +386,7 @@ template <typename T> vector<shared_ptr<Blob<T>>> Blob<T>::splite(void)
     labels_.clear();
     areasRaw_.clear();
     areaMasks_.clear();
-    areasMaxMin_.clear();
+    areaMerge_.clear();
     labelCounter_ = 1;
     for (uint16_t ch = 0; ch < this->ch_; ch++) {
         for (uint16_t y = 0; y < this->h_; y++) {
@@ -399,7 +399,7 @@ template <typename T> vector<shared_ptr<Blob<T>>> Blob<T>::splite(void)
                     uint32_t c32 = ch;
                     uint32_t labelKey = ((c32<<30)&iConstCMask) | ((x32<<15) &iConstXMask)| (y32 &iConstYMask) ;
                     uint32_t labelValue = this->label(x,y,ch);
-                    INFO_VAR(labelValue);
+                    TRACE_VAR(labelValue);
                     
                     TRACE_VAR(bitset<32>(x32));
                     TRACE_VAR(bitset<32>(y32));
@@ -412,49 +412,32 @@ template <typename T> vector<shared_ptr<Blob<T>>> Blob<T>::splite(void)
                     } else {
                         ir->second.push_back(labelKey);
                     }
-                    auto ir2 = areasMaxMin_.find(labelValue);
-                    if(ir2 == areasMaxMin_.end()) {
-                        areasMaxMin_[labelValue] = {x,y,x,y};
-                    } else {
-                        if(x < ir2->second[0]){
-                            ir2->second[0] = x;
-                        }
-                        if(y < ir2->second[1]){
-                            ir2->second[1] = y;
-                        }
-                        if(x > ir2->second[2]){
-                            ir2->second[2] = x;
-                        }
-                        if(y > ir2->second[3]){
-                            ir2->second[3] = y;
-                        }
-                    }
                 }
             }
         }
     }
-//    this->cutSmall();
+    this->mergeLabel();
     INFO_VAR(labelCounter_);
     INFO_VAR(areaMasks_.size());
     vector<shared_ptr<Blob<T>>> areas;
     for(auto areaMask:areaMasks_) {
-//        uint32_t areaTheshold = (this->w_*this->h_)/(96*96);
-        uint32_t areaTheshold = 0*0;
+        uint32_t areaTheshold = (this->w_*this->h_)/(96*96);
+//        uint32_t areaTheshold = 0*0;
         if(areaMask.second.size() > areaTheshold) {
-            INFO_VAR(areaTheshold);
-            INFO_VAR(areaMask.second.size());
+            TRACE_VAR(areaTheshold);
+            TRACE_VAR(areaMask.second.size());
             auto area = shared_ptr<Blob<T>> (new Blob<T>(this->w_,this->h_,this->ch_));
             for(auto mask:areaMask.second) {
                 uint16_t ch = mask>>30 & 0x3;
                 uint16_t x = mask>>15 & 0x7fff;
                 uint16_t y = mask & 0x7fff;
-                INFO_VAR(bitset<16>(ch));
-                INFO_VAR(bitset<16>(x));
-                INFO_VAR(bitset<16>(y));
-                INFO_VAR(bitset<32>(mask));
-                INFO_VAR(ch);
-                INFO_VAR(x);
-                INFO_VAR(y);
+                TRACE_VAR(bitset<16>(ch));
+                TRACE_VAR(bitset<16>(x));
+                TRACE_VAR(bitset<16>(y));
+                TRACE_VAR(bitset<32>(mask));
+                TRACE_VAR(ch);
+                TRACE_VAR(x);
+                TRACE_VAR(y);
                 int index = ch * this->w_ * this->h_;
                 index += (y)*this->w_ + x;
                 area->data_[index] = true;
@@ -462,7 +445,6 @@ template <typename T> vector<shared_ptr<Blob<T>>> Blob<T>::splite(void)
             areas.push_back(area);
         }
     }
-    INFO_VAR(areasMaxMin_.size());
     INFO_VAR(areas.size());
     return areas;
 }
@@ -475,12 +457,12 @@ template <typename T> vector<shared_ptr<Blob<T>>> Blob<T>::splite(void)
  **/
 template <typename T> uint32_t Blob<T>::label(uint16_t x,uint16_t y,uint16_t ch)
 {
+    uint32_t c32 = ch;
     uint32_t labelValue = 0;
     // if(x,y)
     {
         uint32_t x32 = x;
         uint32_t y32 = y;
-        uint32_t c32 = ch;
         uint32_t labelKey = ((c32<<30)&iConstCMask) | ((x32<<15) &iConstXMask)| (y32 &iConstYMask) ;
         auto ir = labels_.find(labelKey);
         if(ir!= labels_.end()) {
@@ -498,7 +480,6 @@ template <typename T> uint32_t Blob<T>::label(uint16_t x,uint16_t y,uint16_t ch)
         if(this->data_[index]) {
             uint32_t x32 = x-1;
             uint32_t y32 = y-1;
-            uint32_t c32 = ch;
             uint32_t labelKey = ((c32<<30)&iConstCMask) | ((x32<<15) &iConstXMask)| (y32 &iConstYMask) ;
             auto ir = labels_.find(labelKey);
             if(ir!= labels_.end()) {
@@ -515,7 +496,6 @@ template <typename T> uint32_t Blob<T>::label(uint16_t x,uint16_t y,uint16_t ch)
         if(this->data_[index]) {
             uint32_t x32 = x-1;
             uint32_t y32 = y;
-            uint32_t c32 = ch;
             uint32_t labelKey = ((c32<<30)&iConstCMask) | ((x32<<15) &iConstXMask)| (y32 &iConstYMask) ;
             auto ir = labels_.find(labelKey);
             if(ir!= labels_.end()) {
@@ -532,7 +512,6 @@ template <typename T> uint32_t Blob<T>::label(uint16_t x,uint16_t y,uint16_t ch)
         if(this->data_[index]) {
             uint32_t x32 = x-1;
             uint32_t y32 = y+1;
-            uint32_t c32 = ch;
             uint32_t labelKey = ((c32<<30)&iConstCMask) | ((x32<<15) &iConstXMask)| (y32 &iConstYMask) ;
             auto ir = labels_.find(labelKey);
             if(ir!= labels_.end()) {
@@ -549,7 +528,6 @@ template <typename T> uint32_t Blob<T>::label(uint16_t x,uint16_t y,uint16_t ch)
         if(this->data_[index]) {
             uint32_t x32 = x;
             uint32_t y32 = y-1;
-            uint32_t c32 = ch;
             uint32_t labelKey = ((c32<<30)&iConstCMask) | ((x32<<15) &iConstXMask)| (y32 &iConstYMask) ;
             auto ir = labels_.find(labelKey);
             if(ir!= labels_.end()) {
@@ -566,7 +544,6 @@ template <typename T> uint32_t Blob<T>::label(uint16_t x,uint16_t y,uint16_t ch)
         if(this->data_[index]) {
             uint32_t x32 = x;
             uint32_t y32 = y+1;
-            uint32_t c32 = ch;
             uint32_t labelKey = ((c32<<30)&iConstCMask) | ((x32<<15) &iConstXMask)| (y32 &iConstYMask) ;
             auto ir = labels_.find(labelKey);
             if(ir!= labels_.end()) {
@@ -583,7 +560,6 @@ template <typename T> uint32_t Blob<T>::label(uint16_t x,uint16_t y,uint16_t ch)
         if(this->data_[index]) {
             uint32_t x32 = x+1;
             uint32_t y32 = y-1;
-            uint32_t c32 = ch;
             uint32_t labelKey = ((c32<<30)&iConstCMask) | ((x32<<15) &iConstXMask)| (y32 &iConstYMask) ;
             auto ir = labels_.find(labelKey);
             if(ir!= labels_.end()) {
@@ -600,7 +576,6 @@ template <typename T> uint32_t Blob<T>::label(uint16_t x,uint16_t y,uint16_t ch)
         if(this->data_[index]) {
             uint32_t x32 = x+1;
             uint32_t y32 = y;
-            uint32_t c32 = ch;
             uint32_t labelKey = ((c32<<30)&iConstCMask) | ((x32<<15) &iConstXMask)| (y32 &iConstYMask) ;
             auto ir = labels_.find(labelKey);
             if(ir!= labels_.end()) {
@@ -617,7 +592,6 @@ template <typename T> uint32_t Blob<T>::label(uint16_t x,uint16_t y,uint16_t ch)
         if(this->data_[index]) {
             uint32_t x32 = x+1;
             uint32_t y32 = y+1;
-            uint32_t c32 = ch;
             uint32_t labelKey = ((c32<<30)&iConstCMask) | ((x32<<15) &iConstXMask)| (y32 &iConstYMask) ;
             auto ir = labels_.find(labelKey);
             if(ir!= labels_.end()) {
@@ -635,8 +609,59 @@ template <typename T> uint32_t Blob<T>::label(uint16_t x,uint16_t y,uint16_t ch)
  * @param [in] b
  * @return None.
  **/
-template <typename T> void Blob<T>::mergeLabel(uint32_t a,uint32_t b) {
-    
+template <typename T> void Blob<T>::mergeLabel(uint32_t aLabel,uint32_t bLabel) {
+    // do not need merge the same one.
+    if(aLabel==bLabel) {
+        return;
+    }
+    for(auto &merge:areaMerge_) {
+        auto it = std::find(merge.begin(),merge.end(),aLabel);
+        if(it!= merge.end()) {
+            merge.push_back(bLabel);
+            return;
+        }
+        it = std::find(merge.begin(),merge.end(),bLabel);
+        if(it!= merge.end()) {
+            merge.push_back(aLabel);
+            return;
+        }
+    }
+    areaMerge_.push_back({aLabel,bLabel});
+    return;
+}
+
+
+/**
+ * @return None.
+ **/
+template <typename T> void Blob<T>::mergeLabel() {
+    TRACE_VAR(areaMerge_.size());
+    for(auto mergeGroup:areaMerge_) {
+        TRACE_VAR(mergeGroup.size());
+        if(mergeGroup.size() <2) {
+            continue;
+        }
+        auto base = mergeGroup[0];
+        TRACE_VAR(base);
+        auto maskA = areaMasks_.find(base);
+        if(maskA == areaMasks_.end()) {
+            continue;
+        }
+        for(int i = 1 ;i < mergeGroup.size() ;i++) {
+            auto merge = mergeGroup[i];
+            if(merge==base){
+                continue;
+            }
+            auto maskB = areaMasks_.find(merge);
+            TRACE_VAR(mergeGroup[i]);
+            if(maskB != areaMasks_.end()) {
+                auto pos = maskA->second.begin();
+                maskA->second.insert(pos,maskB->second.begin(),maskB->second.end());
+                areaMasks_.erase(maskB);
+                maskA = areaMasks_.find(base);
+            }
+        }
+    }
 }
 
 
@@ -645,33 +670,6 @@ template <typename T> void Blob<T>::mergeLabel(uint32_t a,uint32_t b) {
  * @return None.
  **/
 template <typename T> void Blob<T>::cutSmall() {
-    for(auto area:areasMaxMin_) {
-        uint32_t areaXY = (area.second[2] - area.second[0])*(area.second[3] - area.second[1]);
-        uint32_t areaTheshold = (this->w_*this->h_)/(32*32);
-        if(areaXY > areaTheshold) {
-            TRACE_VAR(area.second[0]);
-            TRACE_VAR(area.second[1]);
-            TRACE_VAR(area.second[2]);
-            TRACE_VAR(area.second[3]);
-            TRACE_VAR(areaXY);
-            TRACE_VAR(areaTheshold);
-            auto label = area.first;
-            TRACE_VAR(label);
-            auto irLabel = areaMasks_.find(label);
-            if(irLabel != areaMasks_.end()) {
-                for(auto key:irLabel->second) {
-                    uint16_t ch = key>>30 & 0x3;
-                    uint16_t x = key>>15 & 0x7fff;
-                    uint16_t y = key & 0x7fff;
-                    TRACE_VAR(x);
-                    TRACE_VAR(y);
-                    uint16_t index = ch*this->w_ * this->h_+ y*this->w_ + x ;
-                    this->data_[index] = false;
-                }
-            }
-        }
-    }
-    INFO_VAR(areasMaxMin_.size());
 }
 
 

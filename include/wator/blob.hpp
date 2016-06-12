@@ -114,6 +114,11 @@ namespace Wator {
         void mergeLabel(uint32_t a,uint32_t b);
 
         /**
+         * @return None.
+         **/
+        void mergeLabel();
+
+        /**
          * @param [in] x
          * @param [in] y
          * @param [in] ch
@@ -152,6 +157,7 @@ namespace Wator {
         uint16_t maxY_;
         map<uint32_t,uint32_t> labels_;
         map<uint32_t,vector<uint32_t>> areaMasks_;
+        vector<vector<uint32_t>> areaMerge_;
         uint32_t labelCounter_;
         
         map<uint32_t,shared_ptr<Blob<T>>> areasRaw_;
