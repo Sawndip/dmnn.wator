@@ -421,10 +421,10 @@ template <typename T> vector<shared_ptr<Blob<T>>> Blob<T>::splite(void)
     INFO_VAR(areaMasks_.size());
     vector<shared_ptr<Blob<T>>> areas;
     for(auto areaMask:areaMasks_) {
-        uint32_t areaTheshold = (this->w_*this->h_)/(96*96);
+        uint32_t areaTheshold = (this->w_*this->h_)/(32*32);
 //        uint32_t areaTheshold = 0*0;
         if(areaMask.second.size() > areaTheshold) {
-            TRACE_VAR(areaTheshold);
+            INFO_VAR(areaTheshold);
             TRACE_VAR(areaMask.second.size());
             auto area = shared_ptr<Blob<T>> (new Blob<T>(this->w_,this->h_,this->ch_));
             for(auto mask:areaMask.second) {

@@ -153,7 +153,7 @@ namespace Wator {
         uint8_t min_2x2_;
         
         // 1/2
-        const int sparseFractions_ = 32;
+        const int sparseFractions_ = 16;
         const int sparseNumerator_ = 64;
         
     };
