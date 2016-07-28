@@ -1,5 +1,6 @@
 OBJ := object
 build:pre-build
+	export CC=/usr/bin/clang && export CXX=/usr/bin/clang++ && \
 	cd $(OBJ) && cmake ../
 	cd $(OBJ) && make
 pre-build:
