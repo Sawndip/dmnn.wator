@@ -30,3 +30,4 @@ object
 build
 .DS_Store
 dump.image.*
+data
