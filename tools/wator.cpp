@@ -31,12 +31,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace std;
 #include <wator.hpp>
 using namespace Wator;
-#include <boost/program_options.hpp>
-namespace po = boost::program_options;
+//#include <boost/program_options.hpp>
+//namespace po = boost::program_options;
 #include <boost/log/trivial.hpp>
 #include <boost/log/core.hpp>
 #include <boost/log/expressions.hpp>
-namespace log = boost::log;
+namespace _log = boost::log;
 
 
 static void train(void){
@@ -87,9 +87,10 @@ static void test(void){
 
 int main(int ac,char *av[]){
     
-    log::core::get()->set_filter(log::trivial::severity >= log::trivial::trace);
-//    log::core::get()->set_filter(log::trivial::severity >= log::trivial::debug);
-    
+    _log::core::get()->set_filter(_log::trivial::severity >= _log::trivial::trace);
+//    _log::core::get()->set_filter(_log::trivial::severity >= _log::trivial::debug);
+ 
+#if 0   
     po::options_description opt("option");
     opt.add_options()
     ("help,h", "show help")
@@ -123,5 +124,7 @@ int main(int ac,char *av[]){
         std::cout << e.what() << std::endl;
         return 1;
     }
+#endif
+    train();
     return 0;
 }

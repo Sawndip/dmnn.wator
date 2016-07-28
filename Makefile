@@ -2,7 +2,7 @@ OBJ := object
 build:pre-build
 	export CC=/usr/bin/clang && export CXX=/usr/bin/clang++ && \
 	cd $(OBJ) && cmake ../
-	cd $(OBJ) && make
+	cd $(OBJ) && make VERBOSE=1
 pre-build:
 	uname -a
 	mkdir -p $(OBJ)
