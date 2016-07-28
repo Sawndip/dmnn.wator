@@ -50,7 +50,7 @@ using namespace std;
  * Constructor
  **/
 ImageLayer::ImageLayer()
-:extension_({"jpg",".JPG",".png",".PNG",".tif",".TIF",".tiff",".TIFF"})
+:extension_({".jpg",".JPG",".png",".PNG",".tif",".TIF",".tiff",".TIFF"})
 {
     INFO_VAR(this);
 }
@@ -61,11 +61,12 @@ ImageLayer::ImageLayer()
  **/
 void ImageLayer::load(bool train)
 {
-    TRACE_VAR(param_.root_);
+    INFO_VAR(param_.root_);
     const fs::path path(param_.root_);
     BOOST_FOREACH(const fs::path& p, std::make_pair(fs::recursive_directory_iterator(path),fs::recursive_directory_iterator())){
         if (!fs::is_directory(p)){
             auto extension = p.extension().string();
+        	INFO_VAR(extension);
             auto itExt = std::find(extension_.begin(),extension_.end(),extension);
             if(itExt != extension_.end()){
                 INFO_VAR(p);
