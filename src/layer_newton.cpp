@@ -695,6 +695,9 @@ void NewtonLayer::forward4(void)
                 threshold_ += thresholdStep_;
             }
         }
+        string name = typeid(this).name();
+        name += "_2x2";
+        blob2x2->dump(name);
         // add to...
         for (auto top:top_) {
             blobs2x2_.push_back(blob2x2);
