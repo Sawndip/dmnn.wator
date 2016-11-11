@@ -137,33 +137,34 @@ template<> Blob<uint8_t>::Blob(const vector<shared_ptr<Blob<uint8_t>>> &conv)
  **/
 template <typename T> shared_ptr<Blob<T>> Blob<T>::edge(void) {
     auto edgeBlob = shared_ptr<Blob<T>> (new Blob<T>(this->w_,this->h_,this->ch_));
+    auto size_m = this->w_* this->h_ * this->ch_;
     for (int ch = 0; ch < this->ch_; ch++) {
         for (int y = 0; y < this->h_; y++) {
             for (int x = 0; x < this->w_; x++) {
                 int index = ch * this->w_ * this->h_;
                 index += y*this->w_ + x;
                 TRACE_VAR(index);
-                bool Chi = true;
                 if(this->data_[index]) {
+                    bool active = true;
                     // left cols
                     if(x-1 >= 0) {
                         int index1 = ch * this->w_ * this->h_;
                         index1 += y*this->w_ + x -1;
-                        if(this->data_[index1]) {
-                            Chi = false;
+                        if(this->data_[index1] == false) {
+                            active = false;
                         }
                         if(y-1 >= 0) {
                             int index2 = ch * this->w_ * this->h_;
                             index2 += (y-1)*this->w_ + x -1;
-                            if(this->data_[index2]) {
-                                Chi = false;
+                            if(this->data_[index2]== false) {
+                                active = false;
                             }
                         }
-                        if(y+1 <= this->h_) {
+                        if(y+1 < this->h_) {
                             int index2 = ch * this->w_ * this->h_;
                             index2 += (y+1)*this->w_ + x-1;
-                            if(this->data_[index2]) {
-                                Chi = false;
+                            if(this->data_[index2]== false) {
+                                active = false;
                             }
                         }
                     }
@@ -171,42 +172,46 @@ template <typename T> shared_ptr<Blob<T>> Blob<T>::edge(void) {
                     if(y-1 >= 0) {
                         int index1 = ch * this->w_ * this->h_;
                         index1 += (y-1)*this->w_ + x;
-                        if(this->data_[index1]) {
-                            Chi = false;
+                        if(this->data_[index1]== false) {
+                            active = false;
                         }
                     }
-                    if(y+1 <= this->h_) {
+                    if(y+1 < this->h_) {
                         int index1 = ch * this->w_ * this->h_;
                         index1 += (y+1)*this->w_ + x;
-                        if(this->data_[index1]) {
-                            Chi = false;
+                        if(this->data_[index1]== false) {
+                            active = false;
                         }
                     }
                     // right cols
-                    if(x+1 <= this->w_) {
+                    if(x+1 < this->w_) {
                         int index1 = ch * this->w_ * this->h_;
                         index1 += y*this->w_ + x +1;
-                        if(this->data_[index1]) {
-                            Chi = false;
+                        if(this->data_[index1]== false) {
+                            active = false;
                         }
                         if(y-1 >= 0) {
                             int index2 = ch * this->w_ * this->h_;
                             index2 += (y-1)*this->w_ + x +1;
-                            if(this->data_[index2]) {
-                                Chi = false;
+                            if(this->data_[index2]== false) {
+                                active = false;
                             }
                         }
-                        if(y+1 <= this->h_) {
+                        if(y+1 < this->h_) {
                             int index2 = ch * this->w_ * this->h_;
                             index2 += (y+1)*this->w_ + x+1;
-                            if(this->data_[index2]) {
-                                Chi = false;
+                            if(this->data_[index2]== false) {
+                                active = false;
                             }
                         }
                     }
-                }
-                if(Chi) {
-                    this->data_[index] = false;
+                    if(active) {
+                        edgeBlob->data_[index] = false;
+                    } else {
+                        edgeBlob->data_[index] = true;
+                    }
+                } else {
+                    edgeBlob->data_[index] = false;
                 }
             }
         }
