@@ -132,6 +132,90 @@ template<> Blob<uint8_t>::Blob(const vector<shared_ptr<Blob<uint8_t>>> &conv)
 
 
 /**
+ * edge.
+ * @return None.
+ **/
+template <typename T> shared_ptr<Blob<T>> Blob<T>::edge(void) {
+    auto edgeBlob = shared_ptr<Blob<T>> (new Blob<T>(this->w_,this->h_,this->ch_));
+    for (int ch = 0; ch < this->ch_; ch++) {
+        for (int y = 0; y < this->h_; y++) {
+            for (int x = 0; x < this->w_; x++) {
+                int index = ch * this->w_ * this->h_;
+                index += y*this->w_ + x;
+                TRACE_VAR(index);
+                bool Chi = true;
+                if(this->data_[index]) {
+                    // left cols
+                    if(x-1 >= 0) {
+                        int index1 = ch * this->w_ * this->h_;
+                        index1 += y*this->w_ + x -1;
+                        if(this->data_[index1]) {
+                            Chi = false;
+                        }
+                        if(y-1 >= 0) {
+                            int index2 = ch * this->w_ * this->h_;
+                            index2 += (y-1)*this->w_ + x -1;
+                            if(this->data_[index2]) {
+                                Chi = false;
+                            }
+                        }
+                        if(y+1 <= this->h_) {
+                            int index2 = ch * this->w_ * this->h_;
+                            index2 += (y+1)*this->w_ + x-1;
+                            if(this->data_[index2]) {
+                                Chi = false;
+                            }
+                        }
+                    }
+                    // center cols
+                    if(y-1 >= 0) {
+                        int index1 = ch * this->w_ * this->h_;
+                        index1 += (y-1)*this->w_ + x;
+                        if(this->data_[index1]) {
+                            Chi = false;
+                        }
+                    }
+                    if(y+1 <= this->h_) {
+                        int index1 = ch * this->w_ * this->h_;
+                        index1 += (y+1)*this->w_ + x;
+                        if(this->data_[index1]) {
+                            Chi = false;
+                        }
+                    }
+                    // right cols
+                    if(x+1 <= this->w_) {
+                        int index1 = ch * this->w_ * this->h_;
+                        index1 += y*this->w_ + x +1;
+                        if(this->data_[index1]) {
+                            Chi = false;
+                        }
+                        if(y-1 >= 0) {
+                            int index2 = ch * this->w_ * this->h_;
+                            index2 += (y-1)*this->w_ + x +1;
+                            if(this->data_[index2]) {
+                                Chi = false;
+                            }
+                        }
+                        if(y+1 <= this->h_) {
+                            int index2 = ch * this->w_ * this->h_;
+                            index2 += (y+1)*this->w_ + x+1;
+                            if(this->data_[index2]) {
+                                Chi = false;
+                            }
+                        }
+                    }
+                }
+                if(Chi) {
+                    this->data_[index] = false;
+                }
+            }
+        }
+    }
+    return edgeBlob;
+}
+
+
+/**
  * dump to png
  * @return None.
  **/
@@ -784,7 +868,7 @@ template <typename T> void Blob<T>::neighbor(shared_ptr<Blob<T>> area,int x,int 
 
 
 //template Blob<bool>::Blob(const vector<shared_ptr<Blob<bool>>> &conv);
-
+template shared_ptr<Blob<bool>> Blob<bool>::edge(void);
 template void Blob<bool>::dump(const string &name);
 template shared_ptr<Blob<uint8_t>> Blob<uint8_t>::grid(int startX,int startY,int gw,int gh);
 template shared_ptr<Blob<bool>> Blob<bool>::grid(int startX,int startY,int gw,int gh);

@@ -84,6 +84,12 @@ namespace Wator {
         }
  
         /**
+         * edge.
+         * @return None.
+         **/
+        shared_ptr<Blob<T>> edge(void);
+
+        /**
          * splite blob to grid.
          * @param [in] gw grid width
          * @param [in] gh grid height
