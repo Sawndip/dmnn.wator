@@ -34,7 +34,7 @@ using namespace Wator;
 #include <boost/property_tree/json_parser.hpp>
 using namespace boost::property_tree;
 
-
+#include <bitset>
 
 /**
  * Constructor
